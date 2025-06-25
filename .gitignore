@@ -1,0 +1,59 @@
+# Build directories
+build/
+bin/
+out/
+
+# Qt build artifacts
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+*.qmake.cache
+Makefile
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+moc_*
+ui_*
+qrc_*
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+
+# Code::Blocks / CLion / VSCode / QtCreator
+*.cbp
+*.workspace
+.idea/
+.vscode/
+*.autosave
+
+# Backup files
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Compiled binary files
+*.exe
+*.out
+*.hex
+*.elf
+
+# Python tools (optional)
+__pycache__/
+*.pyc
+
+# JSON configuration files generated during runtime (if any)
+*.generated.json

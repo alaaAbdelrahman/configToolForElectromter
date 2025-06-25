@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Main.qml</file>
+        <file alias="icons/icon.png">icons/icon.png</file>
+        <file>DevicePage.qml</file>
+        <file>DisplayPage.qml</file>
+        <file>MeteringPage.qml</file>
+        <file>TariffPage.qml</file>
+        <file>CommunicationPage.qml</file>
+        <file>ControlPage.qml</file>
+        <file>DLMSPage.qml</file>
+        <file alias="icons/microchip.png">icons/microchip.png</file>
+        <file alias="icons/meter.png">icons/meter.png</file>
+        <file>icons/wifi.png</file>
+        <file>icons/gauge.png</file>
+        <file>ConfigGenerator.qml</file>
+        <file>icons/control.png</file>
+        <file>icons/display.png</file>
+        <file>icons/dlms.png</file>
+        <file>icons/keypad.png</file>
+        <file>icons/tariff.png</file>
+        <file>MemoryPage.qml</file>
+    </qresource>
+</RCC>
