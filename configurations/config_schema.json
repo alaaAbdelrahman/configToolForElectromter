@@ -1,0 +1,516 @@
+{
+  "Device": {
+    "MicroController": {
+      "type": "enum",
+      "values": ["Micro_V85XX", "Micro_V94XX", "Micro_V87XX", "Micro_V77XX", "Mixco_V77XX"],
+      "default": "Micro_V85XX",
+      "label": "Micro Controller"
+    },
+    "boardType": {
+      "type": "enum",
+      "values": ["EM130_BOARD", "EM122U_BOARD", "SPAIN_BOARD", "EM122_BOARD", "EM110_BOARD", "Mixco_BOARD"],
+      "default": "EM130_BOARD",
+      "label": "Board Type"
+    },
+    "systemClock": {
+      "type": "enum",
+      "values": [8000, 16000, 25000],
+      "default": 25000,
+      "label": "System Clock (kHz)"
+    }
+  },
+  "Display": {
+    "displayType": {
+      "type": "enum",
+      "values": ["segmented", "dotMatrix", "Alaa", "Ahmed"],
+      "default": "segmented",
+      "label": "Display Type"
+    },
+    "useNewLcd": {
+      "type": "boolean",
+      "default": true,
+      "label": "Use New LCD"
+    },
+    "useNalaaLcd": {
+      "type": "boolean",
+      "default": true,
+      "label": "Use Nalaa LCD"
+    },
+    "hq30774Enabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable HQ30774"
+    },
+    "cnkd0802Enabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable CNKD0802"
+    },
+    "newCnkd0802Enabled": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable New CNKD0802"
+    },
+    "st7033Enabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable ST7033"
+    },
+    "newSt7033Enabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable New ST7033"
+    },
+    "dotMatrixLcd": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Dot Matrix LCD"
+    },
+    "dotMatrixLowPwr": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Dot Matrix Low Power"
+    },
+    "forDialTest": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable For Dial Test"
+    },
+    "backlightTimeoutEnabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Backlight Timeout"
+    },
+    "screenOrder": {
+      "type": "enum",
+      "values": ["CONSTANT", "CHANGEABLE", "Alaa"],
+      "default": "CHANGEABLE",
+      "label": "Screen Order"
+    },
+    "screenLanguage": {
+      "type": "enum",
+      "values": ["ENGLISH", "ARABIC", "Spain"],
+      "default": "ENGLISH",
+      "label": "Screen Language"
+    },
+    "recordNewCustomerDate": {
+      "type": "boolean",
+      "default": true,
+      "label": "Record New Customer Date"
+    },
+    "serialNumberChange": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Serial Number Change"
+    },
+    "displayMapScreen": {
+      "type": "boolean",
+      "default": true,
+      "label": "Display Map Screen"
+    },
+    "displayObis": {
+      "type": "integer",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "label": "Display OBIS"
+    }
+  },
+  "Metering": {
+    "meterType": {
+      "type": "enum",
+      "values": ["singlePhase", "twoPhase", "threePhase"],
+      "default": "singlePhase",
+      "label": "Meter Type"
+    },
+    "directMeasurement": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Direct Measurement"
+    },
+    "numOfPhases": {
+      "type": "integer",
+      "default": 1,
+      "min": 1,
+      "max": 3,
+      "label": "Number of Phases"
+    },
+    "numOfChannels": {
+      "type": "integer",
+      "default": 2,
+      "min": 1,
+      "max": 10,
+      "label": "Number of Channels"
+    },
+    "meteringChips": {
+      "type": "enum",
+      "values": ["ADE7953", "V9203", "V9261F", "V9340", "V9360", "V9381"],
+      "default": "V9381",
+      "label": "Metering Chips"
+    },
+    "pulseConstant": {
+      "type": "enum",
+      "values": ["CONSTANT_1000", "CONSTANT_1600", "CONSTANT_3200", "CONSTANT_10000"],
+      "default": "CONSTANT_3200",
+      "label": "Pulse Constant"
+    },
+    "loadProfile": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Load Profile"
+    },
+    "profileRecordNum": {
+      "type": "integer",
+      "default": 3360,
+      "min": 0,
+      "max": 10000,
+      "label": "Profile Record Number"
+    },
+    "profileTestRecords": {
+      "type": "integer",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "label": "Profile Test Records"
+    },
+    "reverseTamper": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Reverse Tamper"
+    },
+    "earthTamper": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Earth Tamper"
+    },
+    "enableLimiter": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Limiter"
+    },
+    "mismatchNeutral": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Mismatch Neutral"
+    },
+    "pulseCountEnable": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Pulse Count"
+    },
+    "sagZxtoFlags": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Sag ZXTO Flags"
+    }
+  },
+  "I2C_SPI": {
+    "i2cSpiEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable I2C/SPI Settings"
+    },
+    "i2cStatus": {
+      "type": "enum",
+      "values": ["SHARED_I2C", "SEPARATE_I2C","Aaaa"],
+      "default": "SEPARATE_I2C",
+      "label": "I2C Status",
+      "dependsOn": "i2cSpiEnable"
+    },
+    "spiMode": {
+      "type": "enum",
+      "values": ["HW_SPI", "SW_SPI","Spi"],
+      "default": "HW_SPI",
+      "label": "SPI Mode",
+      "dependsOn": "i2cSpiEnable"
+    }
+  },
+  "RF_Link": {
+    "rfLinkFeature": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable RF Link"
+    },
+    "rfLinkMbusDevice": {
+      "type": "enum",
+      "values": ["RF_LINK_COLLECTOR", "RF_LINK_METER"],
+      "default": "RF_LINK_METER",
+      "label": "RF Link Device",
+      "dependsOn": "rfLinkFeature"
+    },
+    "rfLinkTiCc1120Enabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable TI CC1120",
+      "dependsOn": "rfLinkFeature"
+    },
+    "rfLinkTiCc1120Port": {
+      "type": "enum",
+      "values": ["USART1", "USART2", "USART3","USART4"],
+      "default": "USART2",
+      "label": "TI CC1120 Port",
+      "dependsOn": "rfLinkTiCc1120Enabled"
+    },
+    "rfLinkTiCc1120ResetPower": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable TI CC1120 Reset Power",
+      "dependsOn": "rfLinkTiCc1120Enabled"
+    }
+  },
+  "RFID": {
+    "rfidFeature": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable RFID Feature"
+    },
+    "rfidEnabled": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable RFID",
+      "dependsOn": "rfidFeature"
+    },
+    "rfidCardType": {
+      "type": "enum",
+      "values": ["MFRC522_CARD_1K", "MFRC522_CARD_4K", "MFRC522_CARD_32K"],
+      "default": "MFRC522_CARD_32K",
+      "label": "RFID Card Type",
+      "dependsOn": "rfidEnabled"
+    },
+    "rfidParLimited": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Limited Parameters",
+      "dependsOn": "rfidEnabled"
+    },
+    "rfidPrepaidParNum": {
+      "type": "integer",
+      "default": 100,
+      "min": 0,
+      "max": 1000,
+      "label": "Prepaid Parameter Number",
+      "dependsOn": "rfidParLimited"
+    },
+    "rfidParPredefined": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Predefined Parameters",
+      "dependsOn": "rfidParLimited"
+    },
+    "rfidParPostdefined": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Postdefined Parameters",
+      "dependsOn": "rfidParLimited"
+    },
+    "rfidPostpaidParNum": {
+      "type": "integer",
+      "default": 100,
+      "min": 0,
+      "max": 1000,
+      "label": "Postpaid Parameter Number",
+      "dependsOn": "rfidParPostdefined"
+    }
+  },
+  "RS485": {
+    "rs485Feature": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable RS485"
+    },
+    "rs485BaudRate": {
+      "type": "enum",
+      "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
+      "default": "Dlms_eBaud9600",
+      "label": "RS485 Baud Rate",
+      "dependsOn": "rs485Feature"
+    },
+    "rs485Itf": {
+      "type": "integer",
+      "default": 2,
+      "min": 0,
+      "max": 10,
+      "label": "RS485 Interface Timeout",
+      "dependsOn": "rs485Feature"
+    }
+  },
+  "Modem": {
+    "modemEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Modem"
+    },
+    "modemBaudRate": {
+      "type": "enum",
+      "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+      "default": "5",
+      "label": "Modem Baud Rate",
+      "dependsOn": "modemEnable"
+    }
+  },
+  "IR": {
+    "irEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable IR Settings"
+    },
+    "irCom": {
+      "type": "integer",
+      "default": 13,
+      "min": 0,
+      "max": 20,
+      "label": "IR Com Port",
+      "dependsOn": "irEnable"
+    },
+    "irDefaultBaudRate": {
+      "type": "enum",
+      "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
+      "default": "Dlms_eBaud300",
+      "label": "IR Default Baud Rate",
+      "dependsOn": "irEnable"
+    },
+    "irNormalBaudRate": {
+      "type": "enum",
+      "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
+      "default": "Dlms_eBaud9600",
+      "label": "IR Normal Baud Rate",
+      "dependsOn": "irEnable"
+    },
+    "irItb": {
+      "type": "integer",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "label": "IR Frame Timeout (10ms)",
+      "dependsOn": "irEnable"
+    }
+  },
+  "GPRS": {
+    "gprsFeature": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable GPRS"
+    },
+    "gprsSendNotification": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Send Notification",
+      "dependsOn": "gprsFeature"
+    },
+    "gprsScreenFeature": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable GPRS Screen Feature",
+      "dependsOn": "gprsFeature"
+    },
+    "gprsDataBufferSize": {
+      "type": "integer",
+      "default": 1500,
+      "min": 0,
+      "max": 2000,
+      "label": "GPRS Data Buffer Size",
+      "dependsOn": "gprsFeature"
+    },
+    "gprsSrtCard": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable SRT Card",
+      "dependsOn": "gprsFeature"
+    }
+  },
+  "IEC": {
+    "iec62056Slave": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable IEC 62056-21 Slave"
+    },
+    "iecBufferSize": {
+      "type": "integer",
+      "default": 1056,
+      "min": 0,
+      "max": 2000,
+      "label": "IEC Buffer Size",
+      "dependsOn": "iec62056Slave"
+    },
+    "iecBaudRate": {
+      "type": "enum",
+      "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+      "default": "4",
+      "label": "IEC Baud Rate",
+      "dependsOn": "iec62056Slave"
+    },
+    "iecTimeoutSec": {
+      "type": "integer",
+      "default": 7,
+      "min": 0,
+      "max": 255,
+      "label": "IEC Timeout (sec)",
+      "dependsOn": "iec62056Slave"
+    },
+    "iecIsrEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable IEC ISR",
+      "dependsOn": "iec62056Slave"
+    },
+    "opticalDmaEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Optical DMA",
+      "dependsOn": "iec62056Slave"
+    }
+  },
+  "IP": {
+    "ipEnable": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable IP Communication"
+    },
+    "ipInactivityTime": {
+      "type": "integer",
+      "default": 55,
+      "min": 0,
+      "max": 100,
+      "label": "IP Inactivity Time (sec)",
+      "dependsOn": "ipEnable"
+    },
+    "ipPort": {
+      "type": "integer",
+      "default": 4059,
+      "min": 0,
+      "max": 65535,
+      "label": "IP Port",
+      "dependsOn": "ipEnable"
+    },
+    "ipCommProfile": {
+      "type": "enum",
+      "values": ["Dlms_eIpTcp", "Dlms_eIpUdp"],
+      "default": "Dlms_eIpTcp",
+      "label": "IP Communication Profile",
+      "dependsOn": "ipEnable"
+    }
+  }
+  ,
+  "optimizationTariff": true,
+  "billingHistory": true,
+  "historyRecords": 12,
+  "mdKw": true,
+  "mdKva": true,
+  "mdA": true,
+  "paymentSystem": true,
+  "lowCreditLevels": 2,
+  "moneyTransRecords": 20,
+  "enableTaxes": true,
+  "friendlyPeriods": true,
+  "vacationTariff": true,
+  "gracePeriod": true,
+  "Control": {
+    "label": "Control Configurations",
+    "pins": { "label": "Control Pins" },
+    "rfidBoardPinEnabled": { "label": "Enable RFID Board Pin", "type": "boolean", "default": true },
+    "powerFailPinFeature": { "label": "Power Fail Pin Feature", "type": "boolean", "default": true },
+    "keypad": { "label": "Keypad System", "settings": { "label": "Keypad Settings" } },
+    "application": { "label": "Application" },
+    "batteryType": { "label": "Battery Type", "type": "enum", "values": ["non_chargeable", "chargeable", "super_capacitor","super_capacitor"], "default": "non_chargeable" }
+  }
+}

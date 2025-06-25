@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     // ✅ Create and expose configGenerator to QML
     ConfigGenerator configGenerator;
-    configGenerator.loadSchema("config_schema.json"); // Load schema from file
+    configGenerator.loadSchema("qrc:/configurations/config_schema.json"); // Load schema from file
     engine.rootContext()->setContextProperty("configGenerator", &configGenerator);
 
     // Load QML UI from resources
