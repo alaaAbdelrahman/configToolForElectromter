@@ -3,14 +3,16 @@
 #define CONFIGURATOR_H
 
 #include <QMainWindow>
-#include <QStackedWidget>
-#include <QPropertyAnimation>
-#include <QTreeWidget>
-#include <QSettings>
 #include <QMap>
+#include <QPropertyAnimation>
+#include <QSettings>
+#include <QStackedWidget>
+#include <QTreeWidget>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class Configurator; }
+namespace Ui {
+class Configurator;
+}
 QT_END_NAMESPACE
 
 class Configurator : public QMainWindow
@@ -55,6 +57,4 @@ private:
     void animateTransition(int index);
 };
 
-
 #endif // CONFIGURATOR_H
-

@@ -3,62 +3,85 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Page {
-    id: memoryPage
-    property var config: ({
-        fileSysUseInt: true,
-        fileSysLog: false,
-        ctrlEvntLog: false,
-        eventLogRecordNum: 0,
-        ctrlCfgMeterLog: false,
-        cfgMeterRecordNum: 0,
-        fm24c128dEeprom: true,
-        flashFm25w32: true,
-        pymtMonyTrans: false,
-        pmytMnyTransRec: 0,
-        ctrlRtc: false
-    })
-    // ctrlSuperCap should be set externally from ControlPage based on batteryType
-    // (e.g., via Connections: ctrlSuperCap = (controlPage.config.batteryType !== "super_capacitor" ? 1 : 0))
+    id: rootPage
+    property var config: configGenerator.config || {
+        "Memory.FILE_SYS_USE_INT": true,
+        "Memory.FILE_SYS_LOG": false,
+        "Memory.CTRL_EVNT_LOG": false,
+        "Memory.EVENT_LOG_RECORD_NUM": 0,
+        "Memory.CTRL_CFG_METER_LOG": false,
+        "Memory.CFG_METER_RECORD_NUM": 0,
+        "Memory.PMYT_MNY_TRANS_REC": 0,
+        "Memory.FM24C128D_2_Wire_Serial_EEPROM": true,
+        "Memory.FLASH_FM25W32_ENABLE": true
+    }
     signal configUpdated(var newConfig)
+    property string pageId: "MemoryPage_" + Math.random().toString(36).substr(2, 9)
+
+    Component.onCompleted: {
+        console.log(pageId, "Initialized with config:", JSON.stringify(config))
+        const schema = configGenerator.schema["Memory"] || {}
+        for (let key in schema) {
+            const fullKey = "Memory." + key
+            if (config[fullKey] === undefined && schema[key].default !== undefined) {
+                config[fullKey] = schema[key].default
+                console.log(pageId, "Initialized missing config key:", fullKey, "with default:", config[fullKey])
+            }
+        }
+        updateConfigAll()
+    }
+
+    Connections {
+        target: configGenerator
+        function onErrorOccurred(error) {
+            console.error(pageId, "Backend error:", error)
+        }
+        function onConfigChanged() {
+            console.log(pageId, "Backend config changed:", JSON.stringify(configGenerator.config))
+            config = JSON.parse(JSON.stringify(configGenerator.config || {}))
+        }
+    }
 
     background: Rectangle {
         color: "#F5F7FA"
     }
 
     ScrollView {
+        id: scrollView
         anchors.fill: parent
         anchors.margins: 24
         clip: true
         contentWidth: parent.width
 
         ColumnLayout {
+            id: formLayout
             width: parent.width - 48
             spacing: 24
 
-            // Header
-            Label {
-                text: "Memory Management Configurations"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 64
+                color: "#FFFFFF"
+                radius: 8
+                border.color: "#E4E7EB"
+                border.width: 1
 
-            // Logs and Files Section
-            Label {
-                text: "Logs and Files"
-                font.bold: true
-                font.pixelSize: 16
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
+                Label {
+                    text: "Memory Management Configurations"
+                    font.bold: true
+                    font.pixelSize: 24
+                    font.family: "Arial, sans-serif"
+                    color: "#1A2526"
+                    anchors.centerIn: parent
+                }
             }
 
             GroupBox {
+                title: "Logs and Files"
                 Layout.fillWidth: true
+                padding: 20
+                spacing: 16
+
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 8
@@ -67,143 +90,147 @@ Page {
                 }
 
                 ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 16
+                    spacing: 12
+                    width: parent.width
 
                     CheckBox {
                         id: fileSysUseIntCheck
-                        property bool localChecked: config.fileSysUseInt !== undefined ? config.fileSysUseInt : false
-                        text: "Use Internal MCU Memory in File System"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("fileSysUseInt", checked)
-                        }
-                        Component.onCompleted: localChecked = config.fileSysUseInt !== undefined ? config.fileSysUseInt : false
+                        text: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT?.label || "Use Internal MCU Memory in File System"
+                        checked: config["Memory.FILE_SYS_USE_INT"] || false
+                        visible: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT !== undefined
+                        onClicked: updateConfig("Memory.FILE_SYS_USE_INT", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT?.description || ""
                     }
-
 
 
                     CheckBox {
                         id: ctrlEvntLogCheck
-                        property bool localChecked: config.ctrlEvntLog !== undefined ? config.ctrlEvntLog : false
-                        text: "Enable Events Logging"
-                        checked: localChecked
-                        visible: config.batteryType !== "super_capacitor"
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("ctrlEvntLog", checked)
-                        }
-                        Component.onCompleted: localChecked = config.ctrlEvntLog !== undefined ? config.ctrlEvntLog : false
+                        text: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.label || "Enable Events Logging"
+                        checked: config["Memory.CTRL_EVNT_LOG"] || false
+                        visible: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG !== undefined && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
+                        enabled: config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Memory.CTRL_EVNT_LOG", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.description || ""
                     }
-                    CheckBox {
-                           id: fileSysLogCheck
-                           property bool localChecked: config.fileSysLog !== undefined ? config.fileSysLog : false
-                           text: "Enable Logging APIs"
-                           checked: localChecked
-                           enabled: (config.ctrlEvntLog || config.pymtMonyTrans || config.ctrlRtc) || false
-                           onCheckedChanged: {
-                               localChecked = checked
-                               updateConfig("fileSysLog", checked)
-                           }
-                           Component.onCompleted: localChecked = config.fileSysLog !== undefined ? config.fileSysLog : false
-                       }
+
+                    RowLayout {
+                        spacing: 100
+                        Layout.fillWidth: true
+                        visible: ctrlEvntLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM !== undefined
+                        enabled: ctrlEvntLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
+                        opacity: enabled ? 1.0 : 0.6
+
+                        Label {
+                            text: configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.label || "Max Events Log Records"
+                            font.pixelSize: 16
+                            font.family: "Arial, sans-serif"
+                            color: "#1A2526"
+                            Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
+                        }
+
+                        TextField {
+                            id: eventLogRecordNumField
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            text: config["Memory.EVENT_LOG_RECORD_NUM"] !== undefined ? config["Memory.EVENT_LOG_RECORD_NUM"].toString() : "0"
+                            validator: IntValidator { bottom: 0; top: 402 }
+                            onEditingFinished: {
+                                const value = parseInt(text) || 0
+                                if (value !== config["Memory.EVENT_LOG_RECORD_NUM"]) {
+                                    updateConfig("Memory.EVENT_LOG_RECORD_NUM", value)
+                                }
+                            }
+                            background: Rectangle {
+                                color: eventLogRecordNumField.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: eventLogRecordNumField.focus ? "#007BFF" : "#CED4DA"
+                                border.width: eventLogRecordNumField.focus ? 2 : 1
+                                radius: 6
+                            }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.description || ""
+                        }
+                    }
 
                     CheckBox {
                         id: ctrlCfgMeterLogCheck
-                        property bool localChecked: config.ctrlCfgMeterLog !== undefined ? config.ctrlCfgMeterLog : false
-                        text: "Enable Configure Meter Logging"
-                        checked: localChecked
-                        visible: config.batteryType !== "super_capacitor"
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("ctrlCfgMeterLog", checked)
-                        }
-                        Component.onCompleted: localChecked = config.ctrlCfgMeterLog !== undefined ? config.ctrlCfgMeterLog : false
+                        text: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.label || "Enable Configure Meter Logging"
+                        checked: config["Memory.CTRL_CFG_METER_LOG"] || false
+                        visible: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG !== undefined && !config["Control.CTRL_SUPER_CAP"]
+                        enabled: !config["Control.CTRL_SUPER_CAP"]
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Memory.CTRL_CFG_METER_LOG", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.description || ""
                     }
 
-
                     RowLayout {
-                        visible: (config.ctrlCfgMeterLog  !== undefined ? config.ctrlCfgMeterLog : false) && (config.batteryType !== "super_capacitor")
+                        spacing: 100
                         Layout.fillWidth: true
-                        spacing: 20
-                        Layout.alignment: Qt.AlignHCenter
+                        visible: ctrlCfgMeterLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM !== undefined
+                        enabled: ctrlCfgMeterLogCheck.checked && !config["Control.CTRL_SUPER_CAP"]
+                        opacity: enabled ? 1.0 : 0.6
+
                         Label {
-                            text: "Max Events Log Records:"
-                            font.pixelSize: 14
-                            font.family: "Roboto"
+                            text: configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.label || "Max Configure Meter Records"
+                            font.pixelSize: 16
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 180
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
-                        SpinBox {
-                            id: eventLogSpinBox
-                            value: config.eventLogRecordNum !== undefined ? config.eventLogRecordNum : 0
-                            from: 0
-                            to: 402
-                            editable: true
-                            onValueChanged: updateConfig("eventLogRecordNum", value)
+                        TextField {
+                            id: cfgMeterRecordNumField
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            text: config["Memory.CFG_METER_RECORD_NUM"] !== undefined ? config["Memory.CFG_METER_RECORD_NUM"].toString() : "0"
+                            validator: IntValidator { bottom: 0; top: 30 }
+                            onEditingFinished: {
+                                const value = parseInt(text) || 0
+                                if (value !== config["Memory.CFG_METER_RECORD_NUM"]) {
+                                    updateConfig("Memory.CFG_METER_RECORD_NUM", value)
+                                }
+                            }
+                            background: Rectangle {
+                                color: cfgMeterRecordNumField.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: cfgMeterRecordNumField.focus ? "#007BFF" : "#CED4DA"
+                                border.width: cfgMeterRecordNumField.focus ? 2 : 1
+                                radius: 6
+                            }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.description || ""
                         }
                     }
+
 
                     CheckBox {
-                        id: pymtMonyTransCheck
-                        property bool localChecked: config.pymtMonyTrans !== undefined ? config.pymtMonyTrans : false
-                        text: "Enable Money Transaction Logging"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("pymtMonyTrans", checked)
-                        }
-                        Component.onCompleted: localChecked = config.pymtMonyTrans !== undefined ? config.pymtMonyTrans : false
+                        id: fileSysLogCheck
+                        text: configGenerator.schema["Memory"]?.FILE_SYS_LOG?.label || "Enable Logging APIs"
+                        checked: config["Memory.FILE_SYS_LOG"] || false
+                        visible: configGenerator.schema["Memory"]?.FILE_SYS_LOG !== undefined
+                        enabled: config["Memory.CTRL_EVNT_LOG"] || config["Tariff.PYMT_MONY_TRANS"] || false
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Memory.FILE_SYS_LOG", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.FILE_SYS_LOG?.description || ""
                     }
-
-                    RowLayout {
-                        visible: (config.pymtMonyTrans !== undefined ? config.pymtMonyTrans :false) && (config.batteryType !== "super_capacitor")
-                        Layout.fillWidth: true
-                        spacing: 25
-                        Layout.alignment: Qt.AlignHCenter
-                        Label {
-                            text: "Max Money Transaction Records:"
-                            font.pixelSize: 14
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 250
-                            padding: 20
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        SpinBox {
-                            id: pymtMnyTransSpinBox
-                            value: config.pmytMnyTransRec !== undefined ? config.pmytMnyTransRec : 0
-                            from: 0
-                            to: 20
-                            editable: true
-                            onValueChanged: updateConfig("pmytMnyTransRec", value)
-                        }
-                    }
-
-
-
-
                 }
             }
 
-            // Deal with External Memory Section
-            Label {
-                text: "Deal with External Memory"
-                font.bold: true
-                font.pixelSize: 16
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
+                title: "External Memory"
                 Layout.fillWidth: true
+                padding: 20
+                spacing: 16
+
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 8
@@ -212,95 +239,80 @@ Page {
                 }
 
                 ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 16
+                    spacing: 12
+                    width: parent.width
 
                     CheckBox {
                         id: fm24c128dEepromCheck
-                        property bool localChecked: config.fm24c128dEeprom !== undefined ? config.fm24c128dEeprom : false
-                        text: "Enable FM24C128D 2-Wire Serial EEPROM"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("fm24c128dEeprom", checked)
-                        }
-                        Component.onCompleted: localChecked = config.fm24c128dEeprom !== undefined ? config.fm24c128dEeprom : false
+                        text: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM?.label || "Enable FM24C128D 2-Wire Serial EEPROM"
+                        checked: config["Memory.FM24C128D_2_Wire_Serial_EEPROM"] || false
+                        visible: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM !== undefined
+                        onClicked: updateConfig("Memory.FM24C128D_2_Wire_Serial_EEPROM", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM?.description || ""
                     }
-                }
-            }
-
-            // Flash/EEPROM Section
-            Label {
-                text: "Flash/EEPROM"
-                font.bold: true
-                font.pixelSize: 16
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
-            GroupBox {
-                Layout.fillWidth: true
-                background: Rectangle {
-                    color: "#FFFFFF"
-                    radius: 8
-                    border.color: "#E4E7EB"
-                    border.width: 1
-                }
-
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 16
 
                     CheckBox {
                         id: flashFm25w32Check
-                        property bool localChecked: config.flashFm25w32 !== undefined ? config.flashFm25w32 : false
-                        text: "Enable Flash FM25W32"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("flashFm25w32", checked)
-                        }
-                        Component.onCompleted: localChecked = config.flashFm25w32 !== undefined ? config.flashFm25w32 : false
+                        text: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE?.label || "Enable Flash FM25W32"
+                        checked: config["Memory.FLASH_FM25W32_ENABLE"] || false
+                        visible: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE !== undefined
+                        onClicked: updateConfig("Memory.FLASH_FM25W32_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE?.description || ""
                     }
                 }
             }
 
-            // Bottom Spacer
-            Item { Layout.fillWidth: true; Layout.preferredHeight: 24 }
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 24
+            }
         }
     }
 
-    function updateConfig(key, value) {
-        var newConfig = JSON.parse(JSON.stringify(config || {}))
+    function updateConfig(key: string, value: variant): void {
+        const newConfig = JSON.parse(JSON.stringify(config || {}))
         newConfig[key] = value
 
-        // Update fileSysLog based on logging conditions
-        newConfig.fileSysLog = (newConfig.ctrlEvntLog || newConfig.pymtMonyTrans || newConfig.ctrlRtc) || false
+        // Update FILE_SYS_LOG based on dependencies
+        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] || false
 
-        // Apply default record numbers based on enable/disable conditions and CTRL_SUPER_CAP
-        if (key !== "superCapEnabled" ) {
-            if (key === "ctrlEvntLog") newConfig.eventLogRecordNum = newConfig.ctrlEvntLog ? 402 : 0
-            else if (key === "ctrlCfgMeterLog") newConfig.cfgMeterRecordNum = newConfig.ctrlCfgMeterLog ? 30 : 0
-        } else {
-            newConfig.ctrlEvntLog = false
-            newConfig.eventLogRecordNum = 0
-            newConfig.ctrlCfgMeterLog = false
-            newConfig.cfgMeterRecordNum = 0
+        // Reset dependent fields to schema defaults
+        if (key === "Control.CTRL_SUPER_CAP" && value) {
+            newConfig["Memory.CTRL_EVNT_LOG"] = configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.default || false
+            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.default || 0
+            newConfig["Memory.CTRL_CFG_METER_LOG"] = configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.default || false
+            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.default || 0
+        }
+        if (key === "Memory.CTRL_EVNT_LOG" && !value) {
+            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.default || 0
+        }
+        if (key === "Memory.CTRL_CFG_METER_LOG" && !value) {
+            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.default || 0
         }
 
-        // Handle SpinBox values directly, clamping within bounds
-        if (key === "eventLogRecordNum" && newConfig.ctrlEvntLog) newConfig.eventLogRecordNum = Math.min(Math.max(value, 0), 402)
-        if (key === "cfgMeterRecordNum" && newConfig.ctrlCfgMeterLog) newConfig.cfgMeterRecordNum = Math.min(Math.max(value, 0), 30)
-        if (key === "pmytMnyTransRec" && newConfig.pymtMonyTrans) newConfig.pmytMnyTransRec = Math.min(Math.max(value, 0), 20)
+        // Clamp integer values within schema bounds
+        if (key === "Memory.EVENT_LOG_RECORD_NUM" && newConfig["Memory.CTRL_EVNT_LOG"]) {
+            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = Math.min(Math.max(value, 0), 402)
+        }
+        if (key === "Memory.CFG_METER_RECORD_NUM" && newConfig["Memory.CTRL_CFG_METER_LOG"]) {
+            newConfig["Memory.CFG_METER_RECORD_NUM"] = Math.min(Math.max(value, 0), 30)
+        }
 
-        configUpdated(newConfig)
+
+        console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig))
         config = newConfig
+        configUpdated(newConfig)
+        console.log(pageId, "Syncing with C++ backend:", JSON.stringify(newConfig))
+        configGenerator.setConfig(newConfig)
+    }
+
+    function updateConfigAll(): void {
+        const newConfig = JSON.parse(JSON.stringify(config || {}))
+        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] || false
+        console.log(pageId, "Syncing all config with C++ backend:", JSON.stringify(newConfig))
+        configUpdated(newConfig)
+        configGenerator.setConfig(newConfig)
     }
 }
-
-
-

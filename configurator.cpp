@@ -1,12 +1,12 @@
 // configurator.cpp
 #include "configurator.h"
-#include "ui_configurator.h"
-#include <QFileDialog>
-#include <QMessageBox>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QSpinBox>
+#include <QFileDialog>
 #include <QGroupBox>
+#include <QMessageBox>
+#include <QSpinBox>
+#include "ui_configurator.h"
 
 Configurator::Configurator(QWidget *parent)
     : QMainWindow(parent)
@@ -59,18 +59,17 @@ void Configurator::setupCategories()
 {
     ui->treeWidget->setHeaderHidden(true);
 
-    QTreeWidgetItem *categories[] = {
-        new QTreeWidgetItem(ui->treeWidget, QStringList("1. Microcontroller Target")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("2. Meter Type Configuration")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("3. LCD and Display")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("4. Metering Features")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("5. Tariff & Payment")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("6. Communication")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("7. Control Features")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("8. Keypad")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("9. DLMS & Protocol")),
-        new QTreeWidgetItem(ui->treeWidget, QStringList("10. System Clock"))
-    };
+    QTreeWidgetItem *categories[]
+        = {new QTreeWidgetItem(ui->treeWidget, QStringList("1. Microcontroller Target")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("2. Meter Type Configuration")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("3. LCD and Display")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("4. Metering Features")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("5. Tariff & Payment")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("6. Communication")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("7. Control Features")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("8. Keypad")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("9. DLMS & Protocol")),
+           new QTreeWidgetItem(ui->treeWidget, QStringList("10. System Clock"))};
 
     ui->treeWidget->expandAll();
 }
@@ -88,7 +87,7 @@ void Configurator::setupMicrocontrollerPage()
     mcCombo->addItem("V94XX", "Micro_V94XX");
     mcCombo->setCurrentIndex(1); // Default to V94XX
 
-    connect(mcCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, mcCombo](){
+    connect(mcCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, mcCombo]() {
         stringConfigs["MicroController"] = mcCombo->currentData().toString();
         onConfigChanged();
     });
@@ -114,7 +113,7 @@ void Configurator::setupMeterTypePage()
     QRadioButton *threePhase = new QRadioButton("Three Phase");
     singlePhase->setChecked(true);
 
-    connect(singlePhase, &QRadioButton::toggled, [this](bool checked){
+    connect(singlePhase, &QRadioButton::toggled, [this](bool checked) {
         boolConfigs["MTR_SINGLE_PH"] = checked;
         boolConfigs["MTR_THREE_PH"] = !checked;
         onConfigChanged();
@@ -133,7 +132,7 @@ void Configurator::setupMeterTypePage()
     QCheckBox *directMeasure = new QCheckBox("Direct Measurement");
     directMeasure->setChecked(true);
 
-    connect(directMeasure, &QCheckBox::stateChanged, [this](int state){
+    connect(directMeasure, &QCheckBox::stateChanged, [this](int state) {
         boolConfigs["MTR_DIRECT"] = (state == Qt::Checked);
         onConfigChanged();
     });
@@ -149,7 +148,7 @@ void Configurator::setupMeterTypePage()
     QCheckBox *tpDirectMeasure = new QCheckBox("Direct Measurement");
     tpDirectMeasure->setChecked(true);
 
-    connect(tpDirectMeasure, &QCheckBox::stateChanged, [this](int state){
+    connect(tpDirectMeasure, &QCheckBox::stateChanged, [this](int state) {
         boolConfigs["MTR_DIRECT"] = (state == Qt::Checked);
         onConfigChanged();
     });
@@ -160,7 +159,7 @@ void Configurator::setupMeterTypePage()
     layout->addWidget(threePhaseGroup);
 
     // Connect phase change to show/hide options
-    connect(singlePhase, &QRadioButton::toggled, [singlePhaseGroup, threePhaseGroup](bool checked){
+    connect(singlePhase, &QRadioButton::toggled, [singlePhaseGroup, threePhaseGroup](bool checked) {
         singlePhaseGroup->setVisible(checked);
         threePhaseGroup->setVisible(!checked);
     });
@@ -186,7 +185,8 @@ void Configurator::onCategorySelected(QTreeWidgetItem *item, int column)
 void Configurator::animateTransition(int index)
 {
     int currentIndex = configStack->currentIndex();
-    if (currentIndex == -1 || currentIndex == index) return;
+    if (currentIndex == -1 || currentIndex == index)
+        return;
 
     int width = configStack->width();
     animation->stop();
@@ -222,7 +222,10 @@ void Configurator::updateDependencies()
 
 void Configurator::saveConfiguration()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Save Configuration", "", "Config Files (*.mcfg)");
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save Configuration",
+                                                    "",
+                                                    "Config Files (*.mcfg)");
     if (!fileName.isEmpty()) {
         QSettings fileSettings(fileName, QSettings::IniFormat);
 
@@ -243,7 +246,10 @@ void Configurator::saveConfiguration()
 
 void Configurator::loadConfiguration()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Load Configuration", "", "Config Files (*.mcfg)");
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    "Load Configuration",
+                                                    "",
+                                                    "Config Files (*.mcfg)");
     if (!fileName.isEmpty()) {
         QSettings fileSettings(fileName, QSettings::IniFormat);
 
@@ -265,7 +271,10 @@ void Configurator::loadConfiguration()
 
 void Configurator::generateConfigFile()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Generate Config Header", "", "Header Files (*.h)");
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Generate Config Header",
+                                                    "",
+                                                    "Header Files (*.h)");
     if (!fileName.isEmpty()) {
         QFile file(fileName);
         if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -280,7 +289,8 @@ void Configurator::generateConfigFile()
             out << "// =====================================================\n";
             out << "// 1. Microcontroller Target\n";
             out << "// =====================================================\n";
-            out << "#define MicroController " << stringConfigs.value("MicroController", "Micro_V94XX") << "\n\n";
+            out << "#define MicroController "
+                << stringConfigs.value("MicroController", "Micro_V94XX") << "\n\n";
 
             // 2. Meter Type Configuration
             out << "// =====================================================\n";

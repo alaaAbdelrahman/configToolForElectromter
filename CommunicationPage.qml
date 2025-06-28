@@ -4,95 +4,65 @@ import QtQuick.Layouts 1.15
 
 Page {
     id: rootPage
-    property var config: ({
-        i2cStatus: "SEPARATE_I2C",
-        spiMode: "HW_SPI",
-        rfLinkFeature: false,
-        rfLinkMbusDevice: "RF_LINK_METER",
-        rfLinkTiCc1120Enabled: false,
-        rfLinkTiCc1120Port: "USART2",
-        rfLinkTiCc1120ResetPower: false,
-        rfidFeature: false,
-        rfidEnabled: false,
-        rfidCardType: "MFRC522_CARD_32K",
-        rfidParLimited: false,
-        rfidPrepaidParNum: 100,
-        rfidParPredefined: false,
-        rfidParPostdefined: false,
-        rfidPostpaidParNum: 100,
-        rs485Feature: false,
-        rs485BaudRate: "Dlms_eBaud9600",
-        rs485Itf: 2,
-        modemEnable: false,
-        modemBaudRate: "5",
-        irCom: 13,
-        irDefaultBaudRate: "Dlms_eBaud300",
-        irNormalBaudRate: "Dlms_eBaud9600",
-        irItb: 20,
-        gprsFeature: false,
-        gprsSendNotification: false,
-        gprsScreenFeature: false,
-        gprsDataBufferSize: 1500,
-        gprsSrtCard: false,
-        iec62056Slave: false,
-        iecBufferSize: 1056,
-        iecBaudRate: "4",
-        iecTimeoutSec: 7,
-        iecIsrEnable: false,
-        opticalDmaEnable: false,
-        ipEnable: false,
-        ipInactivityTime: 55,
-        ipPort: 4059,
-        ipCommProfile: "Dlms_eIpTcp"
-    })
+    property var config: configGenerator.config || {
+        "Communication.I2C_SPI_ENABLE": false,
+        "Communication.I2C_STATUS": "SEPARATE_I2C",
+        "Communication.HW_SPI": true,
+        "Communication.SW_SPI": true,
+        "Communication.RF_LINK_FEATURE": true,
+        "Communication.RF_LINK_MBUS_DEVICE": "RF_LINK_METER",
+        "Communication.RF_LINK_TI_CC1120_ENABLE": true,
+        "Communication.RF_LINK_TI_CC1120_PORT": "USART2",
+        "Communication.RF_LINK_TI_CC1120_RESET_POWER": true,
+        "Communication.RFID_FEATURE": true,
+        "Communication.MFRC522_ENABLE": true,
+        "Communication.MFRC522_CARD_TYPE": "MFRC522_CARD_32K",
+        "Communication.MFRC522_CARD_32k_TYPE": "CARD_32k_MASRIA_MTCOS_FLEX_ID",
+        "Communication.MFRC522_INCREASE_SPEED": true,
+        "Communication.RFID_SEQ_READ_WRITE": true,
+        "Communication.RFID_BUFFER_LEN": 2000,
+        "Communication.RFID_PAR_LIMITED": true,
+        "Communication.RFID_PREPAID_PAR_NUM": 100,
+        "Communication.RFID_PAR_PREDEFINED": true,
+        "Communication.RFID_PAR_POSTDEFINED": true,
+        "Communication.RFID_POSTPAID_PAR_NUM": 1000,
+        "Communication.RS485_FEATURE": true,
+        "Communication.MODEM_ENABLE": true,
+        "Communication.MODEM_BAUD_RATE": "5",
+        "Communication.GPRS_FEATURE": true,
+        "Communication.GPRS_SEND_NOTIFICATION_FEATURE": true,
+        "Communication.SCREEN_GPRS_FEATURE": true,
+        "Communication.GPRS_DATA_BUFFER_SIZE": 1500,
+        "Communication.GPRS_SRT_CARD": true,
+        "Communication.IEC_62056_21_SLAVE": true,
+        "Communication.IEC_BUFFER_SIZE": 1056,
+        "Communication.IEC_62056_21_ISR_ENABLE": true,
+        "Communication.OPTICAL_DMA_ENABLE": true
+    }
     signal configUpdated(var newConfig)
+    property string pageId: "CommunicationPage_" + Math.random().toString(36).substr(2, 9)
 
     Component.onCompleted: {
-        var defaultConfig = {
-            i2cStatus: "SEPARATE_I2C",
-            spiMode: "HW_SPI",
-            rfLinkFeature: false,
-            rfLinkMbusDevice: "RF_LINK_METER",
-            rfLinkTiCc1120Enabled: false,
-            rfLinkTiCc1120Port: "USART2",
-            rfLinkTiCc1120ResetPower: false,
-            rfidFeature: false,
-            rfidEnabled: false,
-            rfidCardType: "MFRC522_CARD_32K",
-            rfidParLimited: false,
-            rfidPrepaidParNum: 100,
-            rfidParPredefined: false,
-            rfidParPostdefined: false,
-            rfidPostpaidParNum: 100,
-            rs485Feature: false,
-            rs485BaudRate: "Dlms_eBaud9600",
-            rs485Itf: 2,
-            modemEnable: false,
-            modemBaudRate: "5",
-            irCom: 13,
-            irDefaultBaudRate: "Dlms_eBaud300",
-            irNormalBaudRate: "Dlms_eBaud9600",
-            irItb: 20,
-            gprsFeature: false,
-            gprsSendNotification: false,
-            gprsScreenFeature: false,
-            gprsDataBufferSize: 1500,
-            gprsSrtCard: false,
-            iec62056Slave: false,
-            iecBufferSize: 1056,
-            iecBaudRate: "4",
-            iecTimeoutSec: 7,
-            iecIsrEnable: false,
-            opticalDmaEnable: false,
-            ipEnable: false,
-            ipInactivityTime: 55,
-            ipPort: 4059,
-            ipCommProfile: "Dlms_eIpTcp"
-        }
-        for (var key in defaultConfig) {
-            if (config[key] === undefined) {
-                config[key] = defaultConfig[key]
+        console.log(pageId, "Initialized with config:", JSON.stringify(config))
+        const schema = configGenerator.schema["Communication"] || {}
+        for (let key in schema) {
+            const fullKey = "Communication." + key
+            if (config[fullKey] === undefined && schema[key].default !== undefined) {
+                config[fullKey] = schema[key].default
+                console.log(pageId, "Initialized missing config key:", fullKey, "with default:", config[fullKey])
             }
+        }
+        updateConfigAll()
+    }
+
+    Connections {
+        target: configGenerator
+        function onErrorOccurred(error) {
+            console.error(pageId, "Backend error:", error)
+        }
+        function onConfigChanged() {
+            console.log(pageId, "Backend config changed:", JSON.stringify(configGenerator.config))
+            config = JSON.parse(JSON.stringify(configGenerator.config || {}))
         }
     }
 
@@ -119,78 +89,57 @@ Page {
                 radius: 8
                 border.color: "#E4E7EB"
                 border.width: 1
-                Layout.topMargin: 16
 
                 Label {
                     text: "Communication Configuration"
                     font.bold: true
                     font.pixelSize: 24
-                    font.family: "Roboto"
+                    font.family: "Arial, sans-serif"
                     color: "#1A2526"
                     anchors.centerIn: parent
                 }
             }
 
-            // I2C and SPI Settings
-            Label {
-                text: "I2C and SPI Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "I2C and SPI Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 100
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["I2C_SPI"]?.i2cSpiEnable?.label || "Enable I2C/SPI Settings:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: i2cSpiEnableCheck
-                            checked: config.i2cSpiEnable || false
-                            onCheckedChanged: updateConfig("i2cSpiEnable", checked)
-                        }
+                    CheckBox {
+                        id: i2cSpiEnableCheck
+                        text: configGenerator.schema["Communication"]?.I2C_SPI_ENABLE?.label || "Enable I2C/SPI Settings"
+                        checked: config["Communication.I2C_SPI_ENABLE"] || false
+                        visible: configGenerator.schema["Communication"]?.I2C_SPI_ENABLE !== undefined
+                        onClicked: updateConfig("Communication.I2C_SPI_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.I2C_SPI_ENABLE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: i2cSpiEnableCheck.checked
+                        visible: i2cSpiEnableCheck.checked && configGenerator.schema["Communication"]?.I2C_STATUS !== undefined
                         enabled: i2cSpiEnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["I2C_SPI"]?.i2cStatus?.label || "I2C Status:"
+                            text: configGenerator.schema["Communication"]?.I2C_STATUS?.label || "I2C Status"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -201,9 +150,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["I2C_SPI"]?.i2cStatus?.values || ["SHARED_I2C", "SEPARATE_I2C"]
-                            currentIndex: model.indexOf(config.i2cStatus || "SEPARATE_I2C")
-                            onActivated: updateConfig("i2cStatus", model[index])
+                            property var schema: configGenerator.schema["Communication"]?.I2C_STATUS || {}
+                            model: schema.labels || schema.values || ["Shared I2C", "Separate I2C"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -233,128 +181,89 @@ Page {
                                 border.width: i2cStatusCombo.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Communication.I2C_STATUS"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    console.log(pageId, "I2CStatusCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Communication.I2C_STATUS", schema.values[index])
+                                }
+                            }
+                            ToolTip.visible: hovered && schema.description
+                            ToolTip.text: schema.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: i2cSpiEnableCheck.checked
+                    CheckBox {
+                        id: hwSpiCheck
+                        text: configGenerator.schema["Communication"]?.HW_SPI?.label || "Enable Hardware SPI"
+                        checked: config["Communication.HW_SPI"] || false
+                        visible: i2cSpiEnableCheck.checked && configGenerator.schema["Communication"]?.HW_SPI !== undefined
                         enabled: i2cSpiEnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.HW_SPI", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.HW_SPI?.description || ""
+                    }
 
-                        Label {
-                            text:"SPI Mode:" // configGenerator.schema["spiMode"].label|| "SPI Mode:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: spiModeCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["spiMode"]                     //?.spiMode?.values || ["HW_SPI", "SW_SPI"]
-                            currentIndex: model.indexOf(config.spiMode || "HW_SPI")
-                            onActivated: updateConfig("spiMode", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: spiModeCombo.displayText
-                                font: spiModeCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: spiModeCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: spiModeCombo.height
-                                width: spiModeCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: spiModeCombo.popup.visible ? spiModeCombo.delegateModel : null
-                                    currentIndex: spiModeCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: spiModeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: spiModeCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: spiModeCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
+                    CheckBox {
+                        id: swSpiCheck
+                        text: configGenerator.schema["Communication"]?.SW_SPI?.label || "Enable Software SPI"
+                        checked: config["Communication.SW_SPI"] || false
+                        visible: i2cSpiEnableCheck.checked && configGenerator.schema["Communication"]?.SW_SPI !== undefined
+                        enabled: i2cSpiEnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.SW_SPI", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.SW_SPI?.description || ""
                     }
                 }
             }
 
-            // RF Link Settings
-            Label {
-                text: "RF Link Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "RF Link Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 15
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["RF_Link"]?.rfLinkFeature?.label || "Enable RF Link:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfLinkFeatureCheck
-                            checked: config.rfLinkFeature || false
-                            onCheckedChanged: updateConfig("rfLinkFeature", checked)
-                        }
+                    CheckBox {
+                        id: rfLinkFeatureCheck
+                        text: configGenerator.schema["Communication"]?.RF_LINK_FEATURE?.label || "Enable RF Link"
+                        checked: config["Communication.RF_LINK_FEATURE"] || false
+                        visible: configGenerator.schema["Communication"]?.RF_LINK_FEATURE !== undefined
+                        onClicked: updateConfig("Communication.RF_LINK_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RF_LINK_FEATURE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfLinkFeatureCheck.checked
+                        visible: rfLinkFeatureCheck.checked && configGenerator.schema["Communication"]?.RF_LINK_MBUS_DEVICE !== undefined
                         enabled: rfLinkFeatureCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RF_Link"]?.rfLinkMbusDevice?.label || "RF Link Device:"
+                            text: configGenerator.schema["Communication"]?.RF_LINK_MBUS_DEVICE?.label || "RF Link Device"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -365,9 +274,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["rfLinkMbusDevice"]  //?.rfLinkMbusDevice?.values || ["RF_LINK_COLLECTOR", "RF_LINK_METER"]
-                            currentIndex: model.indexOf(config.rfLinkMbusDevice || "RF_LINK_METER")
-                            onActivated: updateConfig("rfLinkMbusDevice", model[index])
+                            property var schema: configGenerator.schema["Communication"]?.RF_LINK_MBUS_DEVICE || {}
+                            model: schema.labels || schema.values || ["RF Link Meter"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -387,7 +295,7 @@ Page {
                                     clip: true
                                     implicitHeight: contentHeight
                                     model: rfLinkMbusDeviceCombo.popup.visible ? rfLinkMbusDeviceCombo.delegateModel : null
-                                    currentIndex: rfLinkMbusDeviceCombo.highlightedIndex
+                                    currentIndex: rfLinkMbusDeviceCombo_highlightedIndex
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
@@ -397,43 +305,48 @@ Page {
                                 border.width: rfLinkMbusDeviceCombo.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Communication.RF_LINK_MBUS_DEVICE"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    console.log(pageId, "RFLinkMbusDeviceCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Communication.RF_LINK_MBUS_DEVICE", schema.values[index])
+                                }
+                            }
+                            ToolTip.visible: hovered && schema.description
+                            ToolTip.text: schema.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rfLinkFeatureCheck.checked
+                    CheckBox {
+                        id: rfLinkTiCc1120EnableCheck
+                        text: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_ENABLE?.label || "Enable TI CC1120"
+                        checked: config["Communication.RF_LINK_TI_CC1120_ENABLE"] || false
+                        visible: rfLinkFeatureCheck.checked && configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_ENABLE !== undefined
                         enabled: rfLinkFeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RF_Link"]?.rfLinkTiCc1120Enabled?.label || "Enable TI CC1120:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfLinkTiCc1120EnabledCheck
-                            checked: config.rfLinkTiCc1120Enabled || false
-                            onCheckedChanged: updateConfig("rfLinkTiCc1120Enabled", checked)
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RF_LINK_TI_CC1120_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_ENABLE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnabledCheck.checked
-                        enabled: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnabledCheck.checked
+                        visible: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnableCheck.checked && configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_PORT !== undefined
+                        enabled: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RF_Link"]?.rfLinkTiCc1120Port?.label || "TI CC1120 Port:"
+                            text: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_PORT?.label || "TI CC1120 Port"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -444,9 +357,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["rfLinkTiCc1120Port"]  //?.rfLinkTiCc1120Port?.values || ["USART1", "USART2", "USART3"]
-                            currentIndex: model.indexOf(config.rfLinkTiCc1120Port || "USART2")
-                            onActivated: updateConfig("rfLinkTiCc1120Port", model[index])
+                            property var schema: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_PORT || {}
+                            model: schema.labels || schema.values || ["USART2"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -476,194 +388,314 @@ Page {
                                 border.width: rfLinkTiCc1120PortCombo.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Communication.RF_LINK_TI_CC1120_PORT"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    console.log(pageId, "RFLinkTiCc1120PortCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Communication.RF_LINK_TI_CC1120_PORT", schema.values[index])
+                                }
+                            }
+                            ToolTip.visible: hovered && schema.description
+                            ToolTip.text: schema.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnabledCheck.checked
-                        enabled: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnabledCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RF_Link"]?.rfLinkTiCc1120ResetPower?.label || "Enable TI CC1120 Reset Power:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 220
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfLinkTiCc1120ResetPowerCheck
-                            checked: config.rfLinkTiCc1120ResetPower || false
-                            onCheckedChanged: updateConfig("rfLinkTiCc1120ResetPower", checked)
-                        }
+                    CheckBox {
+                        id: rfLinkTiCc1120ResetPowerCheck
+                        text: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_RESET_POWER?.label || "Enable TI CC1120 Reset Power"
+                        checked: config["Communication.RF_LINK_TI_CC1120_RESET_POWER"] || false
+                        visible: rfLinkFeatureCheck.checked && configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_RESET_POWER !== undefined
+                        enabled: rfLinkFeatureCheck.checked && rfLinkTiCc1120EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RF_LINK_TI_CC1120_RESET_POWER", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_RESET_POWER?.description || ""
                     }
                 }
             }
 
-            // RFID Settings
-            Label {
-                text: "RFID Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "RFID Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 15
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["RFID"]?.rfidFeature?.label || "Enable RFID Feature:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfidFeatureCheck
-                            checked: config.rfidFeature || false
-                            onCheckedChanged: updateConfig("rfidFeature", checked)
-                        }
+                    CheckBox {
+                        id: rfidFeatureCheck
+                        text: configGenerator.schema["Communication"]?.RFID_FEATURE?.label || "Enable RFID Feature"
+                        checked: config["Communication.RFID_FEATURE"] || false
+                        visible: configGenerator.schema["Communication"]?.RFID_FEATURE !== undefined
+                        onClicked: updateConfig("Communication.RFID_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RFID_FEATURE?.description || ""
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked
+                    CheckBox {
+                        id: mfrc522EnableCheck
+                        text: configGenerator.schema["Communication"]?.MFRC522_ENABLE?.label || "Enable RFID"
+                        checked: config["Communication.MFRC522_ENABLE"] || false
+                        visible: configGenerator.schema["Communication"]?.MFRC522_ENABLE !== undefined
                         enabled: rfidFeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RFID"]?.rfidEnabled?.label || "Enable RFID:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfidEnabledCheck
-                            checked: config.rfidEnabled || false
-                            onCheckedChanged: updateConfig("rfidEnabled", checked)
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.MFRC522_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.MFRC522_ENABLE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.MFRC522_CARD_TYPE !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RFID"]?.rfidCardType?.label || "RFID Card Type:"
+                            text: configGenerator.schema["Communication"]?.MFRC522_CARD_TYPE?.label || "RFID Card Type"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
                         ComboBox {
-                            id: rfidCardTypeCombo
+                            id: mfrc522CardTypeCombo
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["rfidCardType"]   //?.rfidCardType?.values || ["MFRC522_CARD_1K", "MFRC522_CARD_4K", "MFRC522_CARD_32K"]
-                            currentIndex: model.indexOf(config.rfidCardType || "MFRC522_CARD_32K")
-                            onActivated: updateConfig("rfidCardType", model[index])
+                            property var schema: configGenerator.schema["Communication"]?.MFRC522_CARD_TYPE || {}
+                            model: schema.labels || schema.values || ["MFRC522 Card 32K"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
-                                text: rfidCardTypeCombo.displayText
-                                font: rfidCardTypeCombo.font
+                                text: mfrc522CardTypeCombo.displayText
+                                font: mfrc522CardTypeCombo.font
                                 color: "#1A2526"
                                 verticalAlignment: Text.AlignVCenter
                                 elide: Text.ElideRight
-                                width: rfidCardTypeCombo.width - 20
+                                width: mfrc522CardTypeCombo.width - 20
                             }
                             popup: Popup {
-                                y: rfidCardTypeCombo.height
-                                width: rfidCardTypeCombo.width
+                                y: mfrc522CardTypeCombo.height
+                                width: mfrc522CardTypeCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
-                                    model: rfidCardTypeCombo.popup.visible ? rfidCardTypeCombo.delegateModel : null
-                                    currentIndex: rfidCardTypeCombo.highlightedIndex
+                                    model: mfrc522CardTypeCombo.popup.visible ? mfrc522CardTypeCombo.delegateModel : null
+                                    currentIndex: mfrc522CardTypeCombo.highlightedIndex
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
                             background: Rectangle {
-                                color: rfidCardTypeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: rfidCardTypeCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: rfidCardTypeCombo.focus ? 2 : 1
+                                color: mfrc522CardTypeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: mfrc522CardTypeCombo.focus ? "#007BFF" : "#CED4DA"
+                                border.width: mfrc522CardTypeCombo.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Communication.MFRC522_CARD_TYPE"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    console.log(pageId, "MFRC522CardTypeCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    const selectedValue = schema.values[index]
+                                    updateConfig("Communication.MFRC522_CARD_TYPE", selectedValue)
+                                    if (selectedValue !== "MFRC522_CARD_32K") {
+                                        updateConfig("Communication.MFRC522_CARD_32k_TYPE", schema["MFRC522_CARD_32k_TYPE"]?.default || null)
+                                        updateConfig("Communication.MFRC522_INCREASE_SPEED", schema["MFRC522_INCREASE_SPEED"]?.default || false)
+                                        updateConfig("Communication.RFID_SEQ_READ_WRITE", schema["RFID_SEQ_READ_WRITE"]?.default || false)
+                                    }
+                                }
+                            }
+                            ToolTip.visible: hovered && schema.description
+                            ToolTip.text: schema.description || ""
                         }
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE !== undefined && config["Communication.MFRC522_CARD_TYPE"] === "MFRC522_CARD_32K"
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RFID"]?.rfidParLimited?.label || "Enable Limited Parameters:"
+                            text: configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE?.label || "RFID 32K Card Type"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
-                        CheckBox {
-                            id: rfidParLimitedCheck
-                            checked: config.rfidParLimited || false
-                            onCheckedChanged: updateConfig("rfidParLimited", checked)
+                        ComboBox {
+                            id: mfrc522Card32kTypeCombo
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            property var schema: configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE || {}
+                            model: schema.labels || schema.values || ["CARD_32k_MASRIA_MTCOS_FLEX_ID"]
+                            contentItem: Text {
+                                leftPadding: 10
+                                rightPadding: 10
+                                text: mfrc522Card32kTypeCombo.displayText
+                                font: mfrc522Card32kTypeCombo.font
+                                color: "#1A2526"
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+                                width: mfrc522Card32kTypeCombo.width - 20
+                            }
+                            popup: Popup {
+                                y: mfrc522Card32kTypeCombo.height
+                                width: mfrc522Card32kTypeCombo.width
+                                implicitHeight: contentItem.implicitHeight
+                                padding: 2
+                                contentItem: ListView {
+                                    clip: true
+                                    implicitHeight: contentHeight
+                                    model: mfrc522Card32kTypeCombo.popup.visible ? mfrc522Card32kTypeCombo.delegateModel : null
+                                    currentIndex: mfrc522Card32kTypeCombo.highlightedIndex
+                                    ScrollIndicator.vertical: ScrollIndicator {}
+                                }
+                            }
+                            background: Rectangle {
+                                color: mfrc522Card32kTypeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: mfrc522Card32kTypeCombo.focus ? "#007BFF" : "#CED4DA"
+                                border.width: mfrc522Card32kTypeCombo.focus ? 2 : 1
+                                radius: 6
+                            }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Communication.MFRC522_CARD_32k_TYPE"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    console.log(pageId, "MFRC522Card32kTypeCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Communication.MFRC522_CARD_32k_TYPE", schema.values[index])
+                                }
+                            }
+                            ToolTip.visible: hovered && schema.description
+                            ToolTip.text: schema.description || ""
                         }
                     }
 
+                    CheckBox {
+                        id: mfrc522IncreaseSpeedCheck
+                        text: configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED?.label || "Enable MFRC522 Increase Speed"
+                        checked: config["Communication.MFRC522_INCREASE_SPEED"] || false
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED !== undefined && config["Communication.MFRC522_CARD_TYPE"] === "MFRC522_CARD_32K"
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.MFRC522_INCREASE_SPEED", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED?.description || ""
+                    }
+
+                    CheckBox {
+                        id: rfidSeqReadWriteCheck
+                        text: configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE?.label || "Enable RFID Sequential Read/Write"
+                        checked: config["Communication.RFID_SEQ_READ_WRITE"] || false
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE !== undefined && config["Communication.MFRC522_CARD_TYPE"] === "MFRC522_CARD_32K"
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RFID_SEQ_READ_WRITE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE?.description || ""
+                    }
+
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.RFID_BUFFER_LEN !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RFID"]?.rfidPrepaidParNum?.label || "Prepaid Parameter Number:"
+                            text: configGenerator.schema["Communication"]?.RFID_BUFFER_LEN?.label || "RFID Buffer Length"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
+                        }
+
+                        TextField {
+                            id: rfidBufferLenField
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            text: config["Communication.RFID_BUFFER_LEN"] !== undefined ? config["Communication.RFID_BUFFER_LEN"].toString() : "2000"
+                            validator: IntValidator { bottom: 0; top: 5000 }
+                            onEditingFinished: {
+                                const value = parseInt(text) || 2000
+                                if (value !== config["Communication.RFID_BUFFER_LEN"]) {
+                                    updateConfig("Communication.RFID_BUFFER_LEN", value)
+                                }
+                            }
+                            background: Rectangle {
+                                color: rfidBufferLenField.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: rfidBufferLenField.focus ? "#007BFF" : "#CED4DA"
+                                border.width: rfidBufferLenField.focus ? 2 : 1
+                                radius: 6
+                            }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.RFID_BUFFER_LEN?.description || ""
+                        }
+                    }
+
+                    CheckBox {
+                        id: rfidParLimitedCheck
+                        text: configGenerator.schema["Communication"]?.RFID_PAR_LIMITED?.label || "Enable Limited Parameters"
+                        checked: config["Communication.RFID_PAR_LIMITED"] || false
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && configGenerator.schema["Communication"]?.RFID_PAR_LIMITED !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RFID_PAR_LIMITED", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RFID_PAR_LIMITED?.description || ""
+                    }
+
+                    RowLayout {
+                        spacing: 100
+                        Layout.fillWidth: true
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked && configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+
+                        Label {
+                            text: configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM?.label || "Prepaid Parameter Number"
+                            font.pixelSize: 16
+                            font.family: "Arial, sans-serif"
+                            color: "#1A2526"
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -673,12 +705,12 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.rfidPrepaidParNum !== undefined ? config.rfidPrepaidParNum.toString() : "100"
+                            text: config["Communication.RFID_PREPAID_PAR_NUM"] !== undefined ? config["Communication.RFID_PREPAID_PAR_NUM"].toString() : "100"
                             validator: IntValidator { bottom: 0; top: 1000 }
                             onEditingFinished: {
-                                var value = parseInt(text) || 100
-                                if (value !== config.rfidPrepaidParNum) {
-                                    updateConfig("rfidPrepaidParNum", value)
+                                const value = parseInt(text) || 100
+                                if (value !== config["Communication.RFID_PREPAID_PAR_NUM"]) {
+                                    updateConfig("Communication.RFID_PREPAID_PAR_NUM", value)
                                 }
                             }
                             background: Rectangle {
@@ -687,65 +719,48 @@ Page {
                                 border.width: rfidPrepaidParNumField.focus ? 2 : 1
                                 radius: 6
                             }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM?.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
+                    CheckBox {
+                        id: rfidParPredefinedCheck
+                        text: configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED?.label || "Enable Predefined Parameters"
+                        checked: config["Communication.RFID_PAR_PREDEFINED"] || false
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked && configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RFID_PAR_PREDEFINED", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED?.description || ""
+                    }
 
-                        Label {
-                            text: configGenerator.schema["RFID"]?.rfidParPredefined?.label || "Enable Predefined Parameters:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfidParPredefinedCheck
-                            checked: config.rfidParPredefined || false
-                            onCheckedChanged: updateConfig("rfidParPredefined", checked)
-                        }
+                    CheckBox {
+                        id: rfidParPostdefinedCheck
+                        text: configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED?.label || "Enable Postdefined Parameters"
+                        checked: config["Communication.RFID_PAR_POSTDEFINED"] || false
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked && configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.RFID_PAR_POSTDEFINED", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked
+                        visible: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked && rfidParPostdefinedCheck.checked && configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM !== undefined
+                        enabled: rfidFeatureCheck.checked && mfrc522EnableCheck.checked && rfidParLimitedCheck.checked && rfidParPostdefinedCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["RFID"]?.rfidParPostdefined?.label || "Enable Postdefined Parameters:"
+                            text: configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.label || "Postpaid Parameter Number"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rfidParPostdefinedCheck
-                            checked: config.rfidParPostdefined || false
-                            onCheckedChanged: updateConfig("rfidParPostdefined", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked && rfidParPostdefinedCheck.checked
-                        enabled: rfidFeatureCheck.checked && rfidEnabledCheck.checked && rfidParLimitedCheck.checked && rfidParPostdefinedCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RFID"]?.rfidPostpaidParNum?.label || "Postpaid Parameter Number:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -755,12 +770,12 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.rfidPostpaidParNum !== undefined ? config.rfidPostpaidParNum.toString() : "100"
-                            validator: IntValidator { bottom: 0; top: 1000 }
+                            text: config["Communication.RFID_POSTPAID_PAR_NUM"] !== undefined ? config["Communication.RFID_POSTPAID_PAR_NUM"].toString() : "1000"
+                            validator: IntValidator { bottom: 0; top: 2000 }
                             onEditingFinished: {
-                                var value = parseInt(text) || 100
-                                if (value !== config.rfidPostpaidParNum) {
-                                    updateConfig("rfidPostpaidParNum", value)
+                                const value = parseInt(text) || 1000
+                                if (value !== config["Communication.RFID_POSTPAID_PAR_NUM"]) {
+                                    updateConfig("Communication.RFID_POSTPAID_PAR_NUM", value)
                                 }
                             }
                             background: Rectangle {
@@ -769,607 +784,175 @@ Page {
                                 border.width: rfidPostpaidParNumField.focus ? 2 : 1
                                 radius: 6
                             }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.description || ""
                         }
                     }
                 }
             }
 
-            // RS485 Settings
-            Label {
-                text: "RS485 Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "RS485 Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 100
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["RS485"]?.rs485Feature?.label || "Enable RS485:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: rs485FeatureCheck
-                            checked: config.rs485Feature || false
-                            onCheckedChanged: updateConfig("rs485Feature", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rs485FeatureCheck.checked
-                        enabled: rs485FeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RS485"]?.rs485BaudRate?.label || "RS485 Baud Rate:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: rs485BaudRateCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["rs485BaudRate"]   //?.rs485BaudRate?.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
-                            currentIndex: model.indexOf(config.rs485BaudRate || "Dlms_eBaud9600")
-                            onActivated: updateConfig("rs485BaudRate", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: rs485BaudRateCombo.displayText
-                                font: rs485BaudRateCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: rs485BaudRateCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: rs485BaudRateCombo.height
-                                width: rs485BaudRateCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: rs485BaudRateCombo.popup.visible ? rs485BaudRateCombo.delegateModel : null
-                                    currentIndex: rs485BaudRateCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: rs485BaudRateCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: rs485BaudRateCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: rs485BaudRateCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: rs485FeatureCheck.checked
-                        enabled: rs485FeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["RS485"]?.rs485Itf?.label || "RS485 Interface Timeout:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: rs485ItfField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.rs485Itf !== undefined ? config.rs485Itf.toString() : "2"
-                            validator: IntValidator { bottom: 0; top: 10 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 2
-                                if (value !== config.rs485Itf) {
-                                    updateConfig("rs485Itf", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: rs485ItfField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: rs485ItfField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: rs485ItfField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
+                    CheckBox {
+                        id: rs485FeatureCheck
+                        text: configGenerator.schema["Communication"]?.RS485_FEATURE?.label || "Enable RS485"
+                        checked: config["Communication.RS485_FEATURE"] || false
+                        visible: configGenerator.schema["Communication"]?.RS485_FEATURE !== undefined
+                        onClicked: updateConfig("Communication.RS485_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.RS485_FEATURE?.description || ""
                     }
                 }
             }
 
-            // Modem Settings
-            Label {
-                text: "Modem Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "Modem Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 15
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["Modem"]?.modemEnable?.label || "Enable Modem:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: modemEnableCheck
-                            checked: config.modemEnable || false
-                            onCheckedChanged: updateConfig("modemEnable", checked)
-                        }
+                    CheckBox {
+                        id: modemEnableCheck
+                        text: configGenerator.schema["Communication"]?.MODEM_ENABLE?.label || "Enable Modem"
+                        checked: config["Communication.MODEM_ENABLE"] || false
+                        visible: configGenerator.schema["Communication"]?.MODEM_ENABLE !== undefined
+                        onClicked: updateConfig("Communication.MODEM_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.MODEM_ENABLE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: modemEnableCheck.checked
+                        visible: modemEnableCheck.checked && configGenerator.schema["Communication"]?.MODEM_BAUD_RATE !== undefined
                         enabled: modemEnableCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Modem"]?.modemBaudRate?.label || "Modem Baud Rate:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
+                            text: configGenerator.schema["Communication"]?.MODEM_BAUD_RATE?.label || "Modem Baud Rate"
+                            font.pixelSize: each16
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
-                        ComboBox {
-                            id: modemBaudRateCombo
-                            Layout.fillWidth: true
+                        TextField {
+                            id: modemBaudRateComboNumField
                             Layout.minimumWidth: 280
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["modemBaudRate"]   //?.modemBaudRate?.values || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-                            currentIndex: model.indexOf(config.modemBaudRate || "5")
-                            onActivated: updateConfig("modemBaudRate", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: modemBaudRateCombo.displayText
-                                font: modemBaudRateCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: modemBaudRateCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: modemBaudRateCombo.height
-                                width: modemBaudRateCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: modemBaudRateCombo.popup.visible ? modemBaudRateCombo.delegateModel : null
-                                    currentIndex: modemBaudRateCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
+                            text: config["Communication.MODEM_BAUD_RATE"] !== undefined ? config["Communication.MODEM_BAUD_RATE"].toString() : 5
+                            validator: IntValidator { bottom: configGenerator.schema["Communication"]?.MODEM_BAUD_RATE.min; top: configGenerator.schema["Communication"]?.MODEM_BAUD_RATE?.max}
+                            onEditingFinished: {
+                                const value = parseInt(text) || 1000
+                                if (value !== config["Communication.MODEM_BAUD_RATE"]) {
+                                    updateConfig("Communication.MODEM_BAUD_RATE", value)
                                 }
                             }
                             background: Rectangle {
-                                color: modemBaudRateCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: modemBaudRateCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: modemBaudRateCombo.focus ? 2 : 1
+                                color: rfidPostpaidParNumField.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: rfidPostpaidParNumField.focus ? "#007BFF" : "#CED4DA"
+                                border.width: rfidPostpaidParNumField.focus ? 2 : 1
                                 radius: 6
                             }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.MODEM_BAUD_RATE?.description || ""
                         }
-                    }
+                       }
                 }
             }
 
-            // IR Settings
-            Label {
-                text: "IR Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "GPRS Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 100
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["IR"]?.irEnable?.label || "Enable IR Settings:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: irEnableCheck
-                            checked: config.irEnable || false
-                            onCheckedChanged: updateConfig("irEnable", checked)
-                        }
+                    CheckBox {
+                        id: gprsFeatureCheck
+                        text: configGenerator.schema["Communication"]?.GPRS_FEATURE?.label || "Enable GPRS"
+                        checked: config["Communication.GPRS_FEATURE"] || false
+                        visible: configGenerator.schema["Communication"]?.GPRS_FEATURE !== undefined
+                        onClicked: updateConfig("Communication.GPRS_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.GPRS_FEATURE?.description || ""
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: irEnableCheck.checked
-                        enabled: irEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IR"]?.irCom?.label || "IR Com Port:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: irComField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.irCom !== undefined ? config.irCom.toString() : "13"
-                            validator: IntValidator { bottom: 0; top: 20 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 13
-                                if (value !== config.irCom) {
-                                    updateConfig("irCom", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: irComField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: irComField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: irComField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
+                    CheckBox {
+                        id: gprsSendNotificationCheck
+                        text: configGenerator.schema["Communication"]?.GPRS_SEND_NOTIFICATION_FEATURE?.label || "Enable Send Notification"
+                        checked: config["Communication.GPRS_SEND_NOTIFICATION_FEATURE"] || false
+                        visible:gprsFeatureCheck.checked && configGenerator.schema["Communication"]?.GPRS_SEND_NOTIFICATION_FEATURE !== undefined
+                        enabled: gprsFeatureCheck.checked && gprsFeatureCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.GPRS_SEND_NOTIFICATION_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.GPRS_SEND_NOTIFICATION_FEATURE?.description || ""
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: irEnableCheck.checked
-                        enabled: irEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IR"]?.irDefaultBaudRate?.label || "IR Default Baud Rate:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: irDefaultBaudRateCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["irDefaultBaudRate"]     //?.irDefaultBaudRate?.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
-                            currentIndex: model.indexOf(config.irDefaultBaudRate || "Dlms_eBaud300")
-                            onActivated: updateConfig("irDefaultBaudRate", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: irDefaultBaudRateCombo.displayText
-                                font: irDefaultBaudRateCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: irDefaultBaudRateCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: irDefaultBaudRateCombo.height
-                                width: irDefaultBaudRateCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: irDefaultBaudRateCombo.popup.visible ? irDefaultBaudRateCombo.delegateModel : null
-                                    currentIndex: irDefaultBaudRateCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: irDefaultBaudRateCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: irDefaultBaudRateCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: irDefaultBaudRateCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: irEnableCheck.checked
-                        enabled: irEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IR"]?.irNormalBaudRate?.label || "IR Normal Baud Rate:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: irNormalBaudRateCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["irNormalBaudRate"] //?.irNormalBaudRate?.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
-                            currentIndex: model.indexOf(config.irNormalBaudRate || "Dlms_eBaud9600")
-                            onActivated: updateConfig("irNormalBaudRate", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: irNormalBaudRateCombo.displayText
-                                font: irNormalBaudRateCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: irNormalBaudRateCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: irNormalBaudRateCombo.height
-                                width: irNormalBaudRateCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: irNormalBaudRateCombo.popup.visible ? irNormalBaudRateCombo.delegateModel : null
-                                    currentIndex: irNormalBaudRateCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: irNormalBaudRateCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: irNormalBaudRateCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: irNormalBaudRateCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: irEnableCheck.checked
-                        enabled: irEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IR"]?.irItb?.label || "IR Frame Timeout (10ms):"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: irItbField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.irItb !== undefined ? config.irItb.toString() : "20"
-                            validator: IntValidator { bottom: 0; top: 100 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 20
-                                if (value !== config.irItb) {
-                                    updateConfig("irItb", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: irItbField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: irItbField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: irItbField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-                }
-            }
-
-            // GPRS Settings
-            Label {
-                text: "GPRS Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
-            GroupBox {
-                title: ""
-                Layout.fillWidth: true
-                padding: 12
-                spacing: 16
-
-                background: Rectangle {
-                    color: "#FFFFFF"
-                    radius: 4
-                    border.color: "#E4E7EB"
-                    border.width: 1
-                }
-
-                ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["GPRS"]?.gprsFeature?.label || "Enable GPRS:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: gprsFeatureCheck
-                            checked: config.gprsFeature || false
-                            onCheckedChanged: updateConfig("gprsFeature", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: gprsFeatureCheck.checked
+                    CheckBox {
+                        id: screenGprsFeatureCheck
+                        text: configGenerator.schema["Communication"]?.SCREEN_GPRS_FEATURE?.label || "Enable GPRS Screen Feature"
+                        checked: config["Communication.SCREEN_GPRS_FEATURE"] || false
+                        visible: gprsFeatureCheck.checked && configGenerator.schema["Communication"]?.SCREEN_GPRS_FEATURE !== undefined
                         enabled: gprsFeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["GPRS"]?.gprsSendNotification?.label || "Enable Send Notification:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: gprsSendNotificationCheck
-                            checked: config.gprsSendNotification || false
-                            onCheckedChanged: updateConfig("gprsSendNotification", checked)
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.SCREEN_GPRS_FEATURE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.SCREEN_GPRS_FEATURE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: gprsFeatureCheck.checked
+                        visible: gprsFeatureCheck.checked && configGenerator.schema["Communication"]?.GPRS_DATA_BUFFER_SIZE !== undefined
                         enabled: gprsFeatureCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["GPRS"]?.gprsScreenFeature?.label || "Enable GPRS Screen Feature:"
+                            text: configGenerator.schema["Communication"]?.GPRS_DATA_BUFFER_SIZE?.label || "GPRS Data Buffer Size"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: gprsScreenFeatureCheck
-                            checked: config.gprsScreenFeature || false
-                            onCheckedChanged: updateConfig("gprsScreenFeature", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: gprsFeatureCheck.checked
-                        enabled: gprsFeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["GPRS"]?.gprsDataBufferSize?.label || "GPRS Data Buffer Size:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -1379,12 +962,12 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.gprsDataBufferSize !== undefined ? config.gprsDataBufferSize.toString() : "1500"
+                            text: config["Communication.GPRS_DATA_BUFFER_SIZE"] !== undefined ? config["Communication.GPRS_DATA_BUFFER_SIZE"].toString() : "1500"
                             validator: IntValidator { bottom: 0; top: 2000 }
                             onEditingFinished: {
-                                var value = parseInt(text) || 1500
-                                if (value !== config.gprsDataBufferSize) {
-                                    updateConfig("gprsDataBufferSize", value)
+                                const value = parseInt(text) || 1500
+                                if (value !== config["Communication.GPRS_DATA_BUFFER_SIZE"]) {
+                                    updateConfig("Communication.GPRS_DATA_BUFFER_SIZE", value)
                                 }
                             }
                             background: Rectangle {
@@ -1393,93 +976,65 @@ Page {
                                 border.width: gprsDataBufferSizeField.focus ? 2 : 1
                                 radius: 6
                             }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.GPRS_DATA_BUFFER_SIZE?.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: gprsFeatureCheck.checked
+                    CheckBox {
+                        id: gprsSrtCardCheck
+                        text: configGenerator.schema["Communication"]?.GPRS_SRT_CARD?.label || "Enable SRT Card"
+                        checked: config["Communication.GPRS_SRT_CARD"] || false
+                        visible: gprsFeatureCheck.checked && configGenerator.schema["Communication"]?.GPRS_SRT_CARD !== undefined
                         enabled: gprsFeatureCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["GPRS"]?.gprsSrtCard?.label || "Enable SRT Card:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: gprsSrtCardCheck
-                            checked: config.gprsSrtCard || false
-                            onCheckedChanged: updateConfig("gprsSrtCard", checked)
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.GPRS_SRT_CARD", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.GPRS_SRT_CARD?.description || ""
                     }
                 }
             }
 
-            // IEC Settings
-            Label {
-                text: "IEC Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
             GroupBox {
-                title: ""
+                title: "IEC Settings"
                 Layout.fillWidth: true
-                padding: 12
+                padding: 20
                 spacing: 16
 
                 background: Rectangle {
                     color: "#FFFFFF"
-                    radius: 4
+                    radius: 8
                     border.color: "#E4E7EB"
                     border.width: 1
                 }
 
                 ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
+                    spacing: 15
+                    width: parent.width
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["IEC"]?.iec62056Slave?.label || "Enable IEC 62056-21 Slave:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: iec62056SlaveCheck
-                            checked: config.iec62056Slave || false
-                            onCheckedChanged: updateConfig("iec62056Slave", checked)
-                        }
+                    CheckBox {
+                        id: iec62056SlaveCheck
+                        text: configGenerator.schema["Communication"]?.IEC_62056_21_SLAVE?.label || "Enable IEC 62056-21 Slave"
+                        checked: config["Communication.IEC_62056_21_SLAVE"] || false
+                        visible: configGenerator.schema["Communication"]?.IEC_62056_21_SLAVE !== undefined
+                        onClicked: updateConfig("Communication.IEC_62056_21_SLAVE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.IEC_62056_21_SLAVE?.description || ""
                     }
 
                     RowLayout {
-                        spacing: 24
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: iec62056SlaveCheck.checked
+                        visible: iec62056SlaveCheck.checked && configGenerator.schema["Communication"]?.IEC_BUFFER_SIZE !== undefined
                         enabled: iec62056SlaveCheck.checked
+                        opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["IEC"]?.iecBufferSize?.label || "IEC Buffer Size:"
+                            text: configGenerator.schema["Communication"]?.IEC_BUFFER_SIZE?.label || "IEC Buffer Size"
                             font.pixelSize: 16
-                            font.family: "Roboto"
+                            font.family: "Arial, sans-serif"
                             color: "#1A2526"
-                            Layout.preferredWidth: 200
+                            Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
 
@@ -1489,12 +1044,12 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.iecBufferSize !== undefined ? config.iecBufferSize.toString() : "1056"
+                            text: config["Communication.IEC_BUFFER_SIZE"] !== undefined ? config["Communication.IEC_BUFFER_SIZE"].toString() : "1056"
                             validator: IntValidator { bottom: 0; top: 2000 }
                             onEditingFinished: {
-                                var value = parseInt(text) || 1056
-                                if (value !== config.iecBufferSize) {
-                                    updateConfig("iecBufferSize", value)
+                                const value = parseInt(text) || 1056
+                                if (value !== config["Communication.IEC_BUFFER_SIZE"]) {
+                                    updateConfig("Communication.IEC_BUFFER_SIZE", value)
                                 }
                             }
                             background: Rectangle {
@@ -1503,332 +1058,33 @@ Page {
                                 border.width: iecBufferSizeField.focus ? 2 : 1
                                 radius: 6
                             }
+                            ToolTip.visible: hovered
+                            ToolTip.text: configGenerator.schema["Communication"]?.IEC_BUFFER_SIZE?.description || ""
                         }
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: iec62056SlaveCheck.checked
+                    CheckBox {
+                        id: iecIsrEnableCheck
+                        text: configGenerator.schema["Communication"]?.IEC_62056_21_ISR_ENABLE?.label || "Enable IEC ISR"
+                        checked: config["Communication.IEC_62056_21_ISR_ENABLE"] || false
+                        visible: iec62056SlaveCheck.checked && configGenerator.schema["Communication"]?.IEC_62056_21_ISR_ENABLE !== undefined
                         enabled: iec62056SlaveCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IEC"]?.iecBaudRate?.label || "IEC Baud Rate:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: iecBaudRateCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["iecBaudRate"]    //?.iecBaudRate?.values || ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-                            currentIndex: model.indexOf(config.iecBaudRate || "4")
-                            onActivated: updateConfig("iecBaudRate", model[index])
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: iecBaudRateCombo.displayText
-                                font: iecBaudRateCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: iecBaudRateCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: iecBaudRateCombo.height
-                                width: iecBaudRateCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: iecBaudRateCombo.popup.visible ? iecBaudRateCombo.delegateModel : null
-                                    currentIndex: iecBaudRateCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: iecBaudRateCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: iecBaudRateCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: iecBaudRateCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.IEC_62056_21_ISR_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.IEC_62056_21_ISR_ENABLE?.description || ""
                     }
 
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: iec62056SlaveCheck.checked
+                    CheckBox {
+                        id: opticalDmaEnableCheck
+                        text: configGenerator.schema["Communication"]?.OPTICAL_DMA_ENABLE?.label || "Enable Optical DMA"
+                        checked: config["Communication.OPTICAL_DMA_ENABLE"] || false
+                        visible: iec62056SlaveCheck.checked && configGenerator.schema["Communication"]?.OPTICAL_DMA_ENABLE !== undefined
                         enabled: iec62056SlaveCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IEC"]?.iecTimeoutSec?.label || "IEC Timeout (sec):"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: iecTimeoutSecField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.iecTimeoutSec !== undefined ? config.iecTimeoutSec.toString() : "7"
-                            validator: IntValidator { bottom: 0; top: 255 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 7
-                                if (value !== config.iecTimeoutSec) {
-                                    updateConfig("iecTimeoutSec", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: iecTimeoutSecField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: iecTimeoutSecField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: iecTimeoutSecField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: iec62056SlaveCheck.checked
-                        enabled: iec62056SlaveCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IEC"]?.iecIsrEnable?.label || "Enable IEC ISR:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: iecIsrEnableCheck
-                            checked: config.iecIsrEnable || false
-                            onCheckedChanged: updateConfig("iecIsrEnable", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: iec62056SlaveCheck.checked
-                        enabled: iec62056SlaveCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IEC"]?.opticalDmaEnable?.label || "Enable Optical DMA:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: opticalDmaEnableCheck
-                            checked: config.opticalDmaEnable || false
-                            onCheckedChanged: updateConfig("opticalDmaEnable", checked)
-                        }
-                    }
-                }
-            }
-
-            // IP Settings
-            Label {
-                text: "IP Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
-            GroupBox {
-                title: ""
-                Layout.fillWidth: true
-                padding: 12
-                spacing: 16
-
-                background: Rectangle {
-                    color: "#FFFFFF"
-                    radius: 4
-                    border.color: "#E4E7EB"
-                    border.width: 1
-                }
-
-                ColumnLayout {
-                    spacing: 16
-                    width: parent.width - 24
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-
-                        Label {
-                            text: configGenerator.schema["IP"]?.ipEnable?.label || "Enable IP Communication:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: ipEnableCheck
-                            checked: config.ipEnable || false
-                            onCheckedChanged: updateConfig("ipEnable", checked)
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: ipEnableCheck.checked
-                        enabled: ipEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IP"]?.ipInactivityTime?.label || "IP Inactivity Time (sec):"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: ipInactivityTimeField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.ipInactivityTime !== undefined ? config.ipInactivityTime.toString() : "55"
-                            validator: IntValidator { bottom: 0; top: 100 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 55
-                                if (value !== config.ipInactivityTime) {
-                                    updateConfig("ipInactivityTime", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: ipInactivityTimeField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: ipInactivityTimeField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: ipInactivityTimeField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: ipEnableCheck.checked
-                        enabled: ipEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IP"]?.ipPort?.label || "IP Port:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        TextField {
-                            id: ipPortField
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            text: config.ipPort !== undefined ? config.ipPort.toString() : "4059"
-                            validator: IntValidator { bottom: 0; top: 65535 }
-                            onEditingFinished: {
-                                var value = parseInt(text) || 4059
-                                if (value !== config.ipPort) {
-                                    updateConfig("ipPort", value)
-                                }
-                            }
-                            background: Rectangle {
-                                color: ipPortField.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: ipPortField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: ipPortField.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 24
-                        Layout.fillWidth: true
-                        visible: ipEnableCheck.checked
-                        enabled: ipEnableCheck.checked
-
-                        Label {
-                            text: configGenerator.schema["IP"]?.ipCommProfile?.label || "IP Communication Profile:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 200
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        ComboBox {
-                            id: ipCommProfileCombo
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: 280
-                            Layout.maximumWidth: 480
-                            font.pixelSize: 14
-                            padding: 8
-                            model: configGenerator.schema["ipCommProfile"]   //?.ipCommProfile?.values || ["Dlms_eIpTcp", "Dlms_eIpUdp"]
-                            currentIndex: (config.ipCommProfile || "Dlms_eIpTcp") === "Dlms_eIpTcp" ? 0 : 1
-                            onActivated: {
-                                var typeMap = ["Dlms_eIpTcp", "Dlms_eIpUdp"]
-                                updateConfig("ipCommProfile", typeMap[index])
-                            }
-                            contentItem: Text {
-                                leftPadding: 10
-                                rightPadding: 10
-                                text: ipCommProfileCombo.displayText
-                                font: ipCommProfileCombo.font
-                                color: "#1A2526"
-                                verticalAlignment: Text.AlignVCenter
-                                elide: Text.ElideRight
-                                width: ipCommProfileCombo.width - 20
-                            }
-                            popup: Popup {
-                                y: ipCommProfileCombo.height
-                                width: ipCommProfileCombo.width
-                                implicitHeight: contentItem.implicitHeight
-                                padding: 2
-                                contentItem: ListView {
-                                    clip: true
-                                    implicitHeight: contentHeight
-                                    model: ipCommProfileCombo.popup.visible ? ipCommProfileCombo.delegateModel : null
-                                    currentIndex: ipCommProfileCombo.highlightedIndex
-                                    ScrollIndicator.vertical: ScrollIndicator {}
-                                }
-                            }
-                            background: Rectangle {
-                                color: ipCommProfileCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                                border.color: ipCommProfileCombo.focus ? "#007BFF" : "#CED4DA"
-                                border.width: ipCommProfileCombo.focus ? 2 : 1
-                                radius: 6
-                            }
-                        }
+                        opacity: enabled ? 1.0 : 0.6
+                        onClicked: updateConfig("Communication.OPTICAL_DMA_ENABLE", checked)
+                        ToolTip.visible: hovered
+                        ToolTip.text: configGenerator.schema["Communication"]?.OPTICAL_DMA_ENABLE?.description || ""
                     }
                 }
             }
@@ -1841,67 +1097,87 @@ Page {
     }
 
     function updateConfig(key: string, value: variant): void {
-        var newConfig = JSON.parse(JSON.stringify(config || {}))
-        if (!newConfig) newConfig = {}
+        const newConfig = JSON.parse(JSON.stringify(config || {}))
         newConfig[key] = value
-        if (key === "rfLinkFeature" && !value) {
-            newConfig.rfLinkMbusDevice = "RF_LINK_METER"
-            newConfig.rfLinkTiCc1120Enabled = false
-            newConfig.rfLinkTiCc1120Port = "USART2"
-            newConfig.rfLinkTiCc1120ResetPower = false
+        if (key === "Communication.I2C_SPI_ENABLE" && !value) {
+            newConfig["Communication.I2C_STATUS"] = configGenerator.schema["Communication"]?.I2C_STATUS?.default || "SEPARATE_I2C"
+            newConfig["Communication.HW_SPI"] = configGenerator.schema["Communication"]?.HW_SPI?.default || false
+            newConfig["Communication.SW_SPI"] = configGenerator.schema["Communication"]?.SW_SPI?.default || false
         }
-        if (key === "rfLinkTiCc1120Enabled" && !value) {
-            newConfig.rfLinkTiCc1120Port = "USART2"
-            newConfig.rfLinkTiCc1120ResetPower = false
+        if (key === "Communication.RF_LINK_FEATURE" && !value) {
+            newConfig["Communication.RF_LINK_MBUS_DEVICE"] = configGenerator.schema["Communication"]?.RF_LINK_MBUS_DEVICE?.default || "RF_LINK_METER"
+            newConfig["Communication.RF_LINK_TI_CC1120_ENABLE"] = configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_ENABLE?.default || false
+            newConfig["Communication.RF_LINK_TI_CC1120_PORT"] = configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_PORT?.default || "USART2"
+            newConfig["Communication.RF_LINK_TI_CC1120_RESET_POWER"] = configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_RESET_POWER?.default || false
         }
-        if (key === "rfidFeature" && !value) {
-            newConfig.rfidEnabled = false
-            newConfig.rfidCardType = "MFRC522_CARD_32K"
-            newConfig.rfidParLimited = false
-            newConfig.rfidPrepaidParNum = 100
-            newConfig.rfidParPredefined = false
-            newConfig.rfidParPostdefined = false
-            newConfig.rfidPostpaidParNum = 100
+        if (key === "Communication.RF_LINK_TI_CC1120_ENABLE" && !value) {
+            newConfig["Communication.RF_LINK_TI_CC1120_PORT"] = configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_PORT?.default || "USART2"
+            newConfig["Communication.RF_LINK_TI_CC1120_RESET_POWER"] = configGenerator.schema["Communication"]?.RF_LINK_TI_CC1120_RESET_POWER?.default || false
         }
-        if (key === "rfidEnabled" && !value) {
-            newConfig.rfidCardType = "MFRC522_CARD_32K"
-            newConfig.rfidParLimited = false
-            newConfig.rfidPrepaidParNum = 100
-            newConfig.rfidParPredefined = false
-            newConfig.rfidParPostdefined = false
-            newConfig.rfidPostpaidParNum = 100
+        if (key === "Communication.RFID_FEATURE" && !value) {
+            newConfig["Communication.MFRC522_ENABLE"] = configGenerator.schema["Communication"]?.MFRC522_ENABLE?.default || false
+            newConfig["Communication.MFRC522_CARD_TYPE"] = configGenerator.schema["Communication"]?.MFRC522_CARD_TYPE?.default || "MFRC522_CARD_32K"
+            newConfig["Communication.MFRC522_CARD_32k_TYPE"] = configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE?.default || "CARD_32k_MASRIA_MTCOS_FLEX_ID"
+            newConfig["Communication.MFRC522_INCREASE_SPEED"] = configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED?.default || false
+            newConfig["Communication.RFID_SEQ_READ_WRITE"] = configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE?.default || false
+            newConfig["Communication.RFID_BUFFER_LEN"] = configGenerator.schema["Communication"]?.RFID_BUFFER_LEN?.default || 2000
+            newConfig["Communication.RFID_PAR_LIMITED"] = configGenerator.schema["Communication"]?.RFID_PAR_LIMITED?.default || false
+            newConfig["Communication.RFID_PREPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM?.default || 100
+            newConfig["Communication.RFID_PAR_PREDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED?.default || false
+            newConfig["Communication.RFID_PAR_POSTDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED?.default || false
+            newConfig["Communication.RFID_POSTPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.default || 1000
         }
-        if (key === "rfidParLimited" && !value) {
-            newConfig.rfidPrepaidParNum = 100
-            newConfig.rfidParPredefined = false
-            newConfig.rfidParPostdefined = false
-            newConfig.rfidPostpaidParNum = 100
+        if (key === "Communication.MFRC522_ENABLE" && !value) {
+            newConfig["Communication.MFRC522_CARD_TYPE"] = configGenerator.schema["Communication"]?.MFRC522_CARD_TYPE?.default || "MFRC522_CARD_32K"
+            newConfig["Communication.MFRC522_CARD_32k_TYPE"] = configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE?.default || "CARD_32k_MASRIA_MTCOS_FLEX_ID"
+            newConfig["Communication.MFRC522_INCREASE_SPEED"] = configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED?.default || false
+            newConfig["Communication.RFID_SEQ_READ_WRITE"] = configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE?.default || false
+            newConfig["Communication.RFID_BUFFER_LEN"] = configGenerator.schema["Communication"]?.RFID_BUFFER_LEN?.default || 2000
+            newConfig["Communication.RFID_PAR_LIMITED"] = configGenerator.schema["Communication"]?.RFID_PAR_LIMITED?.default || false
+            newConfig["Communication.RFID_PREPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM?.default || 100
+            newConfig["Communication.RFID_PAR_PREDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED?.default || false
+            newConfig["Communication.RFID_PAR_POSTDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED?.default || false
+            newConfig["Communication.RFID_POSTPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.default || 1000
         }
-        if (key === "rfidParPostdefined" && !value) {
-            newConfig.rfidPostpaidParNum = 100
+        if (key === "Communication.MFRC522_CARD_TYPE" && value !== "MFRC522_CARD_32K") {
+            newConfig["Communication.MFRC522_CARD_32k_TYPE"] = configGenerator.schema["Communication"]?.MFRC522_CARD_32k_TYPE?.default || null
+            newConfig["Communication.MFRC522_INCREASE_SPEED"] = configGenerator.schema["Communication"]?.MFRC522_INCREASE_SPEED?.default || false
+            newConfig["Communication.RFID_SEQ_READ_WRITE"] = configGenerator.schema["Communication"]?.RFID_SEQ_READ_WRITE?.default || false
         }
-        if (key === "rfidParPostdefined" && value) {
-            newConfig.rfidPostpaidParNum = 1000
+        if (key === "Communication.RFID_PAR_LIMITED" && !value) {
+            newConfig["Communication.RFID_PREPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_PREPAID_PAR_NUM?.default || 100
+            newConfig["Communication.RFID_PAR_PREDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_PREDEFINED?.default || false
+            newConfig["Communication.RFID_PAR_POSTDEFINED"] = configGenerator.schema["Communication"]?.RFID_PAR_POSTDEFINED?.default || false
+            newConfig["Communication.RFID_POSTPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.default || 1000
         }
-        if (key === "iec62056Slave" && !value) {
-            newConfig.iecBufferSize = 1056
-            newConfig.iecBaudRate = "4"
-            newConfig.iecTimeoutSec = 7
-            newConfig.iecIsrEnable = false
-            newConfig.opticalDmaEnable = false
+        if (key === "Communication.RFID_PAR_POSTDEFINED" && !value) {
+            newConfig["Communication.RFID_POSTPAID_PAR_NUM"] = configGenerator.schema["Communication"]?.RFID_POSTPAID_PAR_NUM?.default || 1000
         }
-        if (key === "gprsFeature" && !value) {
-            newConfig.gprsSendNotification = false
-            newConfig.gprsScreenFeature = false
-            newConfig.gprsDataBufferSize = 1500
-            newConfig.gprsSrtCard = false
+        if (key === "Communication.GPRS_FEATURE" && !value) {
+            newConfig["Communication.GPRS_SEND_NOTIFICATION_FEATURE"] = configGenerator.schema["Communication"]?.GPRS_SEND_NOTIFICATION_FEATURE?.default || false
+            newConfig["Communication.SCREEN_GPRS_FEATURE"] = configGenerator.schema["Communication"]?.SCREEN_GPRS_FEATURE?.default || false
+            newConfig["Communication.GPRS_DATA_BUFFER_SIZE"] = configGenerator.schema["Communication"]?.GPRS_DATA_BUFFER_SIZE?.default || 1500
+            newConfig["Communication.GPRS_SRT_CARD"] = configGenerator.schema["Communication"]?.GPRS_SRT_CARD?.default || false
         }
-        if (key === "ipEnable" && !value) {
-            newConfig.ipInactivityTime = 55
-            newConfig.ipPort = 4059
-            newConfig.ipCommProfile = "Dlms_eIpTcp"
+        if (key === "Communication.MODEM_ENABLE" && !value) {
+            newConfig["Communication.MODEM_BAUD_RATE"] = configGenerator.schema["Communication"]?.MODEM_BAUD_RATE?.default || "4800"
         }
-        configUpdated(newConfig)
+        if (key === "Communication.IEC_62056_21_SLAVE" && !value) {
+            newConfig["Communication.IEC_BUFFER_SIZE"] = configGenerator.schema["Communication"]?.IEC_BUFFER_SIZE?.default || 1056
+            newConfig["Communication.IEC_62056_21_ISR_ENABLE"] = configGenerator.schema["Communication"]?.IEC_62056_21_ISR_ENABLE?.default || false
+            newConfig["Communication.OPTICAL_DMA_ENABLE"] = configGenerator.schema["Communication"]?.OPTICAL_DMA_ENABLE?.default || false
+        }
+        console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig))
         config = newConfig
+        configUpdated(newConfig)
+        console.log(pageId, "Syncing with C++ backend:", JSON.stringify(newConfig))
+        configGenerator.setConfig(newConfig)
+    }
+
+    function updateConfigAll(): void {
+        const newConfig = JSON.parse(JSON.stringify(config || {}))
+        console.log(pageId, "Syncing all config with C++ backend:", JSON.stringify(newConfig))
+        configUpdated(newConfig)
+        configGenerator.setConfig(newConfig)
     }
 }

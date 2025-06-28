@@ -1,12 +1,14 @@
-#pragma once
+#ifndef CONFIGGENERATOR_H
+#define CONFIGGENERATOR_H
+
 #include <QObject>
 #include <QVariantMap>
-#include <QString>
+#include <QFile>
+#include <QTextStream>
 
-class ConfigGenerator : public QObject
-{
+class ConfigGenerator : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QVariantMap config READ config WRITE setConfig NOTIFY configChanged)
+    Q_PROPERTY(QVariantMap config READ config NOTIFY configChanged)
     Q_PROPERTY(QVariantMap schema READ schema NOTIFY schemaChanged)
 
 public:
@@ -15,20 +17,37 @@ public:
     QVariantMap config() const;
     QVariantMap schema() const;
 
-    void setConfig(const QVariantMap &newConfig);
-    Q_INVOKABLE void onConfigUpdated(const QVariantMap &newConfig);
-    Q_INVOKABLE bool generateConfigFile(const QString &fileUrl);
-    Q_INVOKABLE QString generateConfigHeader() const;
+    //Q_INVOKABLE QVariant getValue(const QString &key) const;
+    Q_INVOKABLE void setValue(const QString &key, const QVariant &value);
+    // Q_INVOKABLE QVariant getSchemaProperty(const QString &path, const QString &property) const;
     Q_INVOKABLE bool loadSchema(const QString &filePath);
+    Q_INVOKABLE bool loadConfig(const QString &filePath);
+    // Q_INVOKABLE bool saveConfig(const QString &filePath);
+    Q_INVOKABLE QString generateConfigHeader() const;
+    Q_INVOKABLE bool generateConfigFile(const QString &fileUrl);
+    Q_INVOKABLE QString getSchemaType(const QString &key) const;
+    //Q_INVOKABLE QString findSchemaKey(const QString &key) const;
+
+    Q_INVOKABLE void setConfig(const QVariantMap &newConfig);
     Q_INVOKABLE QVariantList enumOptions(const QString &key) const;
+
+public slots:
+    void onConfigUpdated(const QVariantMap &updatedConfig);
 
 signals:
     void configChanged();
-    void errorOccurred(const QString &message);
     void schemaChanged();
+    void errorOccurred(const QString &message);
 
 private:
-    QVariantMap m_config;
+
+    void processJsonObject(const QJsonObject &obj, QVariantMap &config, QVariantMap &schema);
+    QVariant getNestedValue(const QVariantMap &map, const QString &path) const;
+    void setNestedValue(QVariantMap &map, const QString &path, const QVariant &value);
+
     QVariantMap m_defaults;
+    QVariantMap m_config;
     QVariantMap m_schema;
 };
+
+#endif // CONFIGGENERATOR_H

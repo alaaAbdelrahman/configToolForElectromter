@@ -218,9 +218,9 @@ ApplicationWindow {
 
         Connections {
             target: stackView.currentItem
-            enabled: target && target.pageId && target.pageId.startsWith("DevicePage_")
+            enabled: target && target.pageId && target.pageId
             function onConfigUpdated(updated) {
-                console.log("ConfigUpdated from initial Device page pageId:", target.pageId, ":", JSON.stringify(updated))
+                console.log("ConfigUpdated from initial page pageId:", target.pageId, ":", JSON.stringify(updated))
                 configGenerator.onConfigUpdated(updated)
             }
         }

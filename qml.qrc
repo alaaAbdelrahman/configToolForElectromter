@@ -20,5 +20,6 @@
         <file>icons/keypad.png</file>
         <file>icons/tariff.png</file>
         <file>MemoryPage.qml</file>
+        <file>configurations/config_schema.json</file>
     </qresource>
 </RCC>

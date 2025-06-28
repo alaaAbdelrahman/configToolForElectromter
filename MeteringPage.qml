@@ -4,27 +4,55 @@ import QtQuick.Layouts 1.15
 
 Page {
     id: rootPage
-    property var config: ({
-        meterType: "singlePhase",
-        directMeasurement: true,
-        numOfPhases: 1,
-        numOfChannels: 2,
-        meteringChips: ["V9381"], // Ensure initial array
-        pulseConstant: "CONSTANT_3200",
-        loadProfile: true,
-        profileRecordNum: 3360,
-        profileTestRecords: 20,
-        reverseTamper: true,
-        earthTamper: true,
-        enableLimiter: true,
-        mismatchNeutral: false,
-        pulseCountEnable: true,
-        sagZxtoFlags: true
-    })
+    property string pageId: "MeteringPage_" + Math.random().toString(36).slice(2)
+    property var config: {
+        if (configGenerator && configGenerator.config) {
+            return configGenerator.config
+        } else {
+            console.warn(pageId, "configGenerator.config is empty, using defaults")
+            return {
+                "Metering.meterType": "MTR_SINGLE_PH",
+                "Metering.MTR_REACTIVE": true,
+                "Metering.meterMeasurement": "MTR_DIRECT",
+                "Metering.meteringChips": "V9381_ENABLE",
+                "Metering.MTR_NUM_OF_PHASE": 1,
+                "Metering.MTR_NUM_OF_CH": 2,
+                "Metering.pulseConstant": "CONSTANT_3200",
+                "Metering.MTR_LOAD_PROFILE": true,
+                "Metering.PROFILE_RECORD_NUM": 3360,
+                "Metering.PROFILE_RECORD_TEST_MODE_NUM": 20,
+                "Metering.MTR_RVS_TMPR": true,
+                "Metering.MTR_ERTH_TMPR": true,
+                "Metering.MTR_ENABLE_LMT": true,
+                "Metering.PULSE_COUNT_ENABLE": true,
+                "Metering.BIG_ENDIAN": true
+            }
+        }
+    }
     signal configUpdated(var newConfig)
 
     background: Rectangle {
         color: "#F5F7FA"
+    }
+
+    Component.onCompleted: {
+        console.log(pageId, "Initial config:", JSON.stringify(config))
+        if (!configGenerator || !configGenerator.schema) {
+            console.warn(pageId, "configGenerator or schema not available")
+        } else {
+            console.log(pageId, "Schema loaded:", JSON.stringify(configGenerator.schema.Metering))
+        }
+    }
+
+    Connections {
+        target: configGenerator
+        function onConfigChanged() {
+            config = configGenerator.config
+            console.log(pageId, "Config updated from ConfigGenerator:", JSON.stringify(config))
+        }
+        function onSchemaChanged() {
+            console.log(pageId, "Schema updated:", JSON.stringify(configGenerator.schema.Metering))
+        }
     }
 
     ScrollView {
@@ -36,7 +64,7 @@ Page {
 
         ColumnLayout {
             id: formLayout
-            width: parent.width - 48
+            width: scrollView.width - 48
             spacing: 24
 
             // Header Section
@@ -75,7 +103,6 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -88,11 +115,11 @@ Page {
                     width: parent.width - 24
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
 
                         Label {
-                            text: "Meter Type:"
+                            text: configGenerator.schema["Metering.meterType?.label || "Meter Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -107,10 +134,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: {
-                                let schemaValues = configGenerator.schema["Metering"]?.meterType?.values || ["singlePhase", "twoPhase", "threePhase"]
-                                return schemaValues.map(v => v.charAt(0).toUpperCase() + v.slice(1).replace(/([A-Z])/g, ' $1'))
-                            }
+                            model: configGenerator.schema["Metering.meterType"].labels ||configGenerator.schema["Metering.meterType"].values|| ["Single Phase", "Two Phase", "Three Phase"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -145,25 +169,83 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const options = model.map(v => v.toLowerCase().replace(/\s/g, ''))
-                                const current = config.meterType || "singlePhase"
-                                currentIndex = options.indexOf(current)
+                                const schema = configGenerator.schema["Metering.meterType"]
+                                if (schema?.type === "enum" && schema.labels && schema.values) {
+                                    const valueMap = {}
+                                    for (let i = 0; i < schema.labels.length; i++) {
+                                        valueMap[schema.labels[i]] = schema.values[i]
+                                    }
+                                    const currentValue = config["Metering.meterType"] || schema.values[0]
+                                    const currentLabel = Object.keys(valueMap).find(label => valueMap[label] === currentValue) || schema.labels[0]
+                                    currentIndex = schema.labels.indexOf(currentLabel)
+                                    if (currentIndex === -1) {
+                                        currentIndex = 0
+                                        console.warn(pageId, "Invalid initial meterType:", currentValue)
+                                    }
+                                    console.log(pageId, "meterType initialized to label:", currentLabel, "value:", currentValue, "index:", currentIndex)
+                                } else {
+                                    currentIndex = 0
+                                    console.warn(pageId, "Invalid meterType schema:", JSON.stringify(schema))
+                                }
                             }
 
                             onActivated: function(index) {
-                                const typeMap = model.map(v => v.toLowerCase().replace(/\s/g, ''))
-                                updateConfig("meterType", typeMap[index])
+                                const schema = configGenerator.schema["Metering.meterType"]
+                                if (schema?.type === "enum" && schema.labels && schema.values) {
+                                    const selectedLabel = model[index]
+                                    const valueMap = {}
+                                    for (let i = 0; i < schema.labels.length; i++) {
+                                        valueMap[schema.labels[i]] = schema.values[i]
+                                    }
+                                    const configKey = valueMap[selectedLabel]
+                                    if (configKey) {
+                                        updateConfig("Metering.meterType", configKey)
+                                        console.log(pageId, "Updated meterType to:", configKey, "from label:", selectedLabel)
+                                    } else {
+                                        console.warn(pageId, "No value mapped for label:", selectedLabel)
+                                    }
+                                } else {
+                                    console.warn(pageId, "Invalid meterType schema on activation:", JSON.stringify(schema))
+                                }
                             }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
-                        visible: config.meterType === "threePhase"
 
                         Label {
-                            text: "Measurement Type:"
+                            text: configGenerator.schema["Metering.MTR_REACTIVE"].label || "Reactive Meter"
+                            font.pixelSize: 16
+                            font.family: "Roboto"
+                            color: "#1A2526"
+                            Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
+                        }
+
+                        CheckBox {
+                            id: reactiveMeterCheck
+                            property bool localChecked: config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : true
+                            checked: localChecked
+                            onCheckedChanged: {
+                                localChecked = checked
+                                updateConfig("Metering.MTR_REACTIVE", checked)
+                                console.log(pageId, "Updating MTR_REACTIVE to", checked)
+                            }
+                            Component.onCompleted: {
+                                localChecked = config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : true
+                                console.log(pageId, "MTR_REACTIVE initialized to", localChecked)
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        spacing: 100
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: configGenerator.schema["Metering.meterMeasurement"].label || "Enable Direct Calculations"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -178,12 +260,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: ["Direct", "Indirect"]
-                            currentIndex: config.directMeasurement ? 0 : 1
-                            onActivated: function(index) {
-                                var typeMap = [true, false]
-                                updateConfig("directMeasurement", typeMap[index])
-                            }
+                            model: configGenerator.schema["Metering.meterMeasurement"].labels || ["MTR_DIRECT", "MTR_INDIRECT"]
+
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -194,6 +272,7 @@ Page {
                                 elide: Text.ElideRight
                                 width: measurementTypeCombo.width - 20
                             }
+
                             popup: Popup {
                                 y: measurementTypeCombo.height
                                 width: measurementTypeCombo.width
@@ -207,21 +286,39 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
+
                             background: Rectangle {
                                 color: measurementTypeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: measurementTypeCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: measurementTypeCombo.focus ? 2 : 1
                                 radius: 6
                             }
+
+                            Component.onCompleted: {
+                                const schema = configGenerator.schema["Metering.meterMeasurement"]
+                                const currentValue = config["Metering.meterMeasurement"] || schema?.default || "MTR_DIRECT"
+                                currentIndex = model.indexOf(currentValue)
+                                if (currentIndex === -1) {
+                                    currentIndex = 0
+                                    console.warn(pageId, "Invalid meterMeasurement:", currentValue)
+                                }
+                                console.log(pageId, "meterMeasurement initialized to:", currentValue, "index:", currentIndex)
+                            }
+
+                            onActivated: function(index) {
+                                const configKey = model[index]
+                                updateConfig("Metering.meterMeasurement", configKey)
+                                console.log(pageId, "Updated meterMeasurement to:", configKey)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
 
                         Label {
-                            text: "Number of Phases:"
+                            text: configGenerator.schema["Metering.MTR_NUM_OF_PHASE"].label || "Number of Phases"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -230,20 +327,28 @@ Page {
                         }
 
                         Label {
-                            text: "" + (config.numOfPhases || 1)
-                            font.pixelSize: 16
-                            font.family: "Roboto"
+                            text: config["Metering.MTR_NUM_OF_PHASE"] !== undefined
+                                  ? config["Metering.MTR_NUM_OF_PHASE"].toString()
+                                  : "1"
+                            font.pixelSize: 14
                             color: "#1A2526"
                             Layout.fillWidth: true
+                        }
+
+                        // Ensure the value is saved on load (optional safety)
+                        Component.onCompleted: {
+                            if (config["Metering.MTR_NUM_OF_PHASE"] === undefined) {
+                                updateConfig("Metering.MTR_NUM_OF_PHASE", 1)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
 
                         Label {
-                            text: "Number of Channels:"
+                            text: configGenerator.schema["Metering.MTR_NUM_OF_CH"].label || "Number of Channels"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -252,14 +357,21 @@ Page {
                         }
 
                         Label {
-                            text: "" + (config.numOfChannels || 2)
-                            font.pixelSize: 16
-                            font.family: "Roboto"
+                            text: config["Metering.MTR_NUM_OF_CH"] !== undefined
+                                  ? config["Metering.MTR_NUM_OF_CH"].toString()
+                                  : "2"
+                            font.pixelSize: 14
                             color: "#1A2526"
                             Layout.fillWidth: true
                         }
+
+                        Component.onCompleted: {
+                            if (config["Metering.MTR_NUM_OF_CH"] === undefined) {
+                                updateConfig("Metering.MTR_NUM_OF_CH", 2)
+                            }
+                        }
                     }
-                }
+                   }
             }
 
             // Metering Chip Group
@@ -278,7 +390,6 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -291,11 +402,11 @@ Page {
                     width: parent.width - 24
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
 
                         Label {
-                            text: "Select Chips:"
+                            text: configGenerator.schema["Metering.meteringChips"].label || "Metering Chips"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -303,24 +414,62 @@ Page {
                             verticalAlignment: Label.AlignVCenter
                         }
 
-                        ColumnLayout {
+                        ComboBox {
+                            id: meteringChipsCombo
                             Layout.fillWidth: true
-                            spacing: 8
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            model: configGenerator.schema["Metering.meteringChips"].values || ["ADE7953_ENABLE", "V9203_ENABLE", "V9261F_ENABLE", "V9340_ENABLE", "V9360_ENABLE", "V9381_ENABLE"]
 
-                            Repeater {
-                                model: configGenerator.schema["meteringChips"]
-                                delegate: CheckBox {
-                                    text: modelData
-                                    property bool localChecked: Array.isArray(config.meteringChips) && config.meteringChips.includes(modelData)
-                                    checked: localChecked
-                                    onCheckedChanged: {
-                                        if (checked !== localChecked) {
-                                            localChecked = checked
-                                            updateConfig("meteringChips", updateChipSelection(modelData, checked))
-                                        }
-                                    }
-                                    Component.onCompleted: localChecked = Array.isArray(config.meteringChips) && config.meteringChips.includes(modelData)
+                            contentItem: Text {
+                                leftPadding: 10
+                                rightPadding: 10
+                                text: meteringChipsCombo.displayText
+                                font: meteringChipsCombo.font
+                                color: "#1A2526"
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+                                width: meteringChipsCombo.width - 20
+                            }
+
+                            popup: Popup {
+                                y: meteringChipsCombo.height
+                                width: meteringChipsCombo.width
+                                implicitHeight: contentItem.implicitHeight
+                                padding: 2
+                                contentItem: ListView {
+                                    clip: true
+                                    implicitHeight: contentHeight
+                                    model: meteringChipsCombo.popup.visible ? meteringChipsCombo.delegateModel : null
+                                    currentIndex: meteringChipsCombo.highlightedIndex
+                                    ScrollIndicator.vertical: ScrollIndicator {}
                                 }
+                            }
+
+                            background: Rectangle {
+                                color: meteringChipsCombo.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: meteringChipsCombo.focus ? "#007BFF" : "#CED4DA"
+                                border.width: meteringChipsCombo.focus ? 2 : 1
+                                radius: 6
+                            }
+
+                            Component.onCompleted: {
+                                const schema = configGenerator.schema["Metering.meteringChips"]
+                                const currentValue = config["Metering.meteringChips"] || schema?.default || "V9381_ENABLE"
+                                currentIndex = model.indexOf(currentValue)
+                                if (currentIndex === -1) {
+                                    currentIndex = 0
+                                    console.warn(pageId, "Invalid meteringChips:", currentValue)
+                                }
+                                console.log(pageId, "meteringChips initialized to:", currentValue, "index:", currentIndex)
+                            }
+
+                            onActivated: function(index) {
+                                const configKey = model[index]
+                                updateConfig("Metering.meteringChips", configKey)
+                                console.log(pageId, "Updated meteringChips to:", configKey)
                             }
                         }
                     }
@@ -343,7 +492,6 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -356,11 +504,11 @@ Page {
                     width: parent.width - 24
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
 
                         Label {
-                            text: "Pulse Constant:"
+                            text: configGenerator.schema["Metering.pulseConstant"].label || "Pulse Constant"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -375,7 +523,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["pulseConstant"]
+                            model: configGenerator.schema["Metering.pulseConstant"].labels|| configGenerator.schema["Metering.pulseConstant"].values || ["CONSTANT_1000", "CONSTANT_1600", "CONSTANT_3200", "CONSTANT_10000"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -410,14 +558,20 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const options = model
-                                const current = config.pulseConstant || "CONSTANT_3200"
-                                currentIndex = options.indexOf(current)
+                                const schema = configGenerator.schema["Metering.pulseConstant"]
+                                const currentValue = config["Metering.pulseConstant"] || schema?.default || "CONSTANT_3200"
+                                currentIndex = model.indexOf(currentValue)
+                                if (currentIndex === -1) {
+                                    currentIndex = 0
+                                    console.warn(pageId, "Invalid pulseConstant:", currentValue)
+                                }
+                                console.log(pageId, "pulseConstant initialized to:", currentValue, "index:", currentIndex)
                             }
 
                             onActivated: function(index) {
-                                const typeMap = model
-                                updateConfig("pulseConstant", typeMap[index])
+                                const configKey = model[index]
+                                updateConfig("Metering.pulseConstant", configKey)
+                                console.log(pageId, "Updated pulseConstant to:", configKey)
                             }
                         }
                     }
@@ -440,7 +594,6 @@ Page {
                 Layout.fillWidth: true
                 padding: 20
                 spacing: 20
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -454,12 +607,12 @@ Page {
                     Layout.alignment: Qt.AlignHCenter
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Load Profile:"
+                            text: configGenerator.schema["Metering.MTR_LOAD_PROFILE"].label || "Enable Load Profile"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -469,24 +622,28 @@ Page {
 
                         CheckBox {
                             id: loadProfileCheck
-                            property bool localChecked: config.loadProfile !== undefined ? config.loadProfile : false
+                            property bool localChecked: config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("loadProfile", checked)
+                                updateConfig("Metering.MTR_LOAD_PROFILE", checked)
+                                console.log(pageId, "Updating MTR_LOAD_PROFILE to", checked)
                             }
-                            Component.onCompleted: localChecked = config.loadProfile !== undefined ? config.loadProfile : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : true
+                                console.log(pageId, "MTR_LOAD_PROFILE initialized to", localChecked)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: config.loadProfile
+                        visible: config["Metering.MTR_LOAD_PROFILE"]
 
                         Label {
-                            text: "Profile Record Number:"
+                            text: configGenerator.schema["Metering.PROFILE_RECORD_NUM"].label || "Profile Record Number"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -500,12 +657,13 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.profileRecordNum !== undefined ? config.profileRecordNum.toString() : "3360"
-                            validator: IntValidator { bottom: 0; top: 9999 }
+                            text: config["Metering.PROFILE_RECORD_NUM"] !== undefined ? config["Metering.PROFILE_RECORD_NUM"].toString() : "3360"
+                            validator: IntValidator { bottom: 0; top: 10000 }
                             onEditingFinished: {
                                 var value = parseInt(text) || 3360
-                                if (value !== config.profileRecordNum) {
-                                    updateConfig("profileRecordNum", value)
+                                if (value !== config["Metering.PROFILE_RECORD_NUM"]) {
+                                    updateConfig("Metering.PROFILE_RECORD_NUM", value)
+                                    console.log(pageId, "Updating PROFILE_RECORD_NUM to", value)
                                 }
                             }
                             background: Rectangle {
@@ -514,17 +672,20 @@ Page {
                                 border.width: profileRecordNumField.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                console.log(pageId, "PROFILE_RECORD_NUM initialized to", text)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: config.loadProfile
+                        visible: config["Metering.MTR_LOAD_PROFILE"]
 
                         Label {
-                            text: "Profile Test Records:"
+                            text: configGenerator.schema["Metering.PROFILE_RECORD_TEST_MODE_NUM"].label || "Profile Test Records"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -538,12 +699,13 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config.profileTestRecords !== undefined ? config.profileTestRecords.toString() : "20"
-                            validator: IntValidator { bottom: 0; top: 999 }
+                            text: config["Metering.PROFILE_RECORD_TEST_MODE_NUM"] !== undefined ? config["Metering.PROFILE_RECORD_TEST_MODE_NUM"].toString() : "20"
+                            validator: IntValidator { bottom: 0; top: 100 }
                             onEditingFinished: {
                                 var value = parseInt(text) || 20
-                                if (value !== config.profileTestRecords) {
-                                    updateConfig("profileTestRecords", value)
+                                if (value !== config["Metering.PROFILE_RECORD_TEST_MODE_NUM"]) {
+                                    updateConfig("Metering.PROFILE_RECORD_TEST_MODE_NUM", value)
+                                    console.log(pageId, "Updating PROFILE_RECORD_TEST_MODE_NUM to", value)
                                 }
                             }
                             background: Rectangle {
@@ -552,16 +714,19 @@ Page {
                                 border.width: profileTestRecordsField.focus ? 2 : 1
                                 radius: 6
                             }
+                            Component.onCompleted: {
+                                console.log(pageId, "PROFILE_RECORD_TEST_MODE_NUM initialized to", text)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Reverse Tamper:"
+                            text: configGenerator.schema["Metering.MTR_RVS_TMPR"].label || "Enable Reverse Tamper"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -571,23 +736,27 @@ Page {
 
                         CheckBox {
                             id: reverseTamperCheck
-                            property bool localChecked: config.reverseTamper !== undefined ? config.reverseTamper : false
+                            property bool localChecked: config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("reverseTamper", checked)
+                                updateConfig("Metering.MTR_RVS_TMPR", checked)
+                                console.log(pageId, "Updating MTR_RVS_TMPR to", checked)
                             }
-                            Component.onCompleted: localChecked = config.reverseTamper !== undefined ? config.reverseTamper : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : true
+                                console.log(pageId, "MTR_RVS_TMPR initialized to", localChecked)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Earth Tamper:"
+                            text: configGenerator.schema["Metering.MTR_ERTH_TMPR"].label || "Enable Earth Tamper"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -597,23 +766,27 @@ Page {
 
                         CheckBox {
                             id: earthTamperCheck
-                            property bool localChecked: config.earthTamper !== undefined ? config.earthTamper : false
+                            property bool localChecked: config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("earthTamper", checked)
+                                updateConfig("Metering.MTR_ERTH_TMPR", checked)
+                                console.log(pageId, "Updating MTR_ERTH_TMPR to", checked)
                             }
-                            Component.onCompleted: localChecked = config.earthTamper !== undefined ? config.earthTamper : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : true
+                                console.log(pageId, "MTR_ERTH_TMPR initialized to", localChecked)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Load Limiter:"
+                            text: configGenerator.schema["Metering.MTR_ENABLE_LMT"].label || "Enable Limiter"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -623,49 +796,27 @@ Page {
 
                         CheckBox {
                             id: enableLimiterCheck
-                            property bool localChecked: config.enableLimiter !== undefined ? config.enableLimiter : false
+                            property bool localChecked: config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("enableLimiter", checked)
+                                updateConfig("Metering.MTR_ENABLE_LMT", checked)
+                                console.log(pageId, "Updating MTR_ENABLE_LMT to", checked)
                             }
-                            Component.onCompleted: localChecked = config.enableLimiter !== undefined ? config.enableLimiter : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : true
+                                console.log(pageId, "MTR_ENABLE_LMT initialized to", localChecked)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Mismatch Neutral:"
-                            font.pixelSize: 16
-                            font.family: "Roboto"
-                            color: "#1A2526"
-                            Layout.preferredWidth: 160
-                            verticalAlignment: Label.AlignVCenter
-                        }
-
-                        CheckBox {
-                            id: mismatchNeutralCheck
-                            property bool localChecked: config.mismatchNeutral !== undefined ? config.mismatchNeutral : false
-                            checked: localChecked
-                            onCheckedChanged: {
-                                localChecked = checked
-                                updateConfig("mismatchNeutral", checked)
-                            }
-                            Component.onCompleted: localChecked = config.mismatchNeutral !== undefined ? config.mismatchNeutral : false
-                        }
-                    }
-
-                    RowLayout {
-                        spacing: 12
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter
-
-                        Label {
-                            text: "Pulse Count:"
+                            text: configGenerator.schema["Metering.PULSE_COUNT_ENABLE].label || "Enable Pulse Count"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -675,38 +826,47 @@ Page {
 
                         CheckBox {
                             id: pulseCountCheck
-                            property bool localChecked: config.pulseCountEnable !== undefined ? config.pulseCountEnable : false
+                            property bool localChecked: config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("pulseCountEnable", checked)
+                                updateConfig("Metering.PULSE_COUNT_ENABLE", checked)
+                                console.log(pageId, "Updating PULSE_COUNT_ENABLE to", checked)
                             }
-                            Component.onCompleted: localChecked = config.pulseCountEnable !== undefined ? config.pulseCountEnable : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : true
+                                console.log(pageId, "PULSE_COUNT_ENABLE initialized to", localChecked)
+                            }
                         }
                     }
 
                     RowLayout {
-                        spacing: 12
+                        spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: "Sag/Zero-Crossing:"
+                            text: configGenerator.schema["Metering.BIG_ENDIAN"].label || "Big Endian"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
                         }
 
                         CheckBox {
-                            id: sagZxtoCheck
-                            property bool localChecked: config.sagZxtoFlags !== undefined ? config.sagZxtoFlags : false
+                            id: bigEndianCheck
+                            property bool localChecked: config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : true
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
-                                updateConfig("sagZxtoFlags", checked)
+                                updateConfig("Metering.BIG_ENDIAN", checked)
+                                console.log(pageId, "Updating BIG_ENDIAN to", checked)
                             }
-                            Component.onCompleted: localChecked = config.sagZxtoFlags !== undefined ? config.sagZxtoFlags : false
+                            Component.onCompleted: {
+                                localChecked = config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : true
+                                console.log(pageId, "BIG_ENDIAN initialized to", localChecked)
+                            }
                         }
                     }
                 }
@@ -725,37 +885,21 @@ Page {
         if (!newConfig) newConfig = {}
         newConfig[key] = value
         // Update dependent fields
-        if (key === "meterType") {
-            if (value === "singlePhase") {
-                newConfig.numOfPhases = 1
-                newConfig.numOfChannels = 2
-            } else if (value === "twoPhase") {
-                newConfig.numOfPhases = 2
-                newConfig.numOfChannels = 2
-            } else { // threePhase
-                newConfig.numOfPhases = 3
-                newConfig.numOfChannels = 3
+        if (key === "Metering.meterType") {
+            if (value === "MTR_SINGLE_PH") {
+                newConfig["Metering.MTR_NUM_OF_PHASE"] = 1
+                newConfig["Metering.MTR_NUM_OF_CH"] = 2
+            } else if (value === "MTR_TWO_PH") {
+                newConfig["Metering.MTR_NUM_OF_PHASE"] = 2
+                newConfig["Metering.MTR_NUM_OF_CH"] = 2
+            } else if (value === "MTR_THREE_PH") {
+                newConfig["Metering.MTR_NUM_OF_PHASE"] = 3
+                newConfig["Metering.MTR_NUM_OF_CH"] = 3
             }
-        } else if (key === "directMeasurement" && newConfig.meterType === "threePhase") {
-            // No additional dependencies, just update
-        } else if (key === "meteringChips") {
-            // Ensure value is an array
-            newConfig.meteringChips = Array.isArray(value) ? value : [value]
-            if (!newConfig.meteringChips || newConfig.meteringChips.length === 0) {
-                newConfig.meteringChips = ["V9381"] // Default fallback
-            }
+            console.log(pageId, "Updated dependent fields for meterType:", JSON.stringify(newConfig))
         }
+        console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig))
         configUpdated(newConfig)
         config = newConfig
-    }
-
-    function updateChipSelection(chip: string, add: bool) {
-        var chips = Array.isArray(config.meteringChips) ? [...config.meteringChips] : ["V9381"]
-        if (add && !chips.includes(chip)) {
-            chips.push(chip)
-        } else if (!add && chips.includes(chip)) {
-            chips = chips.filter(c => c !== chip)
-        }
-        return chips.length > 0 ? chips : ["V9381"] // Default to V9381 if no chips selected
     }
 }

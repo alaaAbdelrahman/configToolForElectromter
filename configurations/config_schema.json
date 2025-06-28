@@ -1,516 +1,810 @@
 {
   "Device": {
     "MicroController": {
-      "type": "enum",
+      "type": "map",
       "values": ["Micro_V85XX", "Micro_V94XX", "Micro_V87XX", "Micro_V77XX", "Mixco_V77XX"],
-      "default": "Micro_V85XX",
+      "default": "Micro_V94XX",
       "label": "Micro Controller"
     },
-    "boardType": {
+    "BOARD_TYPE": {
       "type": "enum",
       "values": ["EM130_BOARD", "EM122U_BOARD", "SPAIN_BOARD", "EM122_BOARD", "EM110_BOARD", "Mixco_BOARD"],
       "default": "EM130_BOARD",
       "label": "Board Type"
     },
-    "systemClock": {
-      "type": "enum",
-      "values": [8000, 16000, 25000],
-      "default": 25000,
-      "label": "System Clock (kHz)"
+    "SYSTEM_CLOCK": {
+  "type": "integer",
+  "default": 25000,
+  "values":[ 16000 ,25000 , 8000 ],
+  "labels": ["16 MHz", "25 MHz", "8 MHz"],
+  "label": "System Clock (kHz)"
+},
+    "NEW_ASHANTI_PROJECT": {
+      "type": "boolean",
+      "default": true,
+      "label": "New Ashanti Project"
     }
   },
   "Display": {
-    "displayType": {
+      "displayType": {
       "type": "enum",
-      "values": ["segmented", "dotMatrix", "Alaa", "Ahmed"],
-      "default": "segmented",
+      "values": ["SEGMENTED_LCD_ENABLE", "DOT_MATRIX_LCD_ENABLE"],
+      "labels":  ["Segmented LCD", "Dot Matrix LCD"],
+      "default": "SEGMENTED_LCD_ENABLE",
       "label": "Display Type"
     },
-    "useNewLcd": {
+    "DOT_MATRIX_LOW_PWR_FEATURE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Dot Matrix Low Power"
+    },
+    "USE_NEW_LCD": {
       "type": "boolean",
       "default": true,
       "label": "Use New LCD"
     },
-    "useNalaaLcd": {
+    "LCD_HQ30774_ENABLE": {
       "type": "boolean",
       "default": true,
-      "label": "Use Nalaa LCD"
+      "label": "Enable LCD HQ30774"
     },
-    "hq30774Enabled": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable HQ30774"
-    },
-    "cnkd0802Enabled": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable CNKD0802"
-    },
-    "newCnkd0802Enabled": {
+    "LCD_CNKD0802_24SEG_8COM": {
       "type": "boolean",
       "default": true,
-      "label": "Enable New CNKD0802"
+      "label": "Enable LCD CNKD0802 24SEG 8COM"
     },
-    "st7033Enabled": {
+    "LCD_NEW_CNKD0802_24SEG_8COM": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable ST7033"
-    },
-    "newSt7033Enabled": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable New ST7033"
-    },
-    "dotMatrixLcd": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Dot Matrix LCD"
-    },
-    "dotMatrixLowPwr": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Dot Matrix Low Power"
-    },
-    "forDialTest": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable For Dial Test"
-    },
-    "backlightTimeoutEnabled": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Backlight Timeout"
-    },
-    "screenOrder": {
-      "type": "enum",
-      "values": ["CONSTANT", "CHANGEABLE", "Alaa"],
-      "default": "CHANGEABLE",
-      "label": "Screen Order"
+      "default": true,
+      "label": "Enable New LCD CNKD0802 24SEG 8COM"
     },
     "screenLanguage": {
       "type": "enum",
-      "values": ["ENGLISH", "ARABIC", "Spain"],
-      "default": "ENGLISH",
+      "values": ["ENGLISH_SCREEN", "ARABIC_SCREEN"],
+      "labels": ["English","Arabic"],
+      "default": "ENGLISH_SCREEN",
       "label": "Screen Language"
     },
-    "recordNewCustomerDate": {
+    "CD0066_MH6531AHSP_ENGLISH": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable CD0066 MH6531AHSP English"
+    },
+    "RECORD_NEW_CUSTOMER_DATE": {
       "type": "boolean",
       "default": true,
       "label": "Record New Customer Date"
     },
-    "serialNumberChange": {
+    "SERIAL_NUMBER_CHANGE": {
       "type": "boolean",
       "default": true,
       "label": "Enable Serial Number Change"
     },
-    "displayMapScreen": {
+    "DISPLAY_MAP_SCREEN": {
       "type": "boolean",
       "default": true,
       "label": "Display Map Screen"
     },
-    "displayObis": {
-      "type": "integer",
+    "DISPLAY_OBIS": {
+      "type": "boolean",
       "default": 0,
-      "min": 0,
-      "max": 100,
       "label": "Display OBIS"
+    },
+    "DISPLAY_SCREEN_ORDER": {
+      "type": "map",
+      "values": ["CONSTANT_SCREEN_ORDER", "CHANGEABLE_SCREEN_ORDER"],
+      "labels": ["Constant Screen Order", "Changeable Screen Order"],
+      "default": "CONSTANT_SCREEN_ORDER",
+      "label": "Display Screen Order"
     }
   },
   "Metering": {
     "meterType": {
-      "type": "enum",
-      "values": ["singlePhase", "twoPhase", "threePhase"],
-      "default": "singlePhase",
-      "label": "Meter Type"
-    },
-    "directMeasurement": {
+    "type": "enum",
+    "labels": ["Single Phase", "Two Phase", "Three Phase","gfg"],
+    "values": [
+      "MTR_SINGLE_PH",
+       "MTR_TWO_PH",
+       "MTR_THREE_PH","fdfdf"
+    ],
+    "default": "Single Phase",
+    "label": "Meter Type"
+  },
+    "MTR_REACTIVE": {
       "type": "boolean",
       "default": true,
-      "label": "Enable Direct Measurement"
+      "label": "Reactive Meter"
     },
-    "numOfPhases": {
+    "meterMeasurement": {
+      "type": "enum",
+      "values": ["MTR_DIRECT", "MTR_INDIRECT"],
+      "default": true,
+      "label": "Enable Direct Calculations"
+    },
+     "meteringChips": {
+      "type": "enum",
+      "values": ["ADE7953_ENABLE", "V9203_ENABLE", "V9261F_ENABLE", "V9340_ENABLE", "V9360_ENABLE", "V9381_ENABLE"],
+      "default": "V9381",
+      "label": "Metering Chips"
+    },
+    "MTR_NUM_OF_PHASE": {
       "type": "integer",
       "default": 1,
       "min": 1,
       "max": 3,
       "label": "Number of Phases"
     },
-    "numOfChannels": {
+    "MTR_NUM_OF_CH": {
       "type": "integer",
       "default": 2,
       "min": 1,
       "max": 10,
       "label": "Number of Channels"
     },
-    "meteringChips": {
-      "type": "enum",
-      "values": ["ADE7953", "V9203", "V9261F", "V9340", "V9360", "V9381"],
-      "default": "V9381",
-      "label": "Metering Chips"
-    },
-    "pulseConstant": {
+
+      "pulseConstant": {
       "type": "enum",
       "values": ["CONSTANT_1000", "CONSTANT_1600", "CONSTANT_3200", "CONSTANT_10000"],
       "default": "CONSTANT_3200",
       "label": "Pulse Constant"
     },
-    "loadProfile": {
+    "MTR_LOAD_PROFILE": {
       "type": "boolean",
       "default": true,
       "label": "Enable Load Profile"
     },
-    "profileRecordNum": {
+    "PROFILE_RECORD_NUM": {
       "type": "integer",
       "default": 3360,
       "min": 0,
       "max": 10000,
       "label": "Profile Record Number"
     },
-    "profileTestRecords": {
+    "PROFILE_RECORD_TEST_MODE_NUM": {
       "type": "integer",
       "default": 20,
       "min": 0,
       "max": 100,
       "label": "Profile Test Records"
     },
-    "reverseTamper": {
+    "MTR_RVS_TMPR": {
       "type": "boolean",
       "default": true,
       "label": "Enable Reverse Tamper"
     },
-    "earthTamper": {
+    "MTR_ERTH_TMPR": {
       "type": "boolean",
       "default": true,
       "label": "Enable Earth Tamper"
     },
-    "enableLimiter": {
+    "MTR_ENABLE_LMT": {
       "type": "boolean",
       "default": true,
       "label": "Enable Limiter"
     },
-    "mismatchNeutral": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Mismatch Neutral"
-    },
-    "pulseCountEnable": {
+    "PULSE_COUNT_ENABLE": {
       "type": "boolean",
       "default": true,
       "label": "Enable Pulse Count"
     },
-    "sagZxtoFlags": {
+    "BIG_ENDIAN": {
       "type": "boolean",
       "default": true,
-      "label": "Enable Sag ZXTO Flags"
+      "label": "Big Endian"
     }
   },
-  "I2C_SPI": {
-    "i2cSpiEnable": {
+  "Communication":
+  {
+    "I2C_SPI_ENABLE": {
       "type": "boolean",
       "default": false,
       "label": "Enable I2C/SPI Settings"
     },
-    "i2cStatus": {
+    "I2C_STATUS": {
       "type": "enum",
-      "values": ["SHARED_I2C", "SEPARATE_I2C","Aaaa"],
+      "values": ["SHARED_I2C", "SEPARATE_I2C"],
       "default": "SEPARATE_I2C",
       "label": "I2C Status",
-      "dependsOn": "i2cSpiEnable"
+      "dependsOn": "I2C_SPI_ENABLE"
     },
-    "spiMode": {
-      "type": "enum",
-      "values": ["HW_SPI", "SW_SPI","Spi"],
-      "default": "HW_SPI",
-      "label": "SPI Mode",
-      "dependsOn": "i2cSpiEnable"
-    }
-  },
-  "RF_Link": {
-    "rfLinkFeature": {
+    "HW_SPI": {
       "type": "boolean",
-      "default": false,
+      "default": true,
+      "label": "Enable Hardware SPI"
+    },
+    "SW_SPI": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Software SPI"
+    },
+    "RF_LINK_FEATURE": {
+      "type": "boolean",
+      "default": true,
       "label": "Enable RF Link"
     },
-    "rfLinkMbusDevice": {
-      "type": "enum",
-      "values": ["RF_LINK_COLLECTOR", "RF_LINK_METER"],
+    "RF_LINK_MBUS_DEVICE": {
+      "type": "map",
+      "values": ["RF_LINK_METER"],
       "default": "RF_LINK_METER",
-      "label": "RF Link Device",
-      "dependsOn": "rfLinkFeature"
+      "label": "RF Link Device"
     },
-    "rfLinkTiCc1120Enabled": {
+    "RF_LINK_TI_CC1120_ENABLE": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable TI CC1120",
-      "dependsOn": "rfLinkFeature"
+      "default": true,
+      "label": "Enable TI CC1120"
     },
-    "rfLinkTiCc1120Port": {
-      "type": "enum",
-      "values": ["USART1", "USART2", "USART3","USART4"],
+    "RF_LINK_TI_CC1120_PORT": {
+      "type": "map",
+      "values": ["USART0", "USART1","USART2"],
       "default": "USART2",
-      "label": "TI CC1120 Port",
-      "dependsOn": "rfLinkTiCc1120Enabled"
+      "label": "TI CC1120 Port"
     },
-    "rfLinkTiCc1120ResetPower": {
+    "RF_LINK_TI_CC1120_RESET_POWER": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable TI CC1120 Reset Power",
-      "dependsOn": "rfLinkTiCc1120Enabled"
-    }
-  },
-  "RFID": {
-    "rfidFeature": {
+      "default": true,
+      "label": "Enable TI CC1120 Reset Power"
+    },
+    "RFID_FEATURE": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "label": "Enable RFID Feature"
     },
-    "rfidEnabled": {
+    "MFRC522_ENABLE": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable RFID",
-      "dependsOn": "rfidFeature"
+      "default": true,
+      "label": "Enable RFID"
     },
-    "rfidCardType": {
-      "type": "enum",
-      "values": ["MFRC522_CARD_1K", "MFRC522_CARD_4K", "MFRC522_CARD_32K"],
+    "MFRC522_CARD_TYPE": {
+      "type": "map",
+      "values": ["MFRC522_CARD_1K","MFRC522_CARD_4K","MFRC522_CARD_32K"],
       "default": "MFRC522_CARD_32K",
-      "label": "RFID Card Type",
-      "dependsOn": "rfidEnabled"
+      "label": "RFID Card Type"
     },
-    "rfidParLimited": {
+    "MFRC522_CARD_32k_TYPE": {
+      "type": "map",
+      "values": ["CARD_32k_MASRIA_NXP_P60","CARD_32k_MASRIA_MTCOS_FLEX_ID"],
+      "default": "CARD_32k_MASRIA_MTCOS_FLEX_ID",
+      "label": "RFID 32K Card Type"
+    },
+    "MFRC522_INCREASE_SPEED": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable Limited Parameters",
-      "dependsOn": "rfidEnabled"
+      "default": true,
+      "label": "Enable MFRC522 Increase Speed"
     },
-    "rfidPrepaidParNum": {
+    "RFID_SEQ_READ_WRITE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable RFID Sequential Read/Write"
+    },
+    "RFID_BUFFER_LEN": {
+      "type": "integer",
+      "default": 2000,
+      "min": 0,
+      "max": 5000,
+      "label": "RFID Buffer Length"
+    },
+    "RFID_PAR_LIMITED": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Limited Parameters"
+    },
+    "RFID_PREPAID_PAR_NUM": {
       "type": "integer",
       "default": 100,
       "min": 0,
       "max": 1000,
-      "label": "Prepaid Parameter Number",
-      "dependsOn": "rfidParLimited"
+      "label": "Prepaid Parameter Number"
     },
-    "rfidParPredefined": {
+    "RFID_PAR_PREDEFINED": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable Predefined Parameters",
-      "dependsOn": "rfidParLimited"
+      "default": true,
+      "label": "Enable Predefined Parameters"
     },
-    "rfidParPostdefined": {
+    "RFID_PAR_POSTDEFINED": {
       "type": "boolean",
-      "default": false,
-      "label": "Enable Postdefined Parameters",
-      "dependsOn": "rfidParLimited"
+      "default": true,
+      "label": "Enable Postdefined Parameters"
     },
-    "rfidPostpaidParNum": {
+    "RFID_POSTPAID_PAR_NUM": {
       "type": "integer",
-      "default": 100,
+      "default": 1000,
       "min": 0,
-      "max": 1000,
-      "label": "Postpaid Parameter Number",
-      "dependsOn": "rfidParPostdefined"
-    }
-  },
-  "RS485": {
-    "rs485Feature": {
+      "max": 2000,
+      "label": "Postpaid Parameter Number"
+    },
+    "RS485_FEATURE": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "label": "Enable RS485"
     },
-    "rs485BaudRate": {
-      "type": "enum",
-      "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
-      "default": "Dlms_eBaud9600",
-      "label": "RS485 Baud Rate",
-      "dependsOn": "rs485Feature"
-    },
-    "rs485Itf": {
-      "type": "integer",
-      "default": 2,
-      "min": 0,
-      "max": 10,
-      "label": "RS485 Interface Timeout",
-      "dependsOn": "rs485Feature"
-    }
-  },
-  "Modem": {
-    "modemEnable": {
+    "MODEM_ENABLE": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "label": "Enable Modem"
     },
-    "modemBaudRate": {
-      "type": "enum",
-      "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      "default": "5",
-      "label": "Modem Baud Rate",
-      "dependsOn": "modemEnable"
+    "MODEM_BAUD_RATE": {
+      "type": "string",
+      "min": 0,
+      "max": 115200,
+      "default": 5,
+      "label": "Modem Baud Rate"
+    },
+     "GPRS_FEATURE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable GPRS"
+    },
+    "GPRS_SEND_NOTIFICATION_FEATURE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Send Notification"
+    },
+    "SCREEN_GPRS_FEATURE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable GPRS Screen Feature"
+    },
+    "GPRS_DATA_BUFFER_SIZE": {
+      "type": "integer",
+      "default": 1500,
+      "min": 0,
+      "max": 2000,
+      "label": "GPRS Data Buffer Size"
+    },
+    "GPRS_SRT_CARD": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable SRT Card"
+    },
+    "IEC_62056_21_SLAVE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable IEC 62056-21 Slave"
+    },
+    "IEC_BUFFER_SIZE": {
+      "type": "integer",
+      "default": 1056,
+      "min": 0,
+      "max": 2000,
+      "label": "IEC Buffer Size"
+    },
+    "IEC_62056_21_ISR_ENABLE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable IEC ISR"
+    },
+    "OPTICAL_DMA_ENABLE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Optical DMA"
     }
   },
-  "IR": {
-    "irEnable": {
+  "Memory": {
+    "FILE_SYS_USE_INT": {
+      "type": "boolean",
+      "default": true,
+      "label": "Use Internal MCU Memory in File System",
+      "description": "Enable or disable the use of internal MCU memory for the file system."
+    },
+    "FILE_SYS_LOG": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Logging APIs",
+      "description": "Enable logging APIs, dependent on events or money transaction logging.",
+      "dependsOn": ["CTRL_EVNT_LOG", "PYMT_MONY_TRANS"]
+    },
+    "CTRL_SUPER_CAP": {
+      "type": "boolean",
+      "default": false,
+      "label": "Super Capacitor Enabled",
+      "description": "Indicates if super capacitor is used, affecting event and meter logging."
+    },
+    "CTRL_EVNT_LOG": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Events Logging",
+      "description": "Enable logging of events, only available if super capacitor is not enabled.",
+      "dependsOn": "CTRL_SUPER_CAP",
+      "dependsOnCondition": false
+    },
+    "EVENT_LOG_RECORD_NUM": {
+      "type": "integer",
+      "default": 0,
+      "min": 0,
+      "max": 402,
+      "label": "Max Events Log Records",
+      "description": "Maximum number of records to store in the events log.",
+      "dependsOn": ["CTRL_EVNT_LOG", "CTRL_SUPER_CAP"],
+      "dependsOnCondition": [true, false]
+    },
+    "CTRL_CFG_METER_LOG": {
+      "type": "boolean",
+      "default": false,
+      "label": "Enable Configure Meter Logging",
+      "description": "Enable logging for meter configuration, only available if super capacitor is not enabled.",
+      "dependsOn": "CTRL_SUPER_CAP",
+      "dependsOnCondition": false
+    },
+    "CFG_METER_RECORD_NUM": {
+      "type": "integer",
+      "default": 0,
+      "min": 0,
+      "max": 30,
+      "label": "Max Configure Meter Records",
+      "description": "Maximum number of records to store in the meter configuration log.",
+      "dependsOn": ["CTRL_CFG_METER_LOG", "CTRL_SUPER_CAP"],
+      "dependsOnCondition": [true, false]
+    },
+    "FM24C128D_2_Wire_Serial_EEPROM": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable FM24C128D 2-Wire Serial EEPROM",
+      "description": "Enable or disable the FM24C128D 2-Wire Serial EEPROM."
+    },
+    "FLASH_FM25W32_ENABLE": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Flash FM25W32",
+      "description": "Enable or disable the Flash FM25W32."
+    }
+  },
+    "Dlms":
+    {
+       "IR_ENABLE": {
       "type": "boolean",
       "default": false,
       "label": "Enable IR Settings"
     },
-    "irCom": {
+    "Dlms_mIrCom": {
       "type": "integer",
       "default": 13,
       "min": 0,
       "max": 20,
       "label": "IR Com Port",
-      "dependsOn": "irEnable"
+      "dependsOn": "IR_ENABLE"
     },
-    "irDefaultBaudRate": {
-      "type": "enum",
+    "Dlms_mIrDefaultBaudrate": {
+      "type": "map",
       "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
       "default": "Dlms_eBaud300",
       "label": "IR Default Baud Rate",
-      "dependsOn": "irEnable"
+      "dependsOn": "IR_ENABLE"
     },
-    "irNormalBaudRate": {
-      "type": "enum",
+    "Dlms_mIrCommunicationMode": {
+      "type": "map",
+      "values": ["Dlms_eModeIec", "Dlms_eModeDlmsUA"],
+      "default": "Dlms_eModeIec",
+      "label": "IR Communication Mode",
+      "dependsOn": "IR_ENABLE"
+    },
+    "Dlms_mIrNormalBaudrate": {
+      "type": "map",
       "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
       "default": "Dlms_eBaud9600",
       "label": "IR Normal Baud Rate",
-      "dependsOn": "irEnable"
+      "dependsOn": "IR_ENABLE"
     },
-    "irItb": {
+    "DLMS_mIrItb": {
       "type": "integer",
       "default": 20,
       "min": 0,
       "max": 100,
       "label": "IR Frame Timeout (10ms)",
-      "dependsOn": "irEnable"
-    }
-  },
-  "GPRS": {
-    "gprsFeature": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable GPRS"
+      "dependsOn": "IR_ENABLE"
     },
-    "gprsSendNotification": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Send Notification",
-      "dependsOn": "gprsFeature"
-    },
-    "gprsScreenFeature": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable GPRS Screen Feature",
-      "dependsOn": "gprsFeature"
-    },
-    "gprsDataBufferSize": {
-      "type": "integer",
-      "default": 1500,
-      "min": 0,
-      "max": 2000,
-      "label": "GPRS Data Buffer Size",
-      "dependsOn": "gprsFeature"
-    },
-    "gprsSrtCard": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable SRT Card",
-      "dependsOn": "gprsFeature"
-    }
-  },
-  "IEC": {
-    "iec62056Slave": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable IEC 62056-21 Slave"
-    },
-    "iecBufferSize": {
-      "type": "integer",
-      "default": 1056,
-      "min": 0,
-      "max": 2000,
-      "label": "IEC Buffer Size",
-      "dependsOn": "iec62056Slave"
-    },
-    "iecBaudRate": {
-      "type": "enum",
-      "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-      "default": "4",
-      "label": "IEC Baud Rate",
-      "dependsOn": "iec62056Slave"
-    },
-    "iecTimeoutSec": {
-      "type": "integer",
-      "default": 7,
-      "min": 0,
-      "max": 255,
-      "label": "IEC Timeout (sec)",
-      "dependsOn": "iec62056Slave"
-    },
-    "iecIsrEnable": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable IEC ISR",
-      "dependsOn": "iec62056Slave"
-    },
-    "opticalDmaEnable": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable Optical DMA",
-      "dependsOn": "iec62056Slave"
-    }
-  },
-  "IP": {
-    "ipEnable": {
-      "type": "boolean",
-      "default": false,
-      "label": "Enable IP Communication"
-    },
-    "ipInactivityTime": {
+        "_IP_":
+      {
+        "type": "boolean",
+        "default": false,
+        "label": "Enable IP Settings"
+      },
+    "Dlms_IpWrap_mInactivityTime": {
       "type": "integer",
       "default": 55,
       "min": 0,
       "max": 100,
       "label": "IP Inactivity Time (sec)",
-      "dependsOn": "ipEnable"
+      "dependsOn": "_IP_"
     },
-    "ipPort": {
+    "DLMS_IpWarp_mPort": {
       "type": "integer",
       "default": 4059,
       "min": 0,
       "max": 65535,
       "label": "IP Port",
-      "dependsOn": "ipEnable"
+      "dependsOn": "_IP_"
     },
-    "ipCommProfile": {
-      "type": "enum",
+    "Dlms_IpWrap_mDefaultCommProfile": {
+      "type": "map",
       "values": ["Dlms_eIpTcp", "Dlms_eIpUdp"],
       "default": "Dlms_eIpTcp",
       "label": "IP Communication Profile",
-      "dependsOn": "ipEnable"
+      "dependsOn": "_IP_"
+    },
+    "Dlms_IpWrap_mItf": {
+      "type": "integer",
+      "default": 1,
+      "min": 0,
+      "max": 10,
+      "label": "IP Interface",
+      "dependsOn": "_IP_"
+    }, 
+    "DLMS_mRsCom": {
+      "type": "integer",
+      "default": 1,
+      "min": 0,
+      "max": 10,
+      "label": "RS485 Com Port"
+    },
+    "Dlms_mRsBaudrate": {
+      "type": "map",
+      "values": ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"],
+      "default": "Dlms_eBaud9600",
+      "label": "RS485 Baud Rate"
+    },
+    "Dlms_mRsDatabits": {
+      "type": "map",
+      "values": ["Dlms_m7DataBits", "Dlms_m8DataBits"],
+      "default": "Dlms_m8DataBits",
+      "label": "RS485 Data Bits"
+    },
+    "Dlms_mRsParity": {
+      "type": "map",
+      "values": ["Dlms_NoParity", "Dlms_EvenParity"],
+      "default": "Dlms_NoParity",
+      "label": "RS485 Parity"
+    },
+    "DLMS_MrsItf": {
+      "type": "integer",
+      "default": 2,
+      "min": 0,
+      "max": 10,
+      "label": "RS485 Interface Timeout"
     }
-  }
-  ,
-  "optimizationTariff": true,
-  "billingHistory": true,
-  "historyRecords": 12,
-  "mdKw": true,
-  "mdKva": true,
-  "mdA": true,
-  "paymentSystem": true,
-  "lowCreditLevels": 2,
-  "moneyTransRecords": 20,
-  "enableTaxes": true,
-  "friendlyPeriods": true,
-  "vacationTariff": true,
-  "gracePeriod": true,
-  "Control": {
-    "label": "Control Configurations",
-    "pins": { "label": "Control Pins" },
-    "rfidBoardPinEnabled": { "label": "Enable RFID Board Pin", "type": "boolean", "default": true },
-    "powerFailPinFeature": { "label": "Power Fail Pin Feature", "type": "boolean", "default": true },
-    "keypad": { "label": "Keypad System", "settings": { "label": "Keypad Settings" } },
-    "application": { "label": "Application" },
-    "batteryType": { "label": "Battery Type", "type": "enum", "values": ["non_chargeable", "chargeable", "super_capacitor","super_capacitor"], "default": "non_chargeable" }
-  }
+  },
+
+  "Tariff": {
+    "TARIFF_SYS": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Tariff System"
+    },
+    "OPTIMIZATION_TARIFF": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Optimization Tariff"
+    },
+    "TRF_BP_HISTORY": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Billing Period History"
+    },
+    "TRF_BP_HISTORY_RECORDS": {
+      "type": "integer",
+      "default": 12,
+      "min": 0,
+      "max": 100,
+      "label": "Billing History Records"
+    },
+    "TRF_USE_MD_KW": {
+      "type": "boolean",
+      "default": true,
+      "label": "Record MD of Active Energy"
+    },
+    "TRF_USE_MD_A": {
+      "type": "boolean",
+      "default": true,
+      "label": "Record MD of Current"
+    },
+    "PAYMENT_SYS": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Payment System"
+    },
+    "PYMT_LOW_TWO_LVL": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Two-Level Low Credit"
+    },
+    "PMYT_LVL": {
+      "type": "integer",
+      "default": 2,
+      "min": 1,
+      "max": 10,
+      "label": "Number of Low Credit Levels"
+    },
+    "PYMT_MONY_TRANS": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Money Transaction Logging"
+    },
+    "PMYT_MNY_TRANS_REC": {
+      "type": "integer",
+      "default": 20,
+      "min": 0,
+      "max": 100,
+      "label": "Money Transaction Records"
+    },
+    "PYMT_TAX": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Taxes"
+    },
+    "PYMT_FRIENDLY": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Friendly Periods"
+    },
+    "PYMT_VACATION_TRF": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Vacation Tariff"
+    }
+  },
+  
+    "Control": {
+        "CTRL_RFID_BOARD_PIN_ENABLE": {
+            "type": "boolean",
+            "default": true,
+            "label": "Enable RFID Board Pin",
+            "section": "Control Pins",
+            "description": "Enable RFID board pin control"
+        },
+        "POWER_FAIL_PIN_FEATURE": {
+            "type": "boolean",
+            "default": true,
+            "label": "Power Fail Pin Feature",
+            "section": "Control Pins",
+            "description": "Enable power fail detection pin"
+        },
+        "CTRL_GPRS_MODULE_CVR_SW": {
+            "type": "boolean",
+            "default": true,
+            "label": "GPRS Module Cover Switch",
+            "section": "Control Pins",
+            "description": "Enable GPRS module cover switch detection"
+        },
+        "CTRL_CVR_SW": {
+            "type": "boolean",
+            "default": true,
+            "label": "Cover Switch",
+            "section": "Control Pins",
+            "description": "Enable main cover switch detection"
+        },
+        "CTRL_TRMNL_SW": {
+            "type": "boolean",
+            "default": true,
+            "label": "Terminal Switch",
+            "section": "Control Pins",
+            "description": "Enable terminal block switch detection"
+        },
+        "CTRL_UP_SW": {
+            "type": "boolean",
+            "default": true,
+            "label": "Up Switch",
+            "section": "Control Pins",
+            "description": "Enable up navigation switch"
+        },
+        "CTRL_DN_SW": {
+            "type": "boolean",
+            "default": true,
+            "label": "Down Switch",
+            "section": "Control Pins",
+            "description": "Enable down navigation switch"
+        },
+        "CTRL_MGNT_SW": {
+            "type": "boolean",
+            "default": false,
+            "label": "Magnetic Switch Detection",
+            "section": "Detection Method",
+            "group": "magnetic_detection",
+            "exclusive": "CTRL_MGNT_SENSOR",
+            "description": "Use magnetic switch for tamper detection"
+        },
+        "CTRL_MGNT_SENSOR": {
+            "type": "boolean",
+            "default": false,
+            "label": "Magnetic Sensor Detection",
+            "section": "Detection Method",
+            "group": "magnetic_detection",
+            "exclusive": "CTRL_MGNT_SW",
+            "description": "Use magnetic sensor for tamper detection"
+        },
+        "CTRL_ACTIONS": {
+            "type": "boolean",
+            "default": true,
+            "label": "Enable Actions",
+            "section": "Action Controls",
+            "description": "Enable all control actions"
+        },
+        "CTRL_RLY": {
+            "type": "boolean",
+            "default": true,
+            "label": "Relay Control",
+            "section": "Action Controls",
+            "depends": "CTRL_ACTIONS",
+            "description": "Enable relay control functionality"
+        },
+        "CTRL_TMPR_LED": {
+            "type": "boolean",
+            "default": true,
+            "label": "Tamper LED Control",
+            "section": "Action Controls",
+            "depends": "CTRL_ACTIONS",
+            "description": "Enable tamper LED indication"
+        },
+        "CTRL_LOW_CRDT_LED": {
+            "type": "boolean",
+            "default": true,
+            "label": "Low Credit LED Control",
+            "section": "Action Controls",
+            "depends": "CTRL_ACTIONS",
+            "description": "Enable low credit LED indication"
+        },
+        "CTRL_BZR": {
+            "type": "boolean",
+            "default": true,
+            "label": "Buzzer Control",
+            "section": "Action Controls",
+            "depends": "CTRL_ACTIONS",
+            "description": "Enable buzzer control"
+        },
+        "AC_BUZZER_FEATURE": {
+            "type": "boolean",
+            "default": true,
+            "label": "AC Buzzer",
+            "section": "Action Controls",
+            "depends": "CTRL_BZR",
+            "description": "Enable AC buzzer feature"
+        },
+        "CTRL_ALRM_ICON": {
+            "type": "boolean",
+            "default": true,
+            "label": "Alarm Icon Control",
+            "section": "Action Controls",
+            "depends": "CTRL_ACTIONS",
+            "description": "Enable alarm icon display"
+        },
+        "BATTERY_TYPE": {
+            "type": "enum",
+            "default": "CTRL_BTRY_NON_CHRG",
+            "label": "Battery Type",
+            "section": "Power Configuration",
+            "values": ["CTRL_BTRY_NON_CHRG", "CTRL_BTRY_CHRG", "CTRL_SUPER_CAP","fgfg"],
+            "labels": ["Non-chargeable Battery", "Chargeable Battery", "Super Capacitor","gfg"],
+            "description": "Select power backup type"
+        },
+        "CTRL_RTC": {
+            "type": "boolean",
+            "default": false,
+            "label": "Enable RTC",
+            "section": "Power Configuration",
+            "exclude": "CTRL_SUPER_CAP",
+            "description": "Enable real-time clock (disabled for super capacitor)"
+        },
+        "KEYPAD_FEATURE": {
+            "type": "boolean",
+            "default": true,
+            "label": "Enable Keypad",
+            "section": "Keypad System",
+            "description": "Enable keypad functionality"
+        },
+        "KEYPAD_TYPE": {
+            "type": "enum",
+            "default": "TOUCH_KEYPAD",
+            "label": "Keypad Type",
+            "section": "Keypad System",
+            "depends": "KEYPAD_FEATURE",
+            "values": ["TOUCH_KEYPAD", "RUBBER_KEYPAD"],
+            "labels": ["Touch Keypad", "Rubber Keypad"],
+            "description": "Select keypad type"
+        },
+        "SUPERCAP_FEATURE": {
+            "type": "boolean",
+            "default": false,
+            "label": "Super Capacitor Feature",
+            "section": "Power Configuration",
+            "description": "Enable super capacitor support"
+        }
+    }
 }

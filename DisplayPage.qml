@@ -4,34 +4,50 @@ import QtQuick.Layouts 1.15
 
 Page {
     id: rootPage
-    property var config: ({
-        displayType: "segmented",
-        useNewLcd: true,
-        hq30774Enabled: false,
-        cnkd0802Enabled: false,
-        newCnkd0802Enabled: true,
-        st7033Enabled: false,
-        newSt7033Enabled: false,
-        dotMatrixLcd: false,
-        dotMatrixLowPwr: false,
-        forDialTest: false,
-        backlightTimeoutEnabled: false,
-        screenOrder: "CHANGEABLE",
-        screenLanguage: "ENGLISH",
-        recordNewCustomerDate: true,
-        serialNumberChange: true,
-        displayMapScreen: true,
-        displayObis: 0,
-
-                                  systemClock: 25000,
-                                  descriptionBrief: "Configuration for Ashntti V94XX 1-phase meter",
-                                  descriptionVersion: "1.0",
-                                  descriptionDate: "2025-06-24",
-                                  descriptionAuthor: "User",
-                                  descriptionDetails: "Initial setup for device configuration created at 05:43 PM EEST, Tuesday, June 24, 2025.\nThis is a longer description to test fitting and scrolling behavior."
-                              })
-
+    property var config: configGenerator.config || {
+        "Display.displayType": "SEGMENTED_LCD_ENABLE",
+        "Display.DOT_MATRIX_LOW_PWR_FEATURE": true,
+        "Display.USE_NEW_LCD": true,
+        "Display.LCD_HQ30774_ENABLE": true,
+        "Display.LCD_CNKD0802_24SEG_8COM": true,
+        "Display.LCD_NEW_CNKD0802_24SEG_8COM": true,
+        "Display.screenLanguage": "ENGLISH_SCREEN",
+        "Display.CD0066_MH6531AHSP_ENGLISH": true,
+        "Display.RECORD_NEW_CUSTOMER_DATE": true,
+        "Display.SERIAL_NUMBER_CHANGE": true,
+        "Display.DISPLAY_MAP_SCREEN": true,
+        "Display.DISPLAY_OBIS": false,
+        "Display.DISPLAY_SCREEN_ORDER": "CONSTANT_SCREEN_ORDER"
+    }
     signal configUpdated(var newConfig)
+
+    property string pageId: "DisplayPage_" + Math.random().toString(36).substr(2, 9)
+
+    Component.onCompleted: {
+        console.log(pageId, "Initialized with config:", JSON.stringify(config))
+        // Initialize missing config keys with schema defaults
+        const displaySchema = configGenerator.schema["Display"] || {}
+        for (let key in displaySchema) {
+            const fullKey = "Display." + key;
+            if (config[fullKey] === undefined && displaySchema[key].default !== undefined) {
+                config[fullKey] = displaySchema[key].default;
+                console.log(pageId, "Initialized missing config key:", fullKey, "with default:", config[fullKey]);
+            }
+        }
+        // Sync initial config with backend
+        updateConfigAll();
+    }
+
+    Connections {
+        target: configGenerator
+        function onErrorOccurred(error) {
+            console.error(pageId, "Backend error:", error);
+        }
+        function onConfigChanged() {
+            console.log(pageId, "Backend config changed:", JSON.stringify(configGenerator.config));
+            config = configGenerator.config;
+        }
+    }
 
     background: Rectangle {
         color: "#F5F7FA"
@@ -48,8 +64,6 @@ Page {
             id: formLayout
             width: parent.width - 48
             spacing: 24
-
-
 
             // Header Section
             Rectangle {
@@ -88,7 +102,6 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -103,16 +116,14 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
-                            text: "Display Type:"
+                            text: configGenerator.schema["Display"]?.displayType?.label || "Display Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         ComboBox {
                             id: displayTypeCombo
                             Layout.fillWidth: true
@@ -120,9 +131,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-
-                            model: configGenerator.schema["displayType"]
-
+                            property var schema: configGenerator.schema["Display"]?.displayType || {}
+                            model: schema.labels || ["Segmented LCD", "Dot Matrix LCD"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -133,13 +143,11 @@ Page {
                                 elide: Text.ElideRight
                                 width: displayTypeCombo.width - 20
                             }
-
                             popup: Popup {
                                 y: displayTypeCombo.height
                                 width: displayTypeCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
-
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
@@ -148,26 +156,42 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
-
                             background: Rectangle {
                                 color: displayTypeCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: displayTypeCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: displayTypeCombo.focus ? 2 : 1
                                 radius: 6
                             }
-
                             Component.onCompleted: {
-                                const options = model
-                                const current = config.displayType || "segmented"
-                                const idx = options ? options.indexOf(current) : -1
-                                if (idx >= 0) currentIndex = idx
-                            }
-
-                            onCurrentIndexChanged: {
-                                if (model.length > 0 && model[currentIndex] !== undefined) {
-                                    updateConfig("displayType", model[currentIndex])
+                                if (schema.values) {
+                                    const current = config["Display.displayType"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "DisplayTypeCombo initialized with index:", currentIndex, "value:", current);
                                 }
                             }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Display.displayType", schema.values[index]);
+                                }
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        spacing: 12
+                        Layout.fillWidth: true
+                        Label {
+                            text: configGenerator.schema["Display"]?.USE_NEW_LCD?.label || "Use New LCD"
+                            font.pixelSize: 16
+                            font.family: "Roboto"
+                            color: "#1A2526"
+                            Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
+                        }
+                        CheckBox {
+                            id: useNewLcdCheck
+                            checked: config["Display.USE_NEW_LCD"] || false
+                            onCheckedChanged: updateConfig("Display.USE_NEW_LCD", checked)
                         }
                     }
                 }
@@ -182,7 +206,7 @@ Page {
                 color: "#1A2526"
                 Layout.topMargin: 16
                 Layout.bottomMargin: 8
-                visible: config.displayType === "segmented"
+                visible: config["Display.displayType"] === "SEGMENTED_LCD_ENABLE"
             }
 
             // Segmented Displays Group
@@ -191,8 +215,7 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-                visible: config.displayType === "segmented"
-
+                visible: config["Display.displayType"] === "SEGMENTED_LCD_ENABLE"
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -205,75 +228,24 @@ Page {
                     width: parent.width - 24
 
                     CheckBox {
-                        id: useNewLcdCheck
-                        property bool localChecked: config.useNewLcd || false
-                        text: "Use New LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("useNewLcd", checked)
-                        }
-                        Component.onCompleted: localChecked = config.useNewLcd || false
-                    }
-
-                    CheckBox {
                         id: hq30774Check
-                        property bool localChecked: config.hq30774Enabled || false
-                        text: "Enable HQ30774 LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("hq30774Enabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.hq30774Enabled || false
+                        text: configGenerator.schema["Display"]?.LCD_HQ30774_ENABLE?.label || "Enable LCD HQ30774"
+                        checked: config["Display.LCD_HQ30774_ENABLE"] || false
+                        onCheckedChanged: updateConfig("Display.LCD_HQ30774_ENABLE", checked)
                     }
 
                     CheckBox {
                         id: cnkd0802Check
-                        property bool localChecked: config.cnkd0802Enabled || false
-                        text: "Enable CNKD0802 LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("cnkd0802Enabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.cnkd0802Enabled || false
+                        text: configGenerator.schema["Display"]?.LCD_CNKD0802_24SEG_8COM?.label || "Enable LCD CNKD0802 24SEG 8COM"
+                        checked: config["Display.LCD_CNKD0802_24SEG_8COM"] || false
+                        onCheckedChanged: updateConfig("Display.LCD_CNKD0802_24SEG_8COM", checked)
                     }
 
                     CheckBox {
                         id: newCnkd0802Check
-                        property bool localChecked: config.newCnkd0802Enabled || false
-                        text: "Enable New CNKD0802 LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("newCnkd0802Enabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.newCnkd0802Enabled || false
-                    }
-
-                    CheckBox {
-                        id: st7033Check
-                        property bool localChecked: config.st7033Enabled || false
-                        text: "Enable ST7033 LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("st7033Enabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.st7033Enabled || false
-                    }
-
-                    CheckBox {
-                        id: newSt7033Check
-                        property bool localChecked: config.newSt7033Enabled || false
-                        text: "Enable New ST7033 LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("newSt7033Enabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.newSt7033Enabled || false
+                        text: configGenerator.schema["Display"]?.LCD_NEW_CNKD0802_24SEG_8COM?.label || "Enable New LCD CNKD0802 24SEG 8COM"
+                        checked: config["Display.LCD_NEW_CNKD0802_24SEG_8COM"] || false
+                        onCheckedChanged: updateConfig("Display.LCD_NEW_CNKD0802_24SEG_8COM", checked)
                     }
                 }
             }
@@ -287,7 +259,7 @@ Page {
                 color: "#1A2526"
                 Layout.topMargin: 16
                 Layout.bottomMargin: 8
-                visible: config.displayType === "dotMatrix"
+                visible: config["Display.displayType"] === "DOT_MATRIX_LCD_ENABLE"
             }
 
             // Dot Matrix Displays Group
@@ -296,8 +268,7 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-                visible: config.displayType === "dotMatrix"
-
+                visible: config["Display.displayType"] === "DOT_MATRIX_LCD_ENABLE"
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -310,27 +281,10 @@ Page {
                     width: parent.width - 24
 
                     CheckBox {
-                        id: dotMatrixLcdCheck
-                        property bool localChecked: config.dotMatrixLcd || false
-                        text: "Enable Dot Matrix LCD"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("dotMatrixLcd", checked)
-                        }
-                        Component.onCompleted: localChecked = config.dotMatrixLcd || false
-                    }
-
-                    CheckBox {
                         id: dotMatrixLowPwrCheck
-                        property bool localChecked: config.dotMatrixLowPwr || false
-                        text: "Enable Dot Matrix Low Power Feature"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("dotMatrixLowPwr", checked)
-                        }
-                        Component.onCompleted: localChecked = config.dotMatrixLowPwr || false
+                        text: configGenerator.schema["Display"]?.DOT_MATRIX_LOW_PWR_FEATURE?.label || "Enable Dot Matrix Low Power"
+                        checked: config["Display.DOT_MATRIX_LOW_PWR_FEATURE"] || false
+                        onCheckedChanged: updateConfig("Display.DOT_MATRIX_LOW_PWR_FEATURE", checked)
                     }
                 }
             }
@@ -344,7 +298,7 @@ Page {
                 color: "#1A2526"
                 Layout.topMargin: 16
                 Layout.bottomMargin: 8
-                visible: config.displayType !== ""
+                visible: config["Display.displayType"] !== ""
             }
 
             // Display Features Group
@@ -353,8 +307,7 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-                visible: config.displayType !== ""
-
+                visible: config["Display.displayType"] !== ""
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -367,30 +320,44 @@ Page {
                     width: parent.width - 24
 
                     CheckBox {
-                        id: backlightCheck
-                        property bool localChecked: config.backlightTimeoutEnabled || false
-                        text: "Enable Backlight Timeout"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("backlightTimeoutEnabled", checked)
-                        }
-                        Component.onCompleted: localChecked = config.backlightTimeoutEnabled || false
+                        id: recordNewCustomerDateCheck
+                        text: configGenerator.schema["Display"]?.RECORD_NEW_CUSTOMER_DATE?.label || "Record New Customer Date"
+                        checked: config["Display.RECORD_NEW_CUSTOMER_DATE"] || false
+                        onCheckedChanged: updateConfig("Display.RECORD_NEW_CUSTOMER_DATE", checked)
+                    }
+
+                    CheckBox {
+                        id: serialNumberChangeCheck
+                        text: configGenerator.schema["Display"]?.SERIAL_NUMBER_CHANGE?.label || "Enable Serial Number Change"
+                        checked: config["Display.SERIAL_NUMBER_CHANGE"] || false
+                        onCheckedChanged: updateConfig("Display.SERIAL_NUMBER_CHANGE", checked)
+                    }
+
+                    CheckBox {
+                        id: displayMapScreenCheck
+                        text: configGenerator.schema["Display"]?.DISPLAY_MAP_SCREEN?.label || "Display Map Screen"
+                        checked: config["Display.DISPLAY_MAP_SCREEN"] || false
+                        onCheckedChanged: updateConfig("Display.DISPLAY_MAP_SCREEN", checked)
+                    }
+
+                    CheckBox {
+                        id: displayObisCheck
+                        text: configGenerator.schema["Display"]?.DISPLAY_OBIS?.label || "Display OBIS"
+                        checked: config["Display.DISPLAY_OBIS"] || false
+                        onCheckedChanged: updateConfig("Display.DISPLAY_OBIS", checked)
                     }
 
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
-                            text: "Screen Order:"
+                            text: configGenerator.schema["Display"]?.DISPLAY_SCREEN_ORDER?.label || "Display Screen Order"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         ComboBox {
                             id: screenOrderCombo
                             Layout.fillWidth: true
@@ -398,9 +365,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-
-                            model: configGenerator.schema["screenOrder"]
-
+                            property var schema: configGenerator.schema["Display"]?.DISPLAY_SCREEN_ORDER || {}
+                            model: schema.labels
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -411,13 +377,11 @@ Page {
                                 elide: Text.ElideRight
                                 width: screenOrderCombo.width - 20
                             }
-
                             popup: Popup {
                                 y: screenOrderCombo.height
                                 width: screenOrderCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
-
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
@@ -426,39 +390,25 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
-
                             background: Rectangle {
                                 color: screenOrderCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: screenOrderCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: screenOrderCombo.focus ? 2 : 1
                                 radius: 6
                             }
-
                             Component.onCompleted: {
-                                const options = model
-                                const current = config.screenOrder || "CHANGEABLE"
-                                const idx = options ? options.indexOf(current) : -1
-                                if (idx >= 0) currentIndex = idx
+                                if (schema.values) {
+                                    const current = config["Display.DISPLAY_SCREEN_ORDER"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "ScreenOrderCombo initialized with index:", currentIndex, "value:", current);
+                                }
                             }
-
-                            onCurrentIndexChanged: {
-                                if (model.length > 0 && model[currentIndex] !== undefined) {
-                                    updateConfig("screenOrder", model[currentIndex])
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Display.DISPLAY_SCREEN_ORDER", schema.values[index]);
                                 }
                             }
                         }
-                    }
-
-                    CheckBox {
-                        id: mapScreenCheck
-                        property bool localChecked: config.displayMapScreen || false
-                        text: "Enable Map Screen"
-                        checked: localChecked
-                        onCheckedChanged: {
-                            localChecked = checked
-                            updateConfig("displayMapScreen", checked)
-                        }
-                        Component.onCompleted: localChecked = config.displayMapScreen || false
                     }
                 }
             }
@@ -472,7 +422,7 @@ Page {
                 color: "#1A2526"
                 Layout.topMargin: 16
                 Layout.bottomMargin: 8
-                visible: config.displayType !== ""
+                visible: config["Display.displayType"] !== ""
             }
 
             // Screen Language Group
@@ -481,8 +431,7 @@ Page {
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-                visible: config.displayType !== ""
-
+                visible: config["Display.displayType"] !== ""
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -497,16 +446,14 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
-                            text: "Language:"
+                            text: configGenerator.schema["Display"]?.screenLanguage?.label || "Screen Language"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         ComboBox {
                             id: screenLanguageCombo
                             Layout.fillWidth: true
@@ -514,9 +461,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-
-                            model: configGenerator.schema["screenLanguage"]
-
+                            property var schema: configGenerator.schema["Display"]?.screenLanguage || {}
+                            model: schema.labels || ["English", "Arabic"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -527,13 +473,11 @@ Page {
                                 elide: Text.ElideRight
                                 width: screenLanguageCombo.width - 20
                             }
-
                             popup: Popup {
                                 y: screenLanguageCombo.height
                                 width: screenLanguageCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
-
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
@@ -542,27 +486,32 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
-
                             background: Rectangle {
                                 color: screenLanguageCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: screenLanguageCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: screenLanguageCombo.focus ? 2 : 1
                                 radius: 6
                             }
-
                             Component.onCompleted: {
-                                const options = model
-                                const current = config.screenLanguage || "ENGLISH"
-                                const idx = options ? options.indexOf(current) : -1
-                                if (idx >= 0) currentIndex = idx
+                                if (schema.values) {
+                                    const current = config["Display.screenLanguage"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "ScreenLanguageCombo initialized with index:", currentIndex, "value:", current);
+                                }
                             }
-
-                            onCurrentIndexChanged: {
-                                if (model.length > 0 && model[currentIndex] !== undefined) {
-                                    updateConfig("screenLanguage", model[currentIndex])
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Display.screenLanguage", schema.values[index]);
                                 }
                             }
                         }
+                    }
+
+                    CheckBox {
+                        id: cd0066Check
+                        text: configGenerator.schema["Display"]?.CD0066_MH6531AHSP_ENGLISH?.label || "Enable CD0066 MH6531AHSP English"
+                        checked: config["Display.CD0066_MH6531AHSP_ENGLISH"] || false
+                        onCheckedChanged: updateConfig("Display.CD0066_MH6531AHSP_ENGLISH", checked)
                     }
                 }
             }
@@ -576,9 +525,19 @@ Page {
     }
 
     function updateConfig(key: string, value: variant): void {
-        var newConfig = JSON.parse(JSON.stringify(config || {}))
-        newConfig[key] = value
-        configUpdated(newConfig)
-        config = newConfig
+        const newConfig = JSON.parse(JSON.stringify(config || {}));
+        newConfig[key] = value;
+        console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig));
+        config = newConfig;
+        configUpdated(newConfig);
+        console.log(pageId, "Syncing with C++ backend:", JSON.stringify(newConfig));
+        configGenerator.setConfig(newConfig);
+    }
+
+    function updateConfigAll(): void {
+        const newConfig = JSON.parse(JSON.stringify(config || {}));
+        console.log(pageId, "Syncing all config with C++ backend:", JSON.stringify(newConfig));
+        configUpdated(newConfig);
+        configGenerator.setConfig(newConfig);
     }
 }

@@ -4,14 +4,44 @@ import QtQuick.Layouts 1.15
 
 Page {
     id: rootPage
-    property var config: configGenerator.config || { systemClock: 25000 }
+    property var config: configGenerator.config || {
+        "descriptionBrief": "",
+        "descriptionVersion": "",
+        "descriptionDate": "",
+        "descriptionAuthor": "",
+        "descriptionDetails": "",
+        "Device.MicroController": "Micro_V94XX",
+        "Device.BOARD_TYPE": "EM130_BOARD",
+        "Device.SYSTEM_CLOCK": 25000
+    }
     signal configUpdated(var newConfig)
 
-    // Unique identifier for debugging
     property string pageId: "DevicePage_" + Math.random().toString(36).substr(2, 9)
 
     Component.onCompleted: {
-        console.log(pageId, "initialized with config:", JSON.stringify(config))
+        console.log(pageId, "Initialized with config:", JSON.stringify(config))
+        // Initialize missing config keys with schema defaults
+        const deviceSchema = configGenerator.schema["Device"] || {}
+        for (let key in deviceSchema) {
+            const fullKey = "Device." + key;
+            if (config[fullKey] === undefined && deviceSchema[key].default !== undefined) {
+                config[fullKey] = deviceSchema[key].default;
+                console.log(pageId, "Initialized missing config key:", fullKey, "with default:", config[fullKey]);
+            }
+        }
+        // Sync initial config with backend
+        updateConfigAll();
+    }
+
+    Connections {
+        target: configGenerator
+        function onErrorOccurred(error) {
+            console.error(pageId, "Backend error:", error);
+        }
+        function onConfigChanged() {
+            console.log(pageId, "Backend config changed:", JSON.stringify(configGenerator.config));
+            config = configGenerator.config;
+        }
     }
 
     background: Rectangle {
@@ -41,13 +71,11 @@ Page {
                 Layout.bottomMargin: 8
             }
 
-
             GroupBox {
                 title: ""
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -63,7 +91,6 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
                             text: "@brief:"
                             font.pixelSize: 16
@@ -72,14 +99,13 @@ Page {
                             Layout.preferredWidth: 80
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         TextField {
                             id: briefTextField
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             font.pixelSize: 14
                             font.family: "Roboto"
-                            text: config.descriptionBrief || ""
+                            text: config["descriptionBrief"] || ""
                             placeholderText: text ? "" : "Brief description"
                             background: Rectangle {
                                 color: "#F8FAFC"
@@ -87,16 +113,7 @@ Page {
                                 border.width: briefTextField.focus ? 2 : 1
                                 radius: 6
                             }
-
-                            onActiveFocusChanged: {
-                                if (activeFocus && !text) placeholderText = ""
-                                else if (!activeFocus && !text) placeholderText = "Brief description"
-                            }
-
-                            onTextChanged: {
-                                updateConfig("descriptionBrief", text)
-                                console.log("Brief updated to:", text)
-                            }
+                            onTextChanged: updateConfig("descriptionBrief", text)
                         }
                     }
 
@@ -104,7 +121,6 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
                             text: "@version:"
                             font.pixelSize: 16
@@ -113,14 +129,13 @@ Page {
                             Layout.preferredWidth: 80
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         TextField {
                             id: versionTextField
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             font.pixelSize: 14
                             font.family: "Roboto"
-                            text: config.descriptionVersion || ""
+                            text: config["descriptionVersion"] || ""
                             placeholderText: text ? "" : "Version number"
                             background: Rectangle {
                                 color: "#F8FAFC"
@@ -128,16 +143,7 @@ Page {
                                 border.width: versionTextField.focus ? 2 : 1
                                 radius: 6
                             }
-
-                            onActiveFocusChanged: {
-                                if (activeFocus && !text) placeholderText = ""
-                                else if (!activeFocus && !text) placeholderText = "Version number"
-                            }
-
-                            onTextChanged: {
-                                updateConfig("descriptionVersion", text)
-                                console.log("Version updated to:", text)
-                            }
+                            onTextChanged: updateConfig("descriptionVersion", text)
                         }
                     }
 
@@ -145,7 +151,6 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
                             text: "@date:"
                             font.pixelSize: 16
@@ -154,14 +159,13 @@ Page {
                             Layout.preferredWidth: 80
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         TextField {
                             id: dateTextField
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             font.pixelSize: 14
                             font.family: "Roboto"
-                            text: config.descriptionDate || ""
+                            text: config["descriptionDate"] || ""
                             placeholderText: text ? "" : "YYYY-MM-DD"
                             background: Rectangle {
                                 color: "#F8FAFC"
@@ -169,16 +173,7 @@ Page {
                                 border.width: dateTextField.focus ? 2 : 1
                                 radius: 6
                             }
-
-                            onActiveFocusChanged: {
-                                if (activeFocus && !text) placeholderText = ""
-                                else if (!activeFocus && !text) placeholderText = "YYYY-MM-DD"
-                            }
-
-                            onTextChanged: {
-                                updateConfig("descriptionDate", text)
-                                console.log("Date updated to:", text)
-                            }
+                            onTextChanged: updateConfig("descriptionDate", text)
                         }
                     }
 
@@ -186,7 +181,6 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
                             text: "@author:"
                             font.pixelSize: 16
@@ -195,14 +189,13 @@ Page {
                             Layout.preferredWidth: 80
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         TextField {
                             id: authorTextField
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             font.pixelSize: 14
                             font.family: "Roboto"
-                            text: config.descriptionAuthor || ""
+                            text: config["descriptionAuthor"] || ""
                             placeholderText: text ? "" : "Author name"
                             background: Rectangle {
                                 color: "#F8FAFC"
@@ -210,16 +203,7 @@ Page {
                                 border.width: authorTextField.focus ? 2 : 1
                                 radius: 6
                             }
-
-                            onActiveFocusChanged: {
-                                if (activeFocus && !text) placeholderText = ""
-                                else if (!activeFocus && !text) placeholderText = "Author name"
-                            }
-
-                            onTextChanged: {
-                                updateConfig("descriptionAuthor", text)
-                                console.log("Author updated to:", text)
-                            }
+                            onTextChanged: updateConfig("descriptionAuthor", text)
                         }
                     }
 
@@ -227,7 +211,6 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
                             text: "@details:"
                             font.pixelSize: 16
@@ -236,66 +219,55 @@ Page {
                             Layout.preferredWidth: 80
                             verticalAlignment: Label.AlignVCenter
                         }
-
-                        TextArea {
-                            id: detailsTextArea
+                        Item {
                             Layout.fillWidth: true
                             Layout.minimumWidth: 280
                             Layout.minimumHeight: 100
-                            Layout.preferredHeight: Math.min(contentHeight, 300)
-                            Layout.maximumHeight: 300
-                            font.pixelSize: 14
-                            font.family: "Roboto"
-                            wrapMode: Text.WordWrap
-                            text: config.descriptionDetails || ""
-                            placeholderText: text ? "" : "Detailed description"
-                            background: Rectangle {
+                            Layout.preferredHeight: 100
+                            Rectangle {
+                                id: textAreaBackground
+                                anchors.fill: parent
                                 color: "#F8FAFC"
                                 border.color: detailsTextArea.focus ? "#007BFF" : "#CED4DA"
                                 border.width: detailsTextArea.focus ? 2 : 1
                                 radius: 6
-                            }
-
-                            onActiveFocusChanged: {
-                                if (activeFocus && !text) placeholderText = ""
-                                else if (!activeFocus && !text) placeholderText = "Detailed description"
-                            }
-
-                            onTextChanged: {
-                                updateConfig("descriptionDetails", text)
-                                console.log("Details updated to:", text)
+                                ScrollView {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                                    TextArea {
+                                        id: detailsTextArea
+                                        width: parent.width
+                                        font.pixelSize: 14
+                                        font.family: "Roboto"
+                                        wrapMode: Text.WordWrap
+                                        text: config["descriptionDetails"] || ""
+                                        background: Item {}
+                                        onTextChanged: updateConfig("descriptionDetails", text)
+                                    }
+                                    Text {
+                                        id: placeholderText
+                                        anchors.fill: parent
+                                        font: detailsTextArea.font
+                                        text: detailsTextArea.text ? "" : "Detailed description"
+                                        color: "#CED4DA"
+                                        verticalAlignment: Text.AlignVCenter
+                                        wrapMode: Text.WordWrap
+                                        visible: !detailsTextArea.text && !detailsTextArea.activeFocus
+                                    }
+                                }
                             }
                         }
                     }
 
                     Label {
-                        text: "Use Doxygen tags for structured documentation. Separate fields will be combined into a comment block."
+                        text: "Use Doxygen tags for structured documentation."
                         font.pixelSize: 12
                         font.family: "Roboto"
                         color: "#6B7280"
                         wrapMode: Text.WordWrap
                     }
-                }
-            }
-
-
-            // Header Section
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 64
-                color: "#FFFFFF"
-                radius: 8
-                border.color: "#E4E7EB"
-                border.width: 1
-                Layout.topMargin: 16
-
-                Label {
-                    text: "Device Configuration"
-                    font.bold: true
-                    font.pixelSize: 24
-                    font.family: "Roboto"
-                    color: "#1A2526"
-                    anchors.centerIn: parent
                 }
             }
 
@@ -310,13 +282,11 @@ Page {
                 Layout.bottomMargin: 8
             }
 
-            // Device Settings Group
             GroupBox {
                 title: ""
                 Layout.fillWidth: true
                 padding: 12
                 spacing: 16
-
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -328,20 +298,18 @@ Page {
                     spacing: 16
                     width: parent.width - 24
 
-                    // Microcontroller Row
+                    // MicroController Row
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
-                            text: "Microcontroller:"
+                            text: configGenerator.schema["Device"]?.MicroController?.label || "Micro Controller"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         ComboBox {
                             id: microCombo
                             Layout.fillWidth: true
@@ -349,9 +317,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-
-                            model: configGenerator.schema["MicroController"] || ["Micro_V85XX", "Micro_V94XX", "Micro_V77XX"]
-
+                            property var schema: configGenerator.schema["Device"]?.MicroController || {}
+                            model: schema.values || ["Micro_V85XX", "Micro_V94XX", "Micro_V87XX", "Micro_V77XX", "Mixco_V77XX"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -362,13 +329,11 @@ Page {
                                 elide: Text.ElideRight
                                 width: microCombo.width - 20
                             }
-
                             popup: Popup {
                                 y: microCombo.height
                                 width: microCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
-
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
@@ -377,28 +342,22 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
-
                             background: Rectangle {
                                 color: microCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: microCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: microCombo.focus ? 2 : 1
                                 radius: 6
                             }
-
                             Component.onCompleted: {
-                                const options = configGenerator.schema["MicroController"] || ["Micro_V85XX", "Micro_V94XX", "Micro_V77XX"]
-                                const current = config["MicroController"] || "Micro_V85XX"
-                                const idx = options.indexOf(current)
-                                if (idx >= 0) {
-                                    currentIndex = idx
-                                    console.log(pageId, "MicroCombo initialized with index:", idx, "value:", current)
+                                if (schema.values) {
+                                    const current = config["Device.MicroController"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "MicroCombo initialized with index:", currentIndex, "value:", current);
                                 }
                             }
-
-                            onCurrentIndexChanged: {
-                                if (model.length > 0 && model[currentIndex] !== undefined) {
-                                    console.log(pageId, "Selected MicroController:", model[currentIndex])
-                                    updateConfig("MicroController", model[currentIndex])
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Device.MicroController", schema.values[index]);
                                 }
                             }
                         }
@@ -414,16 +373,14 @@ Page {
                     RowLayout {
                         spacing: 12
                         Layout.fillWidth: true
-
                         Label {
-                            text: "Board Type:"
+                            text: configGenerator.schema["Device"]?.BOARD_TYPE?.label || "Board Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
                             Layout.preferredWidth: 160
                             verticalAlignment: Label.AlignVCenter
                         }
-
                         ComboBox {
                             id: boardCombo
                             Layout.fillWidth: true
@@ -431,9 +388,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-
-                            model: configGenerator.schema["boardType"] || ["EM130_BOARD", "EM122U_BOARD", "EM124_BOARD"]
-
+                            property var schema: configGenerator.schema["Device"]?.BOARD_TYPE || {}
+                            model: schema.values || ["EM130_BOARD", "EM122U_BOARD", "SPAIN_BOARD", "EM122_BOARD", "EM110_BOARD", "Mixco_BOARD"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -444,13 +400,11 @@ Page {
                                 elide: Text.ElideRight
                                 width: boardCombo.width - 20
                             }
-
                             popup: Popup {
                                 y: boardCombo.height
                                 width: boardCombo.width
                                 implicitHeight: contentItem.implicitHeight
                                 padding: 2
-
                                 contentItem: ListView {
                                     clip: true
                                     implicitHeight: contentHeight
@@ -459,122 +413,96 @@ Page {
                                     ScrollIndicator.vertical: ScrollIndicator {}
                                 }
                             }
-
                             background: Rectangle {
                                 color: boardCombo.hovered ? "#F8FAFC" : "#FFFFFF"
                                 border.color: boardCombo.focus ? "#007BFF" : "#CED4DA"
                                 border.width: boardCombo.focus ? 2 : 1
                                 radius: 6
                             }
-
                             Component.onCompleted: {
-                                const options = configGenerator.schema["boardType"] || ["EM130_BOARD", "EM122U_BOARD", "EM124_BOARD"]
-                                const current = config["boardType"] || "EM130_BOARD"
-                                const idx = options.indexOf(current)
-                                if (idx >= 0) {
-                                    currentIndex = idx
-                                    console.log(pageId, "BoardCombo initialized with index:", idx, "value:", current)
+                                if (schema.values) {
+                                    const current = config["Device.BOARD_TYPE"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "BoardCombo initialized with index:", currentIndex, "value:", current);
                                 }
                             }
-
-                            onCurrentIndexChanged: {
-                                if (model.length > 0 && model[currentIndex] !== undefined) {
-                                    console.log(pageId, "Selected boardType:", model[currentIndex])
-                                    updateConfig("boardType", model[currentIndex])
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Device.BOARD_TYPE", schema.values[index]);
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            // Clock Settings Title
-            Label {
-                text: "Clock Settings"
-                font.bold: true
-                font.pixelSize: 18
-                font.family: "Roboto"
-                color: "#1A2526"
-                Layout.topMargin: 16
-                Layout.bottomMargin: 8
-            }
-
-            // Clock Settings Group
-            GroupBox {
-                title: ""
-                Layout.fillWidth: true
-                padding: 20
-                spacing: 16
-
-                background: Rectangle {
-                    color: "#FFFFFF"
-                    radius: 8
-                    border.color: "#E4E7EB"
-                    border.width: 1
-                }
-
-                RowLayout {
-                    spacing: 12
-                    Layout.fillWidth: true
-
-                    Label {
-                        text: "System Clock:"
-                        font.pixelSize: 16
-                        font.family: "Roboto"
-                        color: "#1A2526"
-                        Layout.preferredWidth: 160
-                        verticalAlignment: Label.AlignVCenter
-                    }
-
-                    ComboBox {
-                        id: systemClockCombo
+                    Rectangle {
                         Layout.fillWidth: true
-                        Layout.minimumWidth: 280
-                        Layout.maximumWidth: 480
-                        font.pixelSize: 14
-                        padding: 8
+                        Layout.preferredHeight: 1
+                        color: "#E4E7EB"
+                    }
 
-                        model: ["8 MHz", "16 MHz", "25 MHz"]
-                        currentIndex: (config.systemClock || 25000) === 8000 ? 0 :
-                                     (config.systemClock || 25000) === 16000 ? 1 : 2
-
-                        contentItem: Text {
-                            leftPadding: 10
-                            rightPadding: 10
-                            text: systemClockCombo.displayText
-                            font: systemClockCombo.font
+                    // System Clock Row
+                    RowLayout {
+                        spacing: 12
+                        Layout.fillWidth: true
+                        Label {
+                            text: configGenerator.schema["Device"]?.SYSTEM_CLOCK?.label || "System Clock (kHz)"
+                            font.pixelSize: 16
+                            font.family: "Roboto"
                             color: "#1A2526"
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
-                            width: systemClockCombo.width - 20
+                            Layout.preferredWidth: 160
+                            verticalAlignment: Label.AlignVCenter
                         }
-
-                        popup: Popup {
-                            y: systemClockCombo.height
-                            width: systemClockCombo.width
-                            implicitHeight: contentItem.implicitHeight
-                            padding: 2
-
-                            contentItem: ListView {
-                                clip: true
-                                implicitHeight: contentHeight
-                                model: systemClockCombo.popup.visible ? systemClockCombo.delegateModel : null
-                                currentIndex: systemClockCombo.highlightedIndex
-                                ScrollIndicator.vertical: ScrollIndicator {}
+                        ComboBox {
+                            id: systemClockCombo
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 280
+                            Layout.maximumWidth: 480
+                            font.pixelSize: 14
+                            padding: 8
+                            property var schema: configGenerator.schema["Device"]?.SYSTEM_CLOCK || {}
+                            property var clockValues: schema.values || [16000, 25000]
+                            model: schema.labels || schema.values|| ["16 MHz", "25 MHz"]
+                            contentItem: Text {
+                                leftPadding: 10
+                                rightPadding: 10
+                                text: systemClockCombo.displayText
+                                font: systemClockCombo.font
+                                color: "#1A2526"
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+                                width: systemClockCombo.width - 20
                             }
-                        }
-
-                        background: Rectangle {
-                            color: systemClockCombo.hovered ? "#F8FAFC" : "#FFFFFF"
-                            border.color: systemClockCombo.focus ? "#007BFF" : "#CED4DA"
-                            border.width: systemClockCombo.focus ? 2 : 1
-                            radius: 6
-                        }
-
-                        onActivated: function(index) {
-                            var typeMap = [8000, 16000, 25000]
-                            console.log(pageId, "Selected systemClock:", typeMap[index])
-                            updateConfig("systemClock", typeMap[index])
+                            popup: Popup {
+                                y: systemClockCombo.height
+                                width: systemClockCombo.width
+                                implicitHeight: contentItem.implicitHeight
+                                padding: 2
+                                contentItem: ListView {
+                                    clip: true
+                                    implicitHeight: contentHeight
+                                    model: systemClockCombo.popup.visible ? systemClockCombo.delegateModel : null
+                                    currentIndex: systemClockCombo.highlightedIndex
+                                    ScrollIndicator.vertical: ScrollIndicator {}
+                                }
+                            }
+                            background: Rectangle {
+                                color: systemClockCombo.hovered ? "#F8FAFC" : "#FFFFFF"
+                                border.color: systemClockCombo.focus ? "#007BFF" : "#CED4DA"
+                                border.width: systemClockCombo.focus ? 2 : 1
+                                radius: 6
+                            }
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Device.SYSTEM_CLOCK"] || schema.default || schema.values[0];
+                                    currentIndex = schema.values.indexOf(current);
+                                    console.log(pageId, "SystemClockCombo initialized with index:", currentIndex, "value:", current);
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Device.SYSTEM_CLOCK", schema.values[index]);
+                                }
+                            }
                         }
                     }
                 }
@@ -589,10 +517,19 @@ Page {
     }
 
     function updateConfig(key: string, value: variant): void {
-        const newConfig = JSON.parse(JSON.stringify(config || {}))
-        newConfig[key] = value
-        console.log(pageId, "Emitting configUpdated for", key, "with value:", value, "new config:", JSON.stringify(newConfig))
-        configUpdated(newConfig)
-        config = newConfig
+        const newConfig = JSON.parse(JSON.stringify(config || {}));
+        newConfig[key] = value;
+        console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig));
+        config = newConfig;
+        configUpdated(newConfig);
+        console.log(pageId, "Syncing with C++ backend:", JSON.stringify(newConfig));
+        configGenerator.setConfig(newConfig);
+    }
+
+    function updateConfigAll(): void {
+        const newConfig = JSON.parse(JSON.stringify(config || {}));
+        console.log(pageId, "Syncing all config with C++ backend:", JSON.stringify(newConfig));
+        configUpdated(newConfig);
+        configGenerator.setConfig(newConfig);
     }
 }
