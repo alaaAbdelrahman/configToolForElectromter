@@ -369,26 +369,42 @@ ApplicationWindow {
     }
 
     function buildAndRun(exePath) {
-        if (root.selectedSourceFiles.length === 0) {
-            statusBar.showMessage("No source files selected. Please select files first.", 5000)
-            return
-        }
-        var configPath = fileDialog.selectedFile.toString() || "config_output.h"
-        var sourceFiles = root.selectedSourceFiles.join(" ")
-        var command = "gcc -o " + exePath.replace("file://", "") + " " + sourceFiles.replace("file://", "") + " -I. -include " + configPath.replace("file://", "")
-        console.log("Executing build command:", command)
-        // Disconnect previous connection to avoid duplicates
-        Process.finished.disconnect(root.onProcessFinished)
-        Process.start(command) // Use the Process context property
-        Process.finished.connect(root, root.onProcessFinished) // Connect to the slot
-    }
+            if (root.selectedSourceFiles.length === 0) {
+                statusBar.showMessage("No source files selected. Please select files first.", 5000)
+                return
+            }
+            var configPath = fileDialog.selectedFile.toString() || "config_output.h"
+            var sourceFiles = root.selectedSourceFiles.join(" ")
 
-    // Define a slot to handle Process.finished
-    function onProcessFinished(exitCode, output, error) {
-        if (exitCode === 0) {
-            statusBar.showMessage("Build successful, executable saved to: " + exePath, 5000)
-        } else {
-            statusBar.showMessage("Build failed: " + error, 5000)
+            // Extract directory from configPath and remove file://
+            var configDir = configPath.substring(0, configPath.lastIndexOf("/")).replace("file://", "")
+            var localExePath = exePath.replace("file://", "").trim()
+            var localSourceFiles = sourceFiles.replace(/file:\/\//g, "").trim()
+            var localConfigPath = configPath.replace("file://", "").trim()
+
+            // Ensure configDir is a valid directory
+            if (!configDir) {
+                configDir = "."
+                console.warn("Config directory not found, defaulting to current directory")
+            }
+
+            // Construct gcc command with corrected -I path and verbose output
+            var command = `gcc -o "${localExePath}" ${localSourceFiles} -I"${configDir}" -include "${localConfigPath}" -v`
+            console.log("Executing build command:", command)
+
+            // Disconnect previous connection to avoid duplicates
+            Process.finished.disconnect(root.onProcessFinished)
+            // Set the working directory
+            //Process.setWorkingDirectory(configDir)
+            Process.start(command)
+            Process.finished.connect(root, root.onProcessFinished)
         }
-    }
-}
+
+        function onProcessFinished(exitCode, output, error) {
+            console.log("Build process finished - exitCode:", exitCode, "output:", output, "error:", error)
+            if (exitCode === 0) {
+                statusBar.showMessage("Build successful, executable saved to: " + exePath, 5000)
+            } else {
+                statusBar.showMessage("Build failed: " + (error || "Unknown error, check console logs"), 5000)
+            }
+        }}
