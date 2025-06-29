@@ -101,11 +101,11 @@
   "Metering": {
     "meterType": {
     "type": "enum",
-    "labels": ["Single Phase", "Two Phase", "Three Phase","gfg"],
+    "labels": ["Single Phase", "Two Phase", "Three Phase"],
     "values": [
       "MTR_SINGLE_PH",
        "MTR_TWO_PH",
-       "MTR_THREE_PH","fdfdf"
+       "MTR_THREE_PH"
     ],
     "default": "Single Phase",
     "label": "Meter Type"

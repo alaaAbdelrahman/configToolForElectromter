@@ -33,6 +33,7 @@ qt_add_qml_module(appConfigGenerator
     SOURCES
         SOURCES ConfigGenerator.h
         SOURCES ConfigGenerator.cpp
+        SOURCES processhelper.h processhelper.cpp
 )
 
 qt_add_resources(QML_RESOURCES qml.qrc)

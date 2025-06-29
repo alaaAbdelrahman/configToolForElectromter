@@ -1,4 +1,3 @@
-
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -13,7 +12,8 @@ ApplicationWindow {
     color: "#f5f5f5"
 
     property int animationDuration: 200
-    property var config: configGenerator.config || {}
+    property var config: configGenerator.config
+    property var selectedSourceFiles: []
 
     FileDialog {
         id: fileDialog
@@ -30,6 +30,31 @@ ApplicationWindow {
             } else {
                 statusBar.showMessage("Failed to save configuration", 4000)
             }
+        }
+    }
+
+    FileDialog {
+        id: buildOutputDialog
+        title: "Save Executable"
+        defaultSuffix: "exe"
+        nameFilters: ["Executable files (*.exe)"]
+        fileMode: FileDialog.SaveFile
+
+        onAccepted: {
+            var exePath = Qt.resolvedUrl(selectedFile)
+            buildAndRun(exePath)
+        }
+    }
+
+    FileDialog {
+        id: sourceFileDialog
+        title: "Select Source Files"
+        nameFilters: ["C source files (*.c)", "All files (*)"]
+        fileMode: FileDialog.OpenFiles
+        onAccepted: {
+            root.selectedSourceFiles = selectedFiles.map(file => Qt.resolvedUrl(file))
+            console.log("Selected source files:", root.selectedSourceFiles)
+            buildOutputDialog.open()
         }
     }
 
@@ -97,6 +122,21 @@ ApplicationWindow {
                     radius: 4
                 }
             }
+
+            ToolButton {
+                id: buildButton
+                text: "Build Executable"
+                onClicked: sourceFileDialog.open()
+                contentItem: Text {
+                    text: parent.text
+                    color: "white"
+                    font.pixelSize: 14
+                }
+                background: Rectangle {
+                    color: parent.pressed ? "#388E3C" : "transparent"
+                    radius: 4
+                }
+            }
         }
     }
 
@@ -127,7 +167,6 @@ ApplicationWindow {
                 ListElement { name: "Communication"; icon: "qrc:/icons/wifi.png"; component: "qrc:/CommunicationPage.qml" }
                 ListElement { name: "Control"; icon: "qrc:/icons/control.png"; component: "qrc:/ControlPage.qml" }
                 ListElement { name: "Memory"; icon: "qrc:/icons/microchip.png"; component: "qrc:/MemoryPage.qml" }
-
                 ListElement { name: "DLMS"; icon: "qrc:/icons/dlms.png"; component: "qrc:/DLMSPage.qml" }
             }
 
@@ -218,7 +257,7 @@ ApplicationWindow {
 
         Connections {
             target: stackView.currentItem
-            enabled: target && target.pageId && target.pageId
+            enabled: !!(target && target.pageId && target.pageId)
             function onConfigUpdated(updated) {
                 console.log("ConfigUpdated from initial page pageId:", target.pageId, ":", JSON.stringify(updated))
                 configGenerator.onConfigUpdated(updated)
@@ -291,5 +330,24 @@ ApplicationWindow {
             console.error("Component loading error for", pageComponent, ":", component.errorString())
             statusBar.showMessage("Error loading page: " + component.errorString(), 4000)
         }
+    }
+
+    function buildAndRun(exePath) {
+        if (root.selectedSourceFiles.length === 0) {
+            statusBar.showMessage("No source files selected. Please select files first.", 5000)
+            return
+        }
+        var configPath = fileDialog.selectedFile || "config_output.h"
+        var sourceFiles = root.selectedSourceFiles.join(" ")
+        var command = "gcc -o " + exePath + " " + sourceFiles + " -I. -include " + configPath
+        console.log("Executing build command:", command)
+        Process.start(command)
+        Process.finished.connect(function(exitCode, output, error) {
+            if (exitCode === 0) {
+                statusBar.showMessage("Build successful, executable saved to: " + exePath, 5000)
+            } else {
+                statusBar.showMessage("Build failed: " + error, 5000)
+            }
+        })
     }
 }
