@@ -6,16 +6,16 @@ Page {
     id: rootPage
     property var config: configGenerator.config || {
         "Display.displayType": "SEGMENTED_LCD_ENABLE",
-        "Display.DOT_MATRIX_LOW_PWR_FEATURE": true,
-        "Display.USE_NEW_LCD": true,
-        "Display.LCD_HQ30774_ENABLE": true,
-        "Display.LCD_CNKD0802_24SEG_8COM": true,
-        "Display.LCD_NEW_CNKD0802_24SEG_8COM": true,
+        "Display.DOT_MATRIX_LOW_PWR_FEATURE": false,
+        "Display.USE_NEW_LCD": false,
+        "Display.LCD_HQ30774_ENABLE": false,
+        "Display.LCD_CNKD0802_24SEG_8COM": false,
+        "Display.LCD_NEW_CNKD0802_24SEG_8COM": false,
         "Display.screenLanguage": "ENGLISH_SCREEN",
-        "Display.CD0066_MH6531AHSP_ENGLISH": true,
-        "Display.RECORD_NEW_CUSTOMER_DATE": true,
-        "Display.SERIAL_NUMBER_CHANGE": true,
-        "Display.DISPLAY_MAP_SCREEN": true,
+        "Display.CD0066_MH6531AHSP_ENGLISH": false,
+        "Display.RECORD_NEW_CUSTOMER_DATE": false,
+        "Display.SERIAL_NUMBER_CHANGE": false,
+        "Display.DISPLAY_MAP_SCREEN": false,
         "Display.DISPLAY_OBIS": false,
         "Display.DISPLAY_SCREEN_ORDER": "CONSTANT_SCREEN_ORDER"
     }

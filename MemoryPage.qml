@@ -5,15 +5,15 @@ import QtQuick.Layouts 1.15
 Page {
     id: rootPage
     property var config: configGenerator.config || {
-        "Memory.FILE_SYS_USE_INT": true,
+        "Memory.FILE_SYS_USE_INT": false,
         "Memory.FILE_SYS_LOG": false,
         "Memory.CTRL_EVNT_LOG": false,
         "Memory.EVENT_LOG_RECORD_NUM": 0,
         "Memory.CTRL_CFG_METER_LOG": false,
         "Memory.CFG_METER_RECORD_NUM": 0,
         "Memory.PMYT_MNY_TRANS_REC": 0,
-        "Memory.FM24C128D_2_Wire_Serial_EEPROM": true,
-        "Memory.FLASH_FM25W32_ENABLE": true
+        "Memory.FM24C128D_2_Wire_Serial_EEPROM": false,
+        "Memory.FLASH_FM25W32_ENABLE": false
     }
     signal configUpdated(var newConfig)
     property string pageId: "MemoryPage_" + Math.random().toString(36).substr(2, 9)

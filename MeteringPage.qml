@@ -12,20 +12,20 @@ Page {
             console.warn(pageId, "configGenerator.config is empty, using defaults")
             return {
                 "Metering.meterType": "MTR_SINGLE_PH",
-                "Metering.MTR_REACTIVE": true,
+                "Metering.MTR_REACTIVE": false,
                 "Metering.meterMeasurement": "MTR_DIRECT",
                 "Metering.meteringChips": "V9381_ENABLE",
                 "Metering.MTR_NUM_OF_PHASE": 1,
                 "Metering.MTR_NUM_OF_CH": 2,
                 "Metering.pulseConstant": "CONSTANT_3200",
-                "Metering.MTR_LOAD_PROFILE": true,
+                "Metering.MTR_LOAD_PROFILE": false,
                 "Metering.PROFILE_RECORD_NUM": 3360,
                 "Metering.PROFILE_RECORD_TEST_MODE_NUM": 20,
-                "Metering.MTR_RVS_TMPR": true,
-                "Metering.MTR_ERTH_TMPR": true,
-                "Metering.MTR_ENABLE_LMT": true,
-                "Metering.PULSE_COUNT_ENABLE": true,
-                "Metering.BIG_ENDIAN": true
+                "Metering.MTR_RVS_TMPR": false,
+                "Metering.MTR_ERTH_TMPR": false,
+                "Metering.MTR_ENABLE_LMT": false,
+                "Metering.PULSE_COUNT_ENABLE": false,
+                "Metering.BIG_ENDIAN": false
             }
         }
     }
@@ -119,7 +119,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.meterType?.label || "Meter Type"
+                            text: configGenerator.schema?.Metering.meterType?.label || "Meter Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -134,7 +134,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["Metering.meterType"].labels ||configGenerator.schema["Metering.meterType"].values|| ["Single Phase", "Two Phase", "Three Phase"]
+                            model: configGenerator.schema?.Metering.meterType?.labels ||configGenerator.schema?.Metering.meterType?.values|| ["Single Phase", "Two Phase", "Three Phase"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -169,7 +169,7 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const schema = configGenerator.schema["Metering.meterType"]
+                                const schema = configGenerator.schema?.Metering.meterType
                                 if (schema?.type === "enum" && schema.labels && schema.values) {
                                     const valueMap = {}
                                     for (let i = 0; i < schema.labels.length; i++) {
@@ -190,7 +190,7 @@ Page {
                             }
 
                             onActivated: function(index) {
-                                const schema = configGenerator.schema["Metering.meterType"]
+                                const schema = configGenerator.schema?.Metering?.meterType
                                 if (schema?.type === "enum" && schema.labels && schema.values) {
                                     const selectedLabel = model[index]
                                     const valueMap = {}
@@ -216,7 +216,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_REACTIVE"].label || "Reactive Meter"
+                            text: configGenerator.schema?.Metering.MTR_REACTIVE?.label || "Reactive Meter"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -245,7 +245,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.meterMeasurement"].label || "Enable Direct Calculations"
+                            text: configGenerator.schema?.Metering.meterMeasurement?.label || "Enable Direct Calculations"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -260,7 +260,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["Metering.meterMeasurement"].labels || ["MTR_DIRECT", "MTR_INDIRECT"]
+                            model: configGenerator.schema?.Metering.meterMeasurement?.labels || ["MTR_DIRECT", "MTR_INDIRECT"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -295,7 +295,7 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const schema = configGenerator.schema["Metering.meterMeasurement"]
+                                const schema = configGenerator.schema?.Metering.meterMeasurement
                                 const currentValue = config["Metering.meterMeasurement"] || schema?.default || "MTR_DIRECT"
                                 currentIndex = model.indexOf(currentValue)
                                 if (currentIndex === -1) {
@@ -318,7 +318,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_NUM_OF_PHASE"].label || "Number of Phases"
+                            text: configGenerator.schema?.Metering.MTR_NUM_OF_PHASE?.label || "Number of Phases"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -348,7 +348,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_NUM_OF_CH"].label || "Number of Channels"
+                            text: configGenerator.schema?.Metering.MTR_NUM_OF_CH?.label || "Number of Channels"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -406,7 +406,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.meteringChips"].label || "Metering Chips"
+                            text: configGenerator.schema?.Metering.meteringChips?.label || "Metering Chips"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -421,7 +421,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["Metering.meteringChips"].values || ["ADE7953_ENABLE", "V9203_ENABLE", "V9261F_ENABLE", "V9340_ENABLE", "V9360_ENABLE", "V9381_ENABLE"]
+                            model: configGenerator.schema?.Metering.meteringChips?.values || ["ADE7953_ENABLE", "V9203_ENABLE", "V9261F_ENABLE", "V9340_ENABLE", "V9360_ENABLE", "V9381_ENABLE"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -456,7 +456,7 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const schema = configGenerator.schema["Metering.meteringChips"]
+                                const schema = configGenerator.schema?.Metering.meteringChips
                                 const currentValue = config["Metering.meteringChips"] || schema?.default || "V9381_ENABLE"
                                 currentIndex = model.indexOf(currentValue)
                                 if (currentIndex === -1) {
@@ -508,7 +508,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema["Metering.pulseConstant"].label || "Pulse Constant"
+                            text: configGenerator.schema?.Metering.pulseConstant?.label || "Pulse Constant"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -523,7 +523,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema["Metering.pulseConstant"].labels|| configGenerator.schema["Metering.pulseConstant"].values || ["CONSTANT_1000", "CONSTANT_1600", "CONSTANT_3200", "CONSTANT_10000"]
+                            model: configGenerator.schema?.Metering.pulseConstant?.labels|| configGenerator.schema?.Metering.pulseConstant?.values || ["CONSTANT_1000", "CONSTANT_1600", "CONSTANT_3200", "CONSTANT_10000"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -558,7 +558,7 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const schema = configGenerator.schema["Metering.pulseConstant"]
+                                const schema = configGenerator.schema?.Metering.pulseConstant
                                 const currentValue = config["Metering.pulseConstant"] || schema?.default || "CONSTANT_3200"
                                 currentIndex = model.indexOf(currentValue)
                                 if (currentIndex === -1) {
@@ -612,7 +612,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_LOAD_PROFILE"].label || "Enable Load Profile"
+                            text: configGenerator.schema?.Metering.MTR_LOAD_PROFILE?.label || "Enable Load Profile"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -643,7 +643,7 @@ Page {
                         visible: config["Metering.MTR_LOAD_PROFILE"]
 
                         Label {
-                            text: configGenerator.schema["Metering.PROFILE_RECORD_NUM"].label || "Profile Record Number"
+                            text: configGenerator.schema?.Metering.PROFILE_RECORD_NUM?.label || "Profile Record Number"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -685,7 +685,7 @@ Page {
                         visible: config["Metering.MTR_LOAD_PROFILE"]
 
                         Label {
-                            text: configGenerator.schema["Metering.PROFILE_RECORD_TEST_MODE_NUM"].label || "Profile Test Records"
+                            text: configGenerator.schema?.Metering.PROFILE_RECORD_TEST_MODE_NUM?.label || "Profile Test Records"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -726,7 +726,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_RVS_TMPR"].label || "Enable Reverse Tamper"
+                            text: configGenerator.schema?.Metering.MTR_RVS_TMPR?.label || "Enable Reverse Tamper"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -756,7 +756,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_ERTH_TMPR"].label || "Enable Earth Tamper"
+                            text: configGenerator.schema?.Metering.MTR_ERTH_TMPR?.label || "Enable Earth Tamper"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -786,7 +786,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.MTR_ENABLE_LMT"].label || "Enable Limiter"
+                            text: configGenerator.schema?.Metering.MTR_ENABLE_LMT?.label || "Enable Limiter"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -816,7 +816,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.PULSE_COUNT_ENABLE].label || "Enable Pulse Count"
+                            text: configGenerator.schema?.Metering?.PULSE_COUNT_ENABLE?.label || "Enable Pulse Count"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -846,7 +846,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Metering.BIG_ENDIAN"].label || "Big Endian"
+                            text: configGenerator.schema?.Metering?.BIG_ENDIAN?.label || "Big Endian"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"

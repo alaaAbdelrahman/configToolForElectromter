@@ -21,7 +21,7 @@ Page {
     Component.onCompleted: {
         console.log(pageId, "Initialized with config:", JSON.stringify(config))
         // Initialize missing config keys with schema defaults
-        const deviceSchema = configGenerator.schema["Device"] || {}
+        const deviceSchema = configGenerator.schema?.Device || {}
         for (let key in deviceSchema) {
             const fullKey = "Device." + key;
             if (config[fullKey] === undefined && deviceSchema[key].default !== undefined) {
@@ -303,7 +303,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Device"]?.MicroController?.label || "Micro Controller"
+                            text: configGenerator.schema?.Device?.MicroController?.label || "Micro Controller"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -317,7 +317,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Device"]?.MicroController || {}
+                            property var schema: configGenerator.schema?.Device?.MicroController || {}
                             model: schema.values || ["Micro_V85XX", "Micro_V94XX", "Micro_V87XX", "Micro_V77XX", "Mixco_V77XX"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -374,7 +374,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Device"]?.BOARD_TYPE?.label || "Board Type"
+                            text: configGenerator.schema?.Device?.BOARD_TYPE?.label || "Board Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -388,7 +388,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Device"]?.BOARD_TYPE || {}
+                            property var schema: configGenerator.schema?.Device?.BOARD_TYPE || {}
                             model: schema.values || ["EM130_BOARD", "EM122U_BOARD", "SPAIN_BOARD", "EM122_BOARD", "EM110_BOARD", "Mixco_BOARD"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -445,7 +445,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Device"]?.SYSTEM_CLOCK?.label || "System Clock (kHz)"
+                            text: configGenerator.schema?.Device?.SYSTEM_CLOCK?.label || "System Clock (kHz)"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -459,7 +459,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Device"]?.SYSTEM_CLOCK || {}
+                            property var schema: configGenerator.schema?.Device?.SYSTEM_CLOCK || {}
                             property var clockValues: schema.values || [16000, 25000]
                             model: schema.labels || schema.values|| ["16 MHz", "25 MHz"]
                             contentItem: Text {

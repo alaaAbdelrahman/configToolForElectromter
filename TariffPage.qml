@@ -11,20 +11,20 @@ Page {
         } else {
             console.warn(pageId, "configGenerator.config is empty, using defaults")
             return {
-                "Tariff.TARIFF_SYS": true,
-                "Tariff.OPTIMIZATION_TARIFF": true,
-                "Tariff.TRF_BP_HISTORY": true,
+                "Tariff.TARIFF_SYS": false,
+                "Tariff.OPTIMIZATION_TARIFF": false,
+                "Tariff.TRF_BP_HISTORY": false,
                 "Tariff.TRF_BP_HISTORY_RECORDS": 12,
-                "Tariff.TRF_USE_MD_KW": true,
-                "Tariff.TRF_USE_MD_A": true,
-                "Tariff.PAYMENT_SYS": true,
-                "Tariff.PYMT_LOW_TWO_LVL": true,
+                "Tariff.TRF_USE_MD_KW": false,
+                "Tariff.TRF_USE_MD_A": false,
+                "Tariff.PAYMENT_SYS": false,
+                "Tariff.PYMT_LOW_TWO_LVL": false,
                 "Tariff.PMYT_LVL": 2,
-                "Tariff.PMYT_MONY_TRANS": true,
+                "Tariff.PMYT_MONY_TRANS": false,
                 "Tariff.PMYT_MNY_TRANS_REC": 20,
-                "Tariff.PYMT_TAX": true,
-                "Tariff.PYMT_FRIENDLY": true,
-                "Tariff.PYMT_VACATION_TRF": true
+                "Tariff.PYMT_TAX": false,
+                "Tariff.PYMT_FRIENDLY": false,
+                "Tariff.PYMT_VACATION_TRF": false
             }
         }
     }
