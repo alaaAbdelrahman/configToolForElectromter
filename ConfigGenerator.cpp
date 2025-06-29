@@ -267,7 +267,7 @@ QString ConfigGenerator::generateConfigHeader() const {
             if (m_config.contains(key)) {
                 const QVariant &val = m_config[key];
                 QString schemaType = getSchemaType(key);
-                if (schemaType == "boolean" && val.type() == QVariant::Bool) {
+                if (schemaType == "boolean") {
                     if (val.toBool()) {
                         out << "#define " << key.split(".").last() << "\n";
                     } else {

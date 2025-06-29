@@ -6,6 +6,7 @@
 #include <QtQuickControls2/QQuickStyle>
 
 #include "ConfigGenerator.h"
+#include "processhelper.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,7 @@ int main(int argc, char *argv[])
     // ✅ Create and expose configGenerator to QML
     ConfigGenerator configGenerator;
     configGenerator.loadSchema(":/configurations/config_schema.json"); // Load schema from file
+    engine.rootContext()->setContextProperty("Process", new ProcessHelper(&engine));
     engine.rootContext()->setContextProperty("configGenerator", &configGenerator);
 
     // Load QML UI from resources
