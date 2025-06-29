@@ -430,7 +430,7 @@ Page {
                     CheckBox {
                         id: rtcCheck
                         text: configGenerator.schema.Control?.CTRL_RTC?.label || "Enable RTC"
-                        checked: config["Control.CTRL_RTC"] !== undefined ? config["Control.CTRL_RTC"] !== undefined : false
+                        checked: config["Control.CTRL_RTC"] !== undefined ? config["Control.CTRL_RTC"] : false
                         visible: configGenerator.schema.Control?.CTRL_RTC !== undefined && !(config["Control.BATTERY_TYPE"] === "CTRL_SUPER_CAP")
                         onCheckedChanged: updateConfig("Control.CTRL_RTC", checked)
                         ToolTip.visible: hovered
@@ -440,7 +440,7 @@ Page {
                     CheckBox {
                         id: superCapCheck
                         text: configGenerator.schema.Control?.SUPERCAP_FEATURE?.label || "Super Capacitor Feature"
-                        checked: config["Control.SUPERCAP_FEATURE"] !== undefined ? config["Control.SUPERCAP_FEATURE"] !== undefined : false
+                        checked: config["Control.SUPERCAP_FEATURE"] !== undefined ? config["Control.SUPERCAP_FEATURE"] : false
                         visible: configGenerator.schema.Control?.SUPERCAP_FEATURE !== undefined
                         onCheckedChanged: updateConfig("Control.SUPERCAP_FEATURE", checked)
                         ToolTip.visible: hovered

@@ -160,9 +160,9 @@ Page {
                     CheckBox {
                         id: ctrlCfgMeterLogCheck
                         text: configGenerator.schema.Memory?.CTRL_CFG_METER_LOG?.label || "Enable Configure Meter Logging"
-                        checked: config["Memory.CTRL_CFG_METER_LOG"] !== undefined ? config["Memory.CTRL_CFG_METER_LOG"] !== undefined : false
+                        checked: config["Memory.CTRL_CFG_METER_LOG"] !== undefined ? config["Memory.CTRL_CFG_METER_LOG"]: false
                         visible: configGenerator.schema.Memory?.CTRL_CFG_METER_LOG !== undefined && !config["Control.CTRL_SUPER_CAP"]
-                        enabled: !config["Control.CTRL_SUPER_CAP"]
+                        enabled: config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
                         opacity: enabled ? 1.0 : 0.6
                         onClicked: updateConfig("Memory.CTRL_CFG_METER_LOG", checked)
                         ToolTip.visible: hovered
@@ -215,12 +215,12 @@ Page {
                         id: fileSysLogCheck
                         text: configGenerator.schema.Memory?.FILE_SYS_LOG?.label || "Enable Logging APIs"
                         checked: config["Memory.FILE_SYS_LOG"] !== undefined ? config["Memory.FILE_SYS_LOG"] : false
-                        visible: configGenerator.schema.Memory?.FILE_SYS_LOG !== undefined
+                        visible: configGenerator.schema?.Memory?.FILE_SYS_LOG !== undefined
                         enabled: config["Memory.CTRL_EVNT_LOG"] || config["Tariff.PYMT_MONY_TRANS"] !== undefined
                         opacity: enabled ? 1.0 : 0.6
                         onClicked: updateConfig("Memory.FILE_SYS_LOG", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema.Memory?.FILE_SYS_LOG?.description || ""
+                        ToolTip.text: configGenerator.schema?.Memory?.FILE_SYS_LOG?.description || ""
                     }
                 }
             }
@@ -275,8 +275,10 @@ Page {
         const newConfig = JSON.parse(JSON.stringify(config || {}))
         newConfig[key] = value
 
-        // Update FILE_SYS_LOG based on dependencies
-        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] !== undefined
+        // Update FILE_SYS_LOG only when dependencies change, not when FILE_SYS_LOG is toggled
+            if (key === "Memory.CTRL_EVNT_LOG" || key === "Memory.PYMT_MONY_TRANS") {
+                newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Memory.PYMT_MONY_TRANS"] || false
+            }
 
         // Reset dependent fields to schema defaults
         if (key === "Control.CTRL_SUPER_CAP" && value) {

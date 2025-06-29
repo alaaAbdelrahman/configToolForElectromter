@@ -495,6 +495,11 @@ Page {
                             Component.onCompleted: {
                                 if (schema.values) {
                                     const current = config["Display.screenLanguage"] || schema.default || schema.values[0];
+                                    if(current !== "ENGLISH_SCREEN")
+                                    {
+                                        updateConfig("Display.CD0066_MH6531AHSP_ENGLISH", False)
+                                    }
+
                                     currentIndex = schema.values.indexOf(current);
                                     console.log(pageId, "ScreenLanguageCombo initialized with index:", currentIndex, "value:", current);
                                 }
@@ -511,6 +516,7 @@ Page {
                         id: cd0066Check
                         text: configGenerator.schema?.Display?.CD0066_MH6531AHSP_ENGLISH?.label || "Enable CD0066 MH6531AHSP English"
                         checked: config["Display.CD0066_MH6531AHSP_ENGLISH"] || false
+                        enabled: config["Display.screenLanguage"] === "ENGLISH_SCREEN"
                         onCheckedChanged: updateConfig("Display.CD0066_MH6531AHSP_ENGLISH", checked)
                     }
                 }

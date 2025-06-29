@@ -118,6 +118,7 @@
     "meterMeasurement": {
       "type": "enum",
       "values": ["MTR_DIRECT", "MTR_INDIRECT"],
+      "labels": ["Direct Measurement", "Indirect Measurement"],
       "default": false,
       "label": "Enable Direct Calculations"
     },
