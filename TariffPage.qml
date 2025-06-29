@@ -97,7 +97,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.TARIFF_SYS"]?.label || "Enable Tariff System"
+                            text: configGenerator.schema?.Tarrif?.TARIFF_SYS?.label || "Enable Tariff System"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -107,7 +107,7 @@ Page {
 
                         CheckBox {
                             id: tariffSysCheck
-                            property bool localChecked: config["Tariff.TARIFF_SYS"] !== undefined ? config["Tariff.TARIFF_SYS"] : true
+                            property bool localChecked: config["Tarrif.TARIFF_SYS"] !== undefined ? config["Tarrif.TARIFF_SYS"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -115,7 +115,7 @@ Page {
                                 console.log(pageId, "Updating TARIFF_SYS to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.TARIFF_SYS"] !== undefined ? config["Tariff.TARIFF_SYS"] : true
+                                localChecked = config["Tarrif.TARIFF_SYS"] !== undefined ? config["Tarrif.TARIFF_SYS"] : false
                                 console.log(pageId, "TARIFF_SYS initialized to", localChecked)
                             }
                         }
@@ -127,7 +127,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.OPTIMIZATION_TARIFF"]?.label || "Enable Optimization Tariff"
+                            text: configGenerator.schema?.Tarrif?.OPTIMIZATION_TARIFF?.label || "Enable Optimization Tariff"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -137,7 +137,7 @@ Page {
 
                         CheckBox {
                             id: optimizationTariffCheck
-                            property bool localChecked: config["Tariff.OPTIMIZATION_TARIFF"] !== undefined ? config["Tariff.OPTIMIZATION_TARIFF"] : true
+                            property bool localChecked: config["Tarrif.OPTIMIZATION_TARIFF"] !== undefined ? config["Tarrif.OPTIMIZATION_TARIFF"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -145,7 +145,7 @@ Page {
                                 console.log(pageId, "Updating OPTIMIZATION_TARIFF to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.OPTIMIZATION_TARIFF"] !== undefined ? config["Tariff.OPTIMIZATION_TARIFF"] : true
+                                localChecked = config["Tarrif.OPTIMIZATION_TARIFF"] !== undefined ? config["Tarrif.OPTIMIZATION_TARIFF"]: false
                                 console.log(pageId, "OPTIMIZATION_TARIFF initialized to", localChecked)
                             }
                         }
@@ -157,7 +157,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.TRF_BP_HISTORY"]?.label || "Enable Billing Period History"
+                            text: configGenerator.schema?.Tarrif?.TRF_BP_HISTORY?.label || "Enable Billing Period History"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -167,7 +167,7 @@ Page {
 
                         CheckBox {
                             id: billingHistoryCheck
-                            property bool localChecked: config["Tariff.TRF_BP_HISTORY"] !== undefined ? config["Tariff.TRF_BP_HISTORY"] : true
+                            property bool localChecked: config["Tarrif.TRF_BP_HISTORY"] !== undefined ? config["Tarrif.TRF_BP_HISTORY"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -175,7 +175,7 @@ Page {
                                 console.log(pageId, "Updating TRF_BP_HISTORY to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.TRF_BP_HISTORY"] !== undefined ? config["Tariff.TRF_BP_HISTORY"] : true
+                                localChecked = config["Tarrif.TRF_BP_HISTORY"] !== undefined ? config["Tarrif.TRF_BP_HISTORY"] : false
                                 console.log(pageId, "TRF_BP_HISTORY initialized to", localChecked)
                             }
                         }
@@ -185,10 +185,10 @@ Page {
                         spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: config["Tariff.TRF_BP_HISTORY"]
+                        visible: !!(config["Tarrif.TRF_BP_HISTORY"])
 
                         Label {
-                            text: configGenerator.schema["Tariff.TRF_BP_HISTORY_RECORDS"]?.label || "Billing History Records"
+                            text: configGenerator.schema?.Tarrif?.TRF_BP_HISTORY_RECORDS?.label || "Billing History Records"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -203,11 +203,11 @@ Page {
                             Layout.alignment: Qt.AlignRight
                             font.pixelSize: 14
                             padding: 8
-                            text: config["Tariff.TRF_BP_HISTORY_RECORDS"] !== undefined ? config["Tariff.TRF_BP_HISTORY_RECORDS"].toString() : "12"
+                            text: config["Tarrif.TRF_BP_HISTORY_RECORDS"] !== undefined ? config["Tarrif.TRF_BP_HISTORY_RECORDS"].toString() : "12"
                             validator: IntValidator { bottom: 0; top: 100 }
                             onEditingFinished: {
                                 var value = parseInt(text) || 12
-                                if (value !== config["Tariff.TRF_BP_HISTORY_RECORDS"]) {
+                                if (value !== config["Tarrif.TRF_BP_HISTORY_RECORDS"]) {
                                     updateConfig("Tariff.TRF_BP_HISTORY_RECORDS", value)
                                     console.log(pageId, "Updating TRF_BP_HISTORY_RECORDS to", value)
                                 }
@@ -230,7 +230,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.TRF_USE_MD_KW"]?.label || "Record MD of Active Energy"
+                            text: configGenerator.schema?.Tarrif?.TRF_USE_MD_KW?.label || "Record MD of Active Energy"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -240,7 +240,7 @@ Page {
 
                         CheckBox {
                             id: mdKwCheck
-                            property bool localChecked: config["Tariff.TRF_USE_MD_KW"] !== undefined ? config["Tariff.TRF_USE_MD_KW"] : true
+                            property bool localChecked: config["Tarrif.TRF_USE_MD_KW"] !== undefined ? config["Tarrif.TRF_USE_MD_KW"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -248,7 +248,7 @@ Page {
                                 console.log(pageId, "Updating TRF_USE_MD_KW to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.TRF_USE_MD_KW"] !== undefined ? config["Tariff.TRF_USE_MD_KW"] : true
+                                localChecked = config["Tarrif.TRF_USE_MD_KW"] !== undefined ? config["Tarrif.TRF_USE_MD_KW"] : false
                                 console.log(pageId, "TRF_USE_MD_KW initialized to", localChecked)
                             }
                         }
@@ -260,7 +260,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.TRF_USE_MD_A"]?.label || "Record MD of Current"
+                            text: configGenerator.schema?.Tarrif?.TRF_USE_MD_A?.label || "Record MD of Current"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -270,7 +270,7 @@ Page {
 
                         CheckBox {
                             id: mdACheck
-                            property bool localChecked: config["Tariff.TRF_USE_MD_A"] !== undefined ? config["Tariff.TRF_USE_MD_A"] : true
+                            property bool localChecked: config["Tarrif.TRF_USE_MD_A"] !== undefined ? config["Tarrif.TRF_USE_MD_A"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -278,7 +278,7 @@ Page {
                                 console.log(pageId, "Updating TRF_USE_MD_A to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.TRF_USE_MD_A"] !== undefined ? config["Tariff.TRF_USE_MD_A"] : true
+                                localChecked = config["Tarrif.TRF_USE_MD_A"] !== undefined ? config["Tarrif.TRF_USE_MD_A"] : false
                                 console.log(pageId, "TRF_USE_MD_A initialized to", localChecked)
                             }
                         }
@@ -290,7 +290,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PAYMENT_SYS"]?.label || "Enable Payment System"
+                            text: configGenerator.schema?.Tarrif?.PAYMENT_SYS?.label || "Enable Payment System"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -300,7 +300,7 @@ Page {
 
                         CheckBox {
                             id: paymentSystemCheck
-                            property bool localChecked: config["Tariff.PAYMENT_SYS"] !== undefined ? config["Tariff.PAYMENT_SYS"] : true
+                            property bool localChecked: config["Tarrif.PAYMENT_SYS"] !== undefined ? config["Tarrif.PAYMENT_SYS"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -308,7 +308,7 @@ Page {
                                 console.log(pageId, "Updating PAYMENT_SYS to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PAYMENT_SYS"] !== undefined ? config["Tariff.PAYMENT_SYS"] : true
+                                localChecked = config["Tarrif.PAYMENT_SYS"] !== undefined ? config["Tarrif.PAYMENT_SYS"] : false
                                 console.log(pageId, "PAYMENT_SYS initialized to", localChecked)
                             }
                         }
@@ -320,7 +320,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PYMT_LOW_TWO_LVL"]?.label || "Enable Two-Level Low Credit"
+                            text: configGenerator.schema?.Tarrif?.PYMT_LOW_TWO_LVL?.label || "Enable Two-Level Low Credit"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -330,7 +330,7 @@ Page {
 
                         CheckBox {
                             id: lowTwoLevelCheck
-                            property bool localChecked: config["Tariff.PYMT_LOW_TWO_LVL"] !== undefined ? config["Tariff.PYMT_LOW_TWO_LVL"] : true
+                            property bool localChecked: config["Tarrif.PYMT_LOW_TWO_LVL"] !== undefined ? config["Tarrif.PYMT_LOW_TWO_LVL"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -346,7 +346,7 @@ Page {
                                 console.log(pageId, "Updating PYMT_LOW_TWO_LVL to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PYMT_LOW_TWO_LVL"] !== undefined ? config["Tariff.PYMT_LOW_TWO_LVL"] : true
+                                localChecked = config["Tarrif.PYMT_LOW_TWO_LVL"] !== undefined ? config["Tarrif.PYMT_LOW_TWO_LVL"] : false
                                 console.log(pageId, "PYMT_LOW_TWO_LVL initialized to", localChecked)
                             }
                         }
@@ -358,7 +358,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PMYT_LVL"]?.label || "Number of Low Credit Levels"
+                            text: configGenerator.schema?.Tarrif?.PMYT_LVL?.label || "Number of Low Credit Levels"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -373,11 +373,11 @@ Page {
                             Layout.alignment: Qt.AlignRight
                             font.pixelSize: 14
                             padding: 8
-                            text: config["Tariff.PMYT_LVL"] !== undefined ? config["Tariff.PMYT_LVL"].toString() : "2"
+                            text: config["Tarrif.PMYT_LVL"] !== undefined ? config["Tarrif.PMYT_LVL"].toString() : "2"
                             validator: IntValidator { bottom: 1; top: 10 }
                             onEditingFinished: {
                                 var value = parseInt(text) || 2
-                                if (value !== config["Tariff.PMYT_LVL"]) {
+                                if (value !== config["Tarrif.PMYT_LVL"]) {
                                     updateConfig("Tariff.PMYT_LVL", value)
                                     console.log(pageId, "Updating PMYT_LVL to", value)
                                 }
@@ -400,7 +400,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PMYT_MONY_TRANS"]?.label || "Enable Money Transaction Logging"
+                            text: configGenerator.schema?.Tarrif?.PMYT_MONY_TRANS?.label || "Enable Money Transaction Logging"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -410,7 +410,7 @@ Page {
 
                         CheckBox {
                             id: moneyTransCheck
-                            property bool localChecked: config["Tariff.PMYT_MONY_TRANS"] !== undefined ? config["Tariff.PMYT_MONY_TRANS"] : true
+                            property bool localChecked: config["Tarrif.PMYT_MONY_TRANS"] !== undefined ? config["Tarrif.PMYT_MONY_TRANS"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -425,7 +425,7 @@ Page {
                                 console.log(pageId, "Updating PMYT_MONY_TRANS to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PMYT_MONY_TRANS"] !== undefined ? config["Tariff.PMYT_MONY_TRANS"] : true
+                                localChecked = config["Tarrif.PMYT_MONY_TRANS"] !== undefined ? config["Tarrif.PMYT_MONY_TRANS"] : false
                                 console.log(pageId, "PMYT_MONY_TRANS initialized to", localChecked)
                             }
                         }
@@ -435,9 +435,9 @@ Page {
                         spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: configGenerator.schema["Tariff.PMYT_MNY_TRANS"]
+                        visible: configGenerator.schema?.Tarrif?.PMYT_MNY_TRANS
                         Label {
-                            text: configGenerator.schema["Tariff.PMYT_MNY_TRANS_REC"]?.label || "Money Transaction Records"
+                            text: configGenerator.schema?.Tarrif?.PMYT_MNY_TRANS_REC?.label || "Money Transaction Records"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -452,11 +452,11 @@ Page {
                             Layout.alignment: Qt.AlignRight
                             font.pixelSize: 14
                             padding: 8
-                            text: config["Tariff.PMYT_MNY_TRANS_REC"] !== undefined ? config["Tariff.PMYT_MNY_TRANS_REC"].toString() : "20"
+                            text: config["Tarrif.PMYT_MNY_TRANS_REC"] !== undefined ? config["Tarrif.PMYT_MNY_TRANS_REC"].toString() : "20"
                             validator: IntValidator { bottom: 0; top: 100 }
                             onEditingFinished: {
                                 var value = parseInt(text) || 20
-                                if (value !== config["Tariff.PMYT_MNY_TRANS_REC"]) {
+                                if (value !== config["Tarrif.PMYT_MNY_TRANS_REC"]) {
                                     updateConfig("Tariff.PMYT_MNY_TRANS_REC", value)
                                     console.log(pageId, "Updating PMYT_MNY_TRANS_REC to", value)
                                 }
@@ -479,7 +479,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PYMT_TAX"]?.label || "Enable Taxes"
+                            text: configGenerator.schema?.Tarrif?.PYMT_TAX?.label || "Enable Taxes"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -489,7 +489,7 @@ Page {
 
                         CheckBox {
                             id: taxesCheck
-                            property bool localChecked: config["Tariff.PYMT_TAX"] !== undefined ? config["Tariff.PYMT_TAX"] : true
+                            property bool localChecked: config["Tarrif.PYMT_TAX"] !== undefined ? config["Tarrif.PYMT_TAX"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -497,7 +497,7 @@ Page {
                                 console.log(pageId, "Updating PYMT_TAX to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PYMT_TAX"] !== undefined ? config["Tariff.PYMT_TAX"] : true
+                                localChecked = config["Tarrif.PYMT_TAX"] !== undefined ? config["Tarrif.PYMT_TAX"] : false
                                 console.log(pageId, "PYMT_TAX initialized to", localChecked)
                             }
                         }
@@ -509,7 +509,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PYMT_FRIENDLY"]?.label || "Enable Friendly Periods"
+                            text: configGenerator.schema?.Tarrif?.PYMT_FRIENDLY?.label || "Enable Friendly Periods"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -519,7 +519,7 @@ Page {
 
                         CheckBox {
                             id: friendlyPeriodsCheck
-                            property bool localChecked: config["Tariff.PYMT_FRIENDLY"] !== undefined ? config["Tariff.PYMT_FRIENDLY"] : true
+                            property bool localChecked: config["Tarrif.PYMT_FRIENDLY"] !== undefined ? config["Tarrif.PYMT_FRIENDLY"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -527,7 +527,7 @@ Page {
                                 console.log(pageId, "Updating PYMT_FRIENDLY to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PYMT_FRIENDLY"] !== undefined ? config["Tariff.PYMT_FRIENDLY"] : true
+                                localChecked = config["Tarrif.PYMT_FRIENDLY"] !== undefined ? config["Tarrif.PYMT_FRIENDLY"] : false
                                 console.log(pageId, "PYMT_FRIENDLY initialized to", localChecked)
                             }
                         }
@@ -539,7 +539,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema["Tariff.PYMT_VACATION_TRF"]?.label || "Enable Vacation Tariff"
+                            text: configGenerator.schema?.Tarrif?.PYMT_VACATION_TRF?.label || "Enable Vacation Tariff"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -549,7 +549,7 @@ Page {
 
                         CheckBox {
                             id: vacationTariffCheck
-                            property bool localChecked: config["Tariff.PYMT_VACATION_TRF"] !== undefined ? config["Tariff.PYMT_VACATION_TRF"] : true
+                            property bool localChecked: config["Tarrif.PYMT_VACATION_TRF"] !== undefined ? config["Tarrif.PYMT_VACATION_TRF"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -557,7 +557,7 @@ Page {
                                 console.log(pageId, "Updating PYMT_VACATION_TRF to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Tariff.PYMT_VACATION_TRF"] !== undefined ? config["Tariff.PYMT_VACATION_TRF"] : true
+                                localChecked = config["Tarrif.PYMT_VACATION_TRF"] !== undefined ? config["Tarrif.PYMT_VACATION_TRF"] : false
                                 console.log(pageId, "PYMT_VACATION_TRF initialized to", localChecked)
                             }
                         }

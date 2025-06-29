@@ -21,7 +21,7 @@
 },
     "NEW_ASHANTI_PROJECT": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "New Ashanti Project"
     }
   },
@@ -35,27 +35,27 @@
     },
     "DOT_MATRIX_LOW_PWR_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Dot Matrix Low Power"
     },
     "USE_NEW_LCD": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Use New LCD"
     },
     "LCD_HQ30774_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable LCD HQ30774"
     },
     "LCD_CNKD0802_24SEG_8COM": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable LCD CNKD0802 24SEG 8COM"
     },
     "LCD_NEW_CNKD0802_24SEG_8COM": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable New LCD CNKD0802 24SEG 8COM"
     },
     "screenLanguage": {
@@ -67,22 +67,22 @@
     },
     "CD0066_MH6531AHSP_ENGLISH": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable CD0066 MH6531AHSP English"
     },
     "RECORD_NEW_CUSTOMER_DATE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Record New Customer Date"
     },
     "SERIAL_NUMBER_CHANGE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Serial Number Change"
     },
     "DISPLAY_MAP_SCREEN": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Display Map Screen"
     },
     "DISPLAY_OBIS": {
@@ -112,13 +112,13 @@
   },
     "MTR_REACTIVE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Reactive Meter"
     },
     "meterMeasurement": {
       "type": "enum",
       "values": ["MTR_DIRECT", "MTR_INDIRECT"],
-      "default": true,
+      "default": false,
       "label": "Enable Direct Calculations"
     },
      "meteringChips": {
@@ -150,7 +150,7 @@
     },
     "MTR_LOAD_PROFILE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Load Profile"
     },
     "PROFILE_RECORD_NUM": {
@@ -169,27 +169,27 @@
     },
     "MTR_RVS_TMPR": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Reverse Tamper"
     },
     "MTR_ERTH_TMPR": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Earth Tamper"
     },
     "MTR_ENABLE_LMT": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Limiter"
     },
     "PULSE_COUNT_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Pulse Count"
     },
     "BIG_ENDIAN": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Big Endian"
     }
   },
@@ -209,17 +209,17 @@
     },
     "HW_SPI": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Hardware SPI"
     },
     "SW_SPI": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Software SPI"
     },
     "RF_LINK_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable RF Link"
     },
     "RF_LINK_MBUS_DEVICE": {
@@ -230,7 +230,7 @@
     },
     "RF_LINK_TI_CC1120_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable TI CC1120"
     },
     "RF_LINK_TI_CC1120_PORT": {
@@ -241,17 +241,17 @@
     },
     "RF_LINK_TI_CC1120_RESET_POWER": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable TI CC1120 Reset Power"
     },
     "RFID_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable RFID Feature"
     },
     "MFRC522_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable RFID"
     },
     "MFRC522_CARD_TYPE": {
@@ -268,12 +268,12 @@
     },
     "MFRC522_INCREASE_SPEED": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable MFRC522 Increase Speed"
     },
     "RFID_SEQ_READ_WRITE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable RFID Sequential Read/Write"
     },
     "RFID_BUFFER_LEN": {
@@ -285,7 +285,7 @@
     },
     "RFID_PAR_LIMITED": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Limited Parameters"
     },
     "RFID_PREPAID_PAR_NUM": {
@@ -297,12 +297,12 @@
     },
     "RFID_PAR_PREDEFINED": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Predefined Parameters"
     },
     "RFID_PAR_POSTDEFINED": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Postdefined Parameters"
     },
     "RFID_POSTPAID_PAR_NUM": {
@@ -314,12 +314,12 @@
     },
     "RS485_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable RS485"
     },
     "MODEM_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Modem"
     },
     "MODEM_BAUD_RATE": {
@@ -331,17 +331,17 @@
     },
      "GPRS_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable GPRS"
     },
     "GPRS_SEND_NOTIFICATION_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Send Notification"
     },
     "SCREEN_GPRS_FEATURE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable GPRS Screen Feature"
     },
     "GPRS_DATA_BUFFER_SIZE": {
@@ -353,12 +353,12 @@
     },
     "GPRS_SRT_CARD": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable SRT Card"
     },
     "IEC_62056_21_SLAVE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable IEC 62056-21 Slave"
     },
     "IEC_BUFFER_SIZE": {
@@ -370,19 +370,19 @@
     },
     "IEC_62056_21_ISR_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable IEC ISR"
     },
     "OPTICAL_DMA_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Optical DMA"
     }
   },
   "Memory": {
     "FILE_SYS_USE_INT": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Use Internal MCU Memory in File System",
       "description": "Enable or disable the use of internal MCU memory for the file system."
     },
@@ -415,7 +415,7 @@
       "label": "Max Events Log Records",
       "description": "Maximum number of records to store in the events log.",
       "dependsOn": ["CTRL_EVNT_LOG", "CTRL_SUPER_CAP"],
-      "dependsOnCondition": [true, false]
+      "dependsOnCondition": [false, false]
     },
     "CTRL_CFG_METER_LOG": {
       "type": "boolean",
@@ -433,17 +433,17 @@
       "label": "Max Configure Meter Records",
       "description": "Maximum number of records to store in the meter configuration log.",
       "dependsOn": ["CTRL_CFG_METER_LOG", "CTRL_SUPER_CAP"],
-      "dependsOnCondition": [true, false]
+      "dependsOnCondition": [false, false]
     },
     "FM24C128D_2_Wire_Serial_EEPROM": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable FM24C128D 2-Wire Serial EEPROM",
       "description": "Enable or disable the FM24C128D 2-Wire Serial EEPROM."
     },
     "FLASH_FM25W32_ENABLE": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Flash FM25W32",
       "description": "Enable or disable the Flash FM25W32."
     }
@@ -554,7 +554,7 @@
       "default": "Dlms_NoParity",
       "label": "RS485 Parity"
     },
-    "DLMS_MrsItf": {
+    "DLMS_mRsItf": {
       "type": "integer",
       "default": 2,
       "min": 0,
@@ -566,17 +566,17 @@
   "Tariff": {
     "TARIFF_SYS": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Tariff System"
     },
     "OPTIMIZATION_TARIFF": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Optimization Tariff"
     },
     "TRF_BP_HISTORY": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Billing Period History"
     },
     "TRF_BP_HISTORY_RECORDS": {
@@ -588,22 +588,22 @@
     },
     "TRF_USE_MD_KW": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Record MD of Active Energy"
     },
     "TRF_USE_MD_A": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Record MD of Current"
     },
     "PAYMENT_SYS": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Payment System"
     },
     "PYMT_LOW_TWO_LVL": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Two-Level Low Credit"
     },
     "PMYT_LVL": {
@@ -615,7 +615,7 @@
     },
     "PYMT_MONY_TRANS": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Money Transaction Logging"
     },
     "PMYT_MNY_TRANS_REC": {
@@ -627,17 +627,17 @@
     },
     "PYMT_TAX": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Taxes"
     },
     "PYMT_FRIENDLY": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Friendly Periods"
     },
     "PYMT_VACATION_TRF": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "label": "Enable Vacation Tariff"
     }
   },
@@ -645,49 +645,49 @@
     "Control": {
         "CTRL_RFID_BOARD_PIN_ENABLE": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Enable RFID Board Pin",
             "section": "Control Pins",
             "description": "Enable RFID board pin control"
         },
         "POWER_FAIL_PIN_FEATURE": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Power Fail Pin Feature",
             "section": "Control Pins",
             "description": "Enable power fail detection pin"
         },
         "CTRL_GPRS_MODULE_CVR_SW": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "GPRS Module Cover Switch",
             "section": "Control Pins",
             "description": "Enable GPRS module cover switch detection"
         },
         "CTRL_CVR_SW": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Cover Switch",
             "section": "Control Pins",
             "description": "Enable main cover switch detection"
         },
         "CTRL_TRMNL_SW": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Terminal Switch",
             "section": "Control Pins",
             "description": "Enable terminal block switch detection"
         },
         "CTRL_UP_SW": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Up Switch",
             "section": "Control Pins",
             "description": "Enable up navigation switch"
         },
         "CTRL_DN_SW": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Down Switch",
             "section": "Control Pins",
             "description": "Enable down navigation switch"
@@ -712,14 +712,14 @@
         },
         "CTRL_ACTIONS": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Enable Actions",
             "section": "Action Controls",
             "description": "Enable all control actions"
         },
         "CTRL_RLY": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Relay Control",
             "section": "Action Controls",
             "depends": "CTRL_ACTIONS",
@@ -727,7 +727,7 @@
         },
         "CTRL_TMPR_LED": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Tamper LED Control",
             "section": "Action Controls",
             "depends": "CTRL_ACTIONS",
@@ -735,7 +735,7 @@
         },
         "CTRL_LOW_CRDT_LED": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Low Credit LED Control",
             "section": "Action Controls",
             "depends": "CTRL_ACTIONS",
@@ -743,7 +743,7 @@
         },
         "CTRL_BZR": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Buzzer Control",
             "section": "Action Controls",
             "depends": "CTRL_ACTIONS",
@@ -751,7 +751,7 @@
         },
         "AC_BUZZER_FEATURE": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "AC Buzzer",
             "section": "Action Controls",
             "depends": "CTRL_BZR",
@@ -759,7 +759,7 @@
         },
         "CTRL_ALRM_ICON": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Alarm Icon Control",
             "section": "Action Controls",
             "depends": "CTRL_ACTIONS",
@@ -784,7 +784,7 @@
         },
         "KEYPAD_FEATURE": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "label": "Enable Keypad",
             "section": "Keypad System",
             "description": "Enable keypad functionality"

@@ -95,36 +95,36 @@ Page {
 
                     CheckBox {
                         id: fileSysUseIntCheck
-                        text: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT?.label || "Use Internal MCU Memory in File System"
-                        checked: config["Memory.FILE_SYS_USE_INT"] || false
-                        visible: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT !== undefined
+                        text: configGenerator.schema.Memory?.FILE_SYS_USE_INT?.label || "Use Internal MCU Memory in File System"
+                        checked: config["Memory.FILE_SYS_USE_INT"] !== undefined ? config["Memory.FILE_SYS_USE_INT"]  : false
+                        visible: configGenerator.schema.Memory?.FILE_SYS_USE_INT !== undefined
                         onClicked: updateConfig("Memory.FILE_SYS_USE_INT", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.FILE_SYS_USE_INT?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.FILE_SYS_USE_INT?.description || ""
                     }
 
 
                     CheckBox {
                         id: ctrlEvntLogCheck
-                        text: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.label || "Enable Events Logging"
-                        checked: config["Memory.CTRL_EVNT_LOG"] || false
-                        visible: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG !== undefined && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
+                        text: configGenerator.schema.Memory?.CTRL_EVNT_LOG?.label || "Enable Events Logging"
+                        checked: config["Memory.CTRL_EVNT_LOG"] !== undefined ? config["Memory.CTRL_EVNT_LOG"]  : false
+                        visible: configGenerator.schema.Memory?.CTRL_EVNT_LOG !== undefined && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
                         enabled: config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
                         opacity: enabled ? 1.0 : 0.6
                         onClicked: updateConfig("Memory.CTRL_EVNT_LOG", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.CTRL_EVNT_LOG?.description || ""
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ctrlEvntLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM !== undefined
+                        visible: ctrlEvntLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema.Memory?.EVENT_LOG_RECORD_NUM !== undefined
                         enabled: ctrlEvntLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.label || "Max Events Log Records"
+                            text: configGenerator.schema.Memory?.EVENT_LOG_RECORD_NUM?.label || "Max Events Log Records"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -153,31 +153,31 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.description || ""
+                            ToolTip.text: configGenerator.schema.Memory?.EVENT_LOG_RECORD_NUM?.description || ""
                         }
                     }
 
                     CheckBox {
                         id: ctrlCfgMeterLogCheck
-                        text: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.label || "Enable Configure Meter Logging"
-                        checked: config["Memory.CTRL_CFG_METER_LOG"] || false
-                        visible: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG !== undefined && !config["Control.CTRL_SUPER_CAP"]
+                        text: configGenerator.schema.Memory?.CTRL_CFG_METER_LOG?.label || "Enable Configure Meter Logging"
+                        checked: config["Memory.CTRL_CFG_METER_LOG"] !== undefined ? config["Memory.CTRL_CFG_METER_LOG"] !== undefined : false
+                        visible: configGenerator.schema.Memory?.CTRL_CFG_METER_LOG !== undefined && !config["Control.CTRL_SUPER_CAP"]
                         enabled: !config["Control.CTRL_SUPER_CAP"]
                         opacity: enabled ? 1.0 : 0.6
                         onClicked: updateConfig("Memory.CTRL_CFG_METER_LOG", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.CTRL_CFG_METER_LOG?.description || ""
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ctrlCfgMeterLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM !== undefined
+                        visible: ctrlCfgMeterLogCheck.checked && config["Control.BATTERY_TYPE"] !== "CTRL_SUPER_CAP"&& configGenerator.schema.Memory?.CFG_METER_RECORD_NUM !== undefined
                         enabled: ctrlCfgMeterLogCheck.checked && !config["Control.CTRL_SUPER_CAP"]
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.label || "Max Configure Meter Records"
+                            text: configGenerator.schema.Memory?.CFG_METER_RECORD_NUM?.label || "Max Configure Meter Records"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -206,21 +206,21 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.description || ""
+                            ToolTip.text: configGenerator.schema.Memory?.CFG_METER_RECORD_NUM?.description || ""
                         }
                     }
 
 
                     CheckBox {
                         id: fileSysLogCheck
-                        text: configGenerator.schema["Memory"]?.FILE_SYS_LOG?.label || "Enable Logging APIs"
-                        checked: config["Memory.FILE_SYS_LOG"] || false
-                        visible: configGenerator.schema["Memory"]?.FILE_SYS_LOG !== undefined
-                        enabled: config["Memory.CTRL_EVNT_LOG"] || config["Tariff.PYMT_MONY_TRANS"] || false
+                        text: configGenerator.schema.Memory?.FILE_SYS_LOG?.label || "Enable Logging APIs"
+                        checked: config["Memory.FILE_SYS_LOG"] !== undefined ? config["Memory.FILE_SYS_LOG"] : false
+                        visible: configGenerator.schema.Memory?.FILE_SYS_LOG !== undefined
+                        enabled: config["Memory.CTRL_EVNT_LOG"] || config["Tariff.PYMT_MONY_TRANS"] !== undefined
                         opacity: enabled ? 1.0 : 0.6
                         onClicked: updateConfig("Memory.FILE_SYS_LOG", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.FILE_SYS_LOG?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.FILE_SYS_LOG?.description || ""
                     }
                 }
             }
@@ -244,22 +244,22 @@ Page {
 
                     CheckBox {
                         id: fm24c128dEepromCheck
-                        text: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM?.label || "Enable FM24C128D 2-Wire Serial EEPROM"
-                        checked: config["Memory.FM24C128D_2_Wire_Serial_EEPROM"] || false
-                        visible: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM !== undefined
+                        text: configGenerator.schema.Memory?.FM24C128D_2_Wire_Serial_EEPROM?.label || "Enable FM24C128D 2-Wire Serial EEPROM"
+                        checked: config["Memory.FM24C128D_2_Wire_Serial_EEPROM"] !== undefined ? config["Memory.FM24C128D_2_Wire_Serial_EEPROM"] : false
+                        visible: configGenerator.schema.Memory?.FM24C128D_2_Wire_Serial_EEPROM !== undefined
                         onClicked: updateConfig("Memory.FM24C128D_2_Wire_Serial_EEPROM", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.FM24C128D_2_Wire_Serial_EEPROM?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.FM24C128D_2_Wire_Serial_EEPROM?.description || ""
                     }
 
                     CheckBox {
                         id: flashFm25w32Check
-                        text: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE?.label || "Enable Flash FM25W32"
-                        checked: config["Memory.FLASH_FM25W32_ENABLE"] || false
-                        visible: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE !== undefined
+                        text: configGenerator.schema.Memory?.FLASH_FM25W32_ENABLE?.label || "Enable Flash FM25W32"
+                        checked: config["Memory.FLASH_FM25W32_ENABLE"] !== undefined ? config["Memory.FLASH_FM25W32_ENABLE"] : false
+                        visible: configGenerator.schema.Memory?.FLASH_FM25W32_ENABLE !== undefined
                         onClicked: updateConfig("Memory.FLASH_FM25W32_ENABLE", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Memory"]?.FLASH_FM25W32_ENABLE?.description || ""
+                        ToolTip.text: configGenerator.schema.Memory?.FLASH_FM25W32_ENABLE?.description || ""
                     }
                 }
             }
@@ -276,20 +276,20 @@ Page {
         newConfig[key] = value
 
         // Update FILE_SYS_LOG based on dependencies
-        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] || false
+        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] !== undefined
 
         // Reset dependent fields to schema defaults
         if (key === "Control.CTRL_SUPER_CAP" && value) {
-            newConfig["Memory.CTRL_EVNT_LOG"] = configGenerator.schema["Memory"]?.CTRL_EVNT_LOG?.default || false
-            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.default || 0
-            newConfig["Memory.CTRL_CFG_METER_LOG"] = configGenerator.schema["Memory"]?.CTRL_CFG_METER_LOG?.default || false
-            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.default || 0
+            newConfig["Memory.CTRL_EVNT_LOG"] = configGenerator.schema.Memory?.CTRL_EVNT_LOG?.default || false
+            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema.Memory?.EVENT_LOG_RECORD_NUM?.default || 0
+            newConfig["Memory.CTRL_CFG_METER_LOG"] = configGenerator.schema.Memory?.CTRL_CFG_METER_LOG?.default || false
+            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema.Memory?.CFG_METER_RECORD_NUM?.default || 0
         }
         if (key === "Memory.CTRL_EVNT_LOG" && !value) {
-            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema["Memory"]?.EVENT_LOG_RECORD_NUM?.default || 0
+            newConfig["Memory.EVENT_LOG_RECORD_NUM"] = configGenerator.schema.Memory?.EVENT_LOG_RECORD_NUM?.default || 0
         }
         if (key === "Memory.CTRL_CFG_METER_LOG" && !value) {
-            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema["Memory"]?.CFG_METER_RECORD_NUM?.default || 0
+            newConfig["Memory.CFG_METER_RECORD_NUM"] = configGenerator.schema.Memory?.CFG_METER_RECORD_NUM?.default || 0
         }
 
         // Clamp integer values within schema bounds
@@ -310,7 +310,7 @@ Page {
 
     function updateConfigAll(): void {
         const newConfig = JSON.parse(JSON.stringify(config || {}))
-        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] || false
+        newConfig["Memory.FILE_SYS_LOG"] = newConfig["Memory.CTRL_EVNT_LOG"] || newConfig["Tariff.PYMT_MONY_TRANS"] !== undefined
         console.log(pageId, "Syncing all config with C++ backend:", JSON.stringify(newConfig))
         configUpdated(newConfig)
         configGenerator.setConfig(newConfig)

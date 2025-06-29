@@ -26,7 +26,7 @@ Page {
     Component.onCompleted: {
         console.log(pageId, "Initialized with config:", JSON.stringify(config))
         // Initialize missing config keys with schema defaults
-        const displaySchema = configGenerator.schema["Display"] || {}
+        const displaySchema = configGenerator.schema?.Display || {}
         for (let key in displaySchema) {
             const fullKey = "Display." + key;
             if (config[fullKey] === undefined && displaySchema[key].default !== undefined) {
@@ -117,7 +117,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Display"]?.displayType?.label || "Display Type"
+                            text: configGenerator.schema?.Display?.displayType?.label || "Display Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -131,7 +131,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Display"]?.displayType || {}
+                            property var schema: configGenerator.schema?.Display?.displayType || {}
                             model: schema.labels || ["Segmented LCD", "Dot Matrix LCD"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -181,7 +181,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Display"]?.USE_NEW_LCD?.label || "Use New LCD"
+                            text: configGenerator.schema?.Display?.USE_NEW_LCD?.label || "Use New LCD"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -229,21 +229,21 @@ Page {
 
                     CheckBox {
                         id: hq30774Check
-                        text: configGenerator.schema["Display"]?.LCD_HQ30774_ENABLE?.label || "Enable LCD HQ30774"
+                        text: configGenerator.schema?.Display?.LCD_HQ30774_ENABLE?.label || "Enable LCD HQ30774"
                         checked: config["Display.LCD_HQ30774_ENABLE"] || false
                         onCheckedChanged: updateConfig("Display.LCD_HQ30774_ENABLE", checked)
                     }
 
                     CheckBox {
                         id: cnkd0802Check
-                        text: configGenerator.schema["Display"]?.LCD_CNKD0802_24SEG_8COM?.label || "Enable LCD CNKD0802 24SEG 8COM"
+                        text: configGenerator.schema?.Display?.LCD_CNKD0802_24SEG_8COM?.label || "Enable LCD CNKD0802 24SEG 8COM"
                         checked: config["Display.LCD_CNKD0802_24SEG_8COM"] || false
                         onCheckedChanged: updateConfig("Display.LCD_CNKD0802_24SEG_8COM", checked)
                     }
 
                     CheckBox {
                         id: newCnkd0802Check
-                        text: configGenerator.schema["Display"]?.LCD_NEW_CNKD0802_24SEG_8COM?.label || "Enable New LCD CNKD0802 24SEG 8COM"
+                        text: configGenerator.schema?.Display?.LCD_NEW_CNKD0802_24SEG_8COM?.label || "Enable New LCD CNKD0802 24SEG 8COM"
                         checked: config["Display.LCD_NEW_CNKD0802_24SEG_8COM"] || false
                         onCheckedChanged: updateConfig("Display.LCD_NEW_CNKD0802_24SEG_8COM", checked)
                     }
@@ -282,7 +282,7 @@ Page {
 
                     CheckBox {
                         id: dotMatrixLowPwrCheck
-                        text: configGenerator.schema["Display"]?.DOT_MATRIX_LOW_PWR_FEATURE?.label || "Enable Dot Matrix Low Power"
+                        text: configGenerator.schema?.Display?.DOT_MATRIX_LOW_PWR_FEATURE?.label || "Enable Dot Matrix Low Power"
                         checked: config["Display.DOT_MATRIX_LOW_PWR_FEATURE"] || false
                         onCheckedChanged: updateConfig("Display.DOT_MATRIX_LOW_PWR_FEATURE", checked)
                     }
@@ -321,28 +321,28 @@ Page {
 
                     CheckBox {
                         id: recordNewCustomerDateCheck
-                        text: configGenerator.schema["Display"]?.RECORD_NEW_CUSTOMER_DATE?.label || "Record New Customer Date"
+                        text: configGenerator.schema?.Display?.RECORD_NEW_CUSTOMER_DATE?.label || "Record New Customer Date"
                         checked: config["Display.RECORD_NEW_CUSTOMER_DATE"] || false
                         onCheckedChanged: updateConfig("Display.RECORD_NEW_CUSTOMER_DATE", checked)
                     }
 
                     CheckBox {
                         id: serialNumberChangeCheck
-                        text: configGenerator.schema["Display"]?.SERIAL_NUMBER_CHANGE?.label || "Enable Serial Number Change"
+                        text: configGenerator.schema?.Display?.SERIAL_NUMBER_CHANGE?.label || "Enable Serial Number Change"
                         checked: config["Display.SERIAL_NUMBER_CHANGE"] || false
                         onCheckedChanged: updateConfig("Display.SERIAL_NUMBER_CHANGE", checked)
                     }
 
                     CheckBox {
                         id: displayMapScreenCheck
-                        text: configGenerator.schema["Display"]?.DISPLAY_MAP_SCREEN?.label || "Display Map Screen"
+                        text: configGenerator.schema?.Display?.DISPLAY_MAP_SCREEN?.label || "Display Map Screen"
                         checked: config["Display.DISPLAY_MAP_SCREEN"] || false
                         onCheckedChanged: updateConfig("Display.DISPLAY_MAP_SCREEN", checked)
                     }
 
                     CheckBox {
                         id: displayObisCheck
-                        text: configGenerator.schema["Display"]?.DISPLAY_OBIS?.label || "Display OBIS"
+                        text: configGenerator.schema?.Display?.DISPLAY_OBIS?.label || "Display OBIS"
                         checked: config["Display.DISPLAY_OBIS"] || false
                         onCheckedChanged: updateConfig("Display.DISPLAY_OBIS", checked)
                     }
@@ -351,7 +351,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Display"]?.DISPLAY_SCREEN_ORDER?.label || "Display Screen Order"
+                            text: configGenerator.schema?.Display?.DISPLAY_SCREEN_ORDER?.label || "Display Screen Order"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -365,7 +365,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Display"]?.DISPLAY_SCREEN_ORDER || {}
+                            property var schema: configGenerator.schema?.Display?.DISPLAY_SCREEN_ORDER || {}
                             model: schema.labels
                             contentItem: Text {
                                 leftPadding: 10
@@ -447,7 +447,7 @@ Page {
                         spacing: 12
                         Layout.fillWidth: true
                         Label {
-                            text: configGenerator.schema["Display"]?.screenLanguage?.label || "Screen Language"
+                            text: configGenerator.schema?.Display?.screenLanguage?.label || "Screen Language"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -461,7 +461,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Display"]?.screenLanguage || {}
+                            property var schema: configGenerator.schema?.Display?.screenLanguage || {}
                             model: schema.labels || ["English", "Arabic"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -509,7 +509,7 @@ Page {
 
                     CheckBox {
                         id: cd0066Check
-                        text: configGenerator.schema["Display"]?.CD0066_MH6531AHSP_ENGLISH?.label || "Enable CD0066 MH6531AHSP English"
+                        text: configGenerator.schema?.Display?.CD0066_MH6531AHSP_ENGLISH?.label || "Enable CD0066 MH6531AHSP English"
                         checked: config["Display.CD0066_MH6531AHSP_ENGLISH"] || false
                         onCheckedChanged: updateConfig("Display.CD0066_MH6531AHSP_ENGLISH", checked)
                     }

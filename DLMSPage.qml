@@ -20,7 +20,7 @@ Page {
         "Dlms.Dlms_mRsBaudrate": "Dlms_eBaud9600",
         "Dlms.Dlms_mRsDatabits": "Dlms_m8DataBits",
         "Dlms.Dlms_mRsParity": "Dlms_NoParity",
-        "Dlms.DLMS_MrsItf": 2
+        "Dlms.Dlms_mRsItf": 2
     }
     signal configUpdated(var newConfig)
     property string pageId: "DlmsPage_" + Math.random().toString(36).substr(2, 9)
@@ -102,23 +102,23 @@ Page {
 
                     CheckBox {
                         id: irEnableCheck
-                        text: configGenerator.schema["Dlms"]?.IR_ENABLE?.label || "Enable IR Settings"
+                        text: configGenerator.schema.Dlms?.IR_ENABLE?.label || "Enable IR Settings"
                         checked: config["Dlms.IR_ENABLE"] || false
-                        visible: configGenerator.schema["Dlms"]?.IR_ENABLE !== undefined
+                        visible: configGenerator.schema.Dlms?.IR_ENABLE !== undefined
                         onClicked: updateConfig("Dlms.IR_ENABLE", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Dlms"]?.IR_ENABLE?.description || ""
+                        ToolTip.text: configGenerator.schema.Dlms?.IR_ENABLE?.description || ""
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: irEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_mIrCom !== undefined
+                        visible: irEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_mIrCom !== undefined
                         enabled: irEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mIrCom?.label || "IR Com Port"
+                            text: configGenerator.schema.Dlms?.Dlms_mIrCom?.label || "IR Com Port"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -147,19 +147,19 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.Dlms_mIrCom?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.Dlms_mIrCom?.description || ""
                         }
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: irEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_mIrDefaultBaudrate !== undefined
+                        visible: irEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_mIrDefaultBaudrate !== undefined
                         enabled: irEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mIrDefaultBaudrate?.label || "IR Default Baud Rate"
+                            text: configGenerator.schema.Dlms?.Dlms_mIrDefaultBaudrate?.label || "IR Default Baud Rate"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -174,7 +174,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mIrDefaultBaudrate || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mIrDefaultBaudrate || {}
                             model: schema.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -225,12 +225,12 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: irEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_mIrCommunicationMode !== undefined
+                        visible: irEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_mIrCommunicationMode !== undefined
                         enabled: irEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mIrCommunicationMode?.label || "IR Communication Mode"
+                            text: configGenerator.schema.Dlms?.Dlms_mIrCommunicationMode?.label || "IR Communication Mode"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -245,7 +245,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mIrCommunicationMode || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mIrCommunicationMode || {}
                             model: schema.values || ["Dlms_eModeIec", "Dlms_eModeDlmsUA"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -296,12 +296,12 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: irEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_mIrNormalBaudrate !== undefined
+                        visible: irEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_mIrNormalBaudrate !== undefined
                         enabled: irEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mIrNormalBaudrate?.label || "IR Normal Baud Rate"
+                            text: configGenerator.schema.Dlms?.Dlms_mIrNormalBaudrate?.label || "IR Normal Baud Rate"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -316,7 +316,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mIrNormalBaudrate || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mIrNormalBaudrate || {}
                             model: schema.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -367,12 +367,12 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: irEnableCheck.checked && configGenerator.schema["Dlms"]?.DLMS_mIrItb !== undefined
+                        visible: irEnableCheck.checked && configGenerator.schema.Dlms?.DLMS_mIrItb !== undefined
                         enabled: irEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.DLMS_mIrItb?.label || "IR Frame Timeout (10ms)"
+                            text: configGenerator.schema.Dlms?.DLMS_mIrItb?.label || "IR Frame Timeout (10ms)"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -401,7 +401,7 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.DLMS_mIrItb?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.DLMS_mIrItb?.description || ""
                         }
                     }
                 }
@@ -426,23 +426,23 @@ Page {
 
                     CheckBox {
                         id: ipEnableCheck
-                        text: configGenerator.schema["Dlms"]?._IP_?.label || "Enable IP Settings"
+                        text: configGenerator.schema.Dlms?._IP_?.label || "Enable IP Settings"
                         checked: config["Dlms._IP_"] || false
-                        visible: configGenerator.schema["Dlms"]?._IP_ !== undefined
+                        visible: configGenerator.schema.Dlms?._IP_ !== undefined
                         onClicked: updateConfig("Dlms._IP_", checked)
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema["Dlms"]?._IP_?.description || ""
+                        ToolTip.text: configGenerator.schema.Dlms?._IP_?.description || ""
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ipEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_IpWrap_mInactivityTime !== undefined
+                        visible: ipEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_IpWrap_mInactivityTime !== undefined
                         enabled: ipEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mInactivityTime?.label || "IP Inactivity Time (sec)"
+                            text: configGenerator.schema.Dlms?.Dlms_IpWrap_mInactivityTime?.label || "IP Inactivity Time (sec)"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -471,19 +471,19 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mInactivityTime?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.Dlms_IpWrap_mInactivityTime?.description || ""
                         }
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ipEnableCheck.checked && configGenerator.schema["Dlms"]?.DLMS_IpWarp_mPort !== undefined
+                        visible: ipEnableCheck.checked && configGenerator.schema.Dlms?.DLMS_IpWarp_mPort !== undefined
                         enabled: ipEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.DLMS_IpWarp_mPort?.label || "IP Port"
+                            text: configGenerator.schema.Dlms?.DLMS_IpWarp_mPort?.label || "IP Port"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -512,19 +512,19 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.DLMS_IpWarp_mPort?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.DLMS_IpWarp_mPort?.description || ""
                         }
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ipEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_IpWrap_mDefaultCommProfile !== undefined
+                        visible: ipEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_IpWrap_mDefaultCommProfile !== undefined
                         enabled: ipEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mDefaultCommProfile?.label || "IP Communication Profile"
+                            text: configGenerator.schema.Dlms?.Dlms_IpWrap_mDefaultCommProfile?.label || "IP Communication Profile"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -539,7 +539,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mDefaultCommProfile || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_IpWrap_mDefaultCommProfile || {}
                             model: schema.values || ["Dlms_eIpTcp", "Dlms_eIpUdp"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -590,12 +590,12 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: ipEnableCheck.checked && configGenerator.schema["Dlms"]?.Dlms_IpWrap_mItf !== undefined
+                        visible: ipEnableCheck.checked && configGenerator.schema.Dlms?.Dlms_IpWrap_mItf !== undefined
                         enabled: ipEnableCheck.checked
                         opacity: enabled ? 1.0 : 0.6
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mItf?.label || "IP Interface"
+                            text: configGenerator.schema.Dlms?.Dlms_IpWrap_mItf?.label || "IP Interface"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -624,7 +624,7 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.Dlms_IpWrap_mItf?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.Dlms_IpWrap_mItf?.description || ""
                         }
                     }
                 }
@@ -650,10 +650,10 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: configGenerator.schema["Dlms"]?.DLMS_mRsCom !== undefined
+                        visible: configGenerator.schema.Dlms?.DLMS_mRsCom !== undefined
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.DLMS_mRsCom?.label || "RS485 Com Port"
+                            text: configGenerator.schema.Dlms?.DLMS_mRsCom?.label || "RS485 Com Port"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -682,17 +682,17 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.DLMS_mRsCom?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.DLMS_mRsCom?.description || ""
                         }
                     }
 
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: configGenerator.schema["Dlms"]?.Dlms_mRsBaudrate !== undefined
+                        visible: configGenerator.schema.Dlms?.Dlms_mRsBaudrate !== undefined
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mRsBaudrate?.label || "RS485 Baud Rate"
+                            text: configGenerator.schema.Dlms?.Dlms_mRsBaudrate?.label || "RS485 Baud Rate"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -707,7 +707,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mRsBaudrate || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mRsBaudrate || {}
                             model: schema.values || ["Dlms_eBaud300", "Dlms_eBaud600", "Dlms_eBaud1200", "Dlms_eBaud2400", "Dlms_eBaud4800", "Dlms_eBaud9600", "Dlms_eBaud19200", "Dlms_eBaud38400", "Dlms_eBaud57600", "Dlms_eBaud115200"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -758,10 +758,10 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: configGenerator.schema["Dlms"]?.Dlms_mRsDatabits !== undefined
+                        visible: configGenerator.schema.Dlms?.Dlms_mRsDatabits !== undefined
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mRsDatabits?.label || "RS485 Data Bits"
+                            text: configGenerator.schema.Dlms?.Dlms_mRsDatabits?.label || "RS485 Data Bits"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -776,7 +776,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mRsDatabits || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mRsDatabits || {}
                             model: schema.values || ["Dlms_m7DataBits", "Dlms_m8DataBits"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -827,10 +827,10 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: configGenerator.schema["Dlms"]?.Dlms_mRsParity !== undefined
+                        visible: configGenerator.schema.Dlms?.Dlms_mRsParity !== undefined
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.Dlms_mRsParity?.label || "RS485 Parity"
+                            text: configGenerator.schema.Dlms?.Dlms_mRsParity?.label || "RS485 Parity"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -845,7 +845,7 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            property var schema: configGenerator.schema["Dlms"]?.Dlms_mRsParity || {}
+                            property var schema: configGenerator.schema.Dlms?.Dlms_mRsParity || {}
                             model: schema.values || ["Dlms_NoParity", "Dlms_EvenParity"]
                             contentItem: Text {
                                 leftPadding: 10
@@ -896,10 +896,10 @@ Page {
                     RowLayout {
                         spacing: 100
                         Layout.fillWidth: true
-                        visible: configGenerator.schema["Dlms"]?.DLMS_MrsItf !== undefined
+                        visible: configGenerator.schema.Dlms?.Dlms_mRsItf !== undefined
 
                         Label {
-                            text: configGenerator.schema["Dlms"]?.DLMS_MrsItf?.label || "RS485 Interface Timeout"
+                            text: configGenerator.schema.Dlms?.Dlms_mRsItf?.label || "RS485 Interface Timeout"
                             font.pixelSize: 16
                             font.family: "Arial, sans-serif"
                             color: "#1A2526"
@@ -913,12 +913,12 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            text: config["Dlms.DLMS_MrsItf"] !== undefined ? config["Dlms.DLMS_MrsItf"].toString() : "2"
+                            text: config["Dlms.Dlms_mRsItf"] !== undefined ? config["Dlms.Dlms_mRsItf"].toString() : "2"
                             validator: IntValidator { bottom: 0; top: 10 }
                             onEditingFinished: {
                                 const value = parseInt(text) || 2
-                                if (value !== config["Dlms.DLMS_MrsItf"]) {
-                                    updateConfig("Dlms.DLMS_MrsItf", value)
+                                if (value !== config["Dlms.Dlms_mRsItf"]) {
+                                    updateConfig("Dlms.Dlms_mRsItf", value)
                                 }
                             }
                             background: Rectangle {
@@ -928,7 +928,7 @@ Page {
                                 radius: 6
                             }
                             ToolTip.visible: hovered
-                            ToolTip.text: configGenerator.schema["Dlms"]?.DLMS_MrsItf?.description || ""
+                            ToolTip.text: configGenerator.schema.Dlms?.Dlms_mRsItf?.description || ""
                         }
                     }
                 }
@@ -945,17 +945,17 @@ Page {
         const newConfig = JSON.parse(JSON.stringify(config || {}))
         newConfig[key] = value
         if (key === "Dlms.IR_ENABLE" && !value) {
-            newConfig["Dlms.Dlms_mIrCom"] = configGenerator.schema["Dlms"]?.Dlms_mIrCom?.default || 13
-            newConfig["Dlms.Dlms_mIrDefaultBaudrate"] = configGenerator.schema["Dlms"]?.Dlms_mIrDefaultBaudrate?.default || "Dlms_eBaud300"
-            newConfig["Dlms.Dlms_mIrCommunicationMode"] = configGenerator.schema["Dlms"]?.Dlms_mIrCommunicationMode?.default || "Dlms_eModeIec"
-            newConfig["Dlms.Dlms_mIrNormalBaudrate"] = configGenerator.schema["Dlms"]?.Dlms_mIrNormalBaudrate?.default || "Dlms_eBaud9600"
-            newConfig["Dlms.DLMS_mIrItb"] = configGenerator.schema["Dlms"]?.DLMS_mIrItb?.default || 20
+            newConfig["Dlms.Dlms_mIrCom"] = configGenerator.schema.Dlms?.Dlms_mIrCom?.default || 13
+            newConfig["Dlms.Dlms_mIrDefaultBaudrate"] = configGenerator.schema.Dlms?.Dlms_mIrDefaultBaudrate?.default || "Dlms_eBaud300"
+            newConfig["Dlms.Dlms_mIrCommunicationMode"] = configGenerator.schema.Dlms?.Dlms_mIrCommunicationMode?.default || "Dlms_eModeIec"
+            newConfig["Dlms.Dlms_mIrNormalBaudrate"] = configGenerator.schema.Dlms?.Dlms_mIrNormalBaudrate?.default || "Dlms_eBaud9600"
+            newConfig["Dlms.DLMS_mIrItb"] = configGenerator.schema.Dlms?.DLMS_mIrItb?.default || 20
         }
         if (key === "Dlms._IP_" && !value) {
-            newConfig["Dlms.Dlms_IpWrap_mInactivityTime"] = configGenerator.schema["Dlms"]?.Dlms_IpWrap_mInactivityTime?.default || 55
-            newConfig["Dlms.DLMS_IpWarp_mPort"] = configGenerator.schema["Dlms"]?.DLMS_IpWarp_mPort?.default || 4059
-            newConfig["Dlms.Dlms_IpWrap_mDefaultCommProfile"] = configGenerator.schema["Dlms"]?.Dlms_IpWrap_mDefaultCommProfile?.default || "Dlms_eIpTcp"
-            newConfig["Dlms.Dlms_IpWrap_mItf"] = configGenerator.schema["Dlms"]?.Dlms_IpWrap_mItf?.default || 1
+            newConfig["Dlms.Dlms_IpWrap_mInactivityTime"] = configGenerator.schema.Dlms?.Dlms_IpWrap_mInactivityTime?.default || 55
+            newConfig["Dlms.DLMS_IpWarp_mPort"] = configGenerator.schema.Dlms?.DLMS_IpWarp_mPort?.default || 4059
+            newConfig["Dlms.Dlms_IpWrap_mDefaultCommProfile"] = configGenerator.schema.Dlms?.Dlms_IpWrap_mDefaultCommProfile?.default || "Dlms_eIpTcp"
+            newConfig["Dlms.Dlms_IpWrap_mItf"] = configGenerator.schema.Dlms?.Dlms_IpWrap_mItf?.default || 1
         }
         console.log(pageId, "Updating config for", key, "with value:", value, "new config:", JSON.stringify(newConfig))
         config = newConfig

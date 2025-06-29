@@ -226,7 +226,7 @@ Page {
 
                         CheckBox {
                             id: reactiveMeterCheck
-                            property bool localChecked: config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : true
+                            property bool localChecked: config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -234,7 +234,7 @@ Page {
                                 console.log(pageId, "Updating MTR_REACTIVE to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : true
+                                localChecked = config["Metering.MTR_REACTIVE"] !== undefined ? config["Metering.MTR_REACTIVE"] : false
                                 console.log(pageId, "MTR_REACTIVE initialized to", localChecked)
                             }
                         }
@@ -622,7 +622,7 @@ Page {
 
                         CheckBox {
                             id: loadProfileCheck
-                            property bool localChecked: config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : true
+                            property bool localChecked: config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -630,7 +630,7 @@ Page {
                                 console.log(pageId, "Updating MTR_LOAD_PROFILE to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : true
+                                localChecked = config["Metering.MTR_LOAD_PROFILE"] !== undefined ? config["Metering.MTR_LOAD_PROFILE"] : false
                                 console.log(pageId, "MTR_LOAD_PROFILE initialized to", localChecked)
                             }
                         }
@@ -640,7 +640,7 @@ Page {
                         spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: config["Metering.MTR_LOAD_PROFILE"]
+                        visible: !!(config["Metering.MTR_LOAD_PROFILE"])
 
                         Label {
                             text: configGenerator.schema?.Metering.PROFILE_RECORD_NUM?.label || "Profile Record Number"
@@ -682,7 +682,7 @@ Page {
                         spacing: 100
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        visible: config["Metering.MTR_LOAD_PROFILE"]
+                        visible: !!(config["Metering.MTR_LOAD_PROFILE"])
 
                         Label {
                             text: configGenerator.schema?.Metering.PROFILE_RECORD_TEST_MODE_NUM?.label || "Profile Test Records"
@@ -736,7 +736,7 @@ Page {
 
                         CheckBox {
                             id: reverseTamperCheck
-                            property bool localChecked: config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : true
+                            property bool localChecked: config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -744,7 +744,7 @@ Page {
                                 console.log(pageId, "Updating MTR_RVS_TMPR to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : true
+                                localChecked = config["Metering.MTR_RVS_TMPR"] !== undefined ? config["Metering.MTR_RVS_TMPR"] : false
                                 console.log(pageId, "MTR_RVS_TMPR initialized to", localChecked)
                             }
                         }
@@ -766,7 +766,7 @@ Page {
 
                         CheckBox {
                             id: earthTamperCheck
-                            property bool localChecked: config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : true
+                            property bool localChecked: config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -774,7 +774,7 @@ Page {
                                 console.log(pageId, "Updating MTR_ERTH_TMPR to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : true
+                                localChecked = config["Metering.MTR_ERTH_TMPR"] !== undefined ? config["Metering.MTR_ERTH_TMPR"] : false
                                 console.log(pageId, "MTR_ERTH_TMPR initialized to", localChecked)
                             }
                         }
@@ -796,7 +796,7 @@ Page {
 
                         CheckBox {
                             id: enableLimiterCheck
-                            property bool localChecked: config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : true
+                            property bool localChecked: config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -804,7 +804,7 @@ Page {
                                 console.log(pageId, "Updating MTR_ENABLE_LMT to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : true
+                                localChecked = config["Metering.MTR_ENABLE_LMT"] !== undefined ? config["Metering.MTR_ENABLE_LMT"] : false
                                 console.log(pageId, "MTR_ENABLE_LMT initialized to", localChecked)
                             }
                         }
@@ -826,7 +826,7 @@ Page {
 
                         CheckBox {
                             id: pulseCountCheck
-                            property bool localChecked: config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : true
+                            property bool localChecked: config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -834,7 +834,7 @@ Page {
                                 console.log(pageId, "Updating PULSE_COUNT_ENABLE to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : true
+                                localChecked = config["Metering.PULSE_COUNT_ENABLE"] !== undefined ? config["Metering.PULSE_COUNT_ENABLE"] : false
                                 console.log(pageId, "PULSE_COUNT_ENABLE initialized to", localChecked)
                             }
                         }
@@ -856,7 +856,7 @@ Page {
 
                         CheckBox {
                             id: bigEndianCheck
-                            property bool localChecked: config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : true
+                            property bool localChecked: config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : false
                             checked: localChecked
                             onCheckedChanged: {
                                 localChecked = checked
@@ -864,7 +864,7 @@ Page {
                                 console.log(pageId, "Updating BIG_ENDIAN to", checked)
                             }
                             Component.onCompleted: {
-                                localChecked = config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : true
+                                localChecked = config["Metering.BIG_ENDIAN"] !== undefined ? config["Metering.BIG_ENDIAN"] : false
                                 console.log(pageId, "BIG_ENDIAN initialized to", localChecked)
                             }
                         }
