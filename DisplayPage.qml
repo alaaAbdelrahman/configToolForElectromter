@@ -132,7 +132,7 @@ Page {
                             font.pixelSize: 14
                             padding: 8
                             property var schema: configGenerator.schema?.Display?.displayType || {}
-                            model: schema.labels || ["Segmented LCD", "Dot Matrix LCD"]
+                            model: schema.labels ||schema.values || ["Segmented LCD", "Dot Matrix LCD"]
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10

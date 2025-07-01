@@ -25,8 +25,8 @@ public:
     // Q_INVOKABLE bool saveConfig(const QString &filePath);
     Q_INVOKABLE QString generateConfigHeader() const;
     Q_INVOKABLE bool generateConfigFile(const QString &fileUrl);
+    Q_INVOKABLE QString generateStaticHeader() const;
     Q_INVOKABLE QString getSchemaType(const QString &key) const;
-    //Q_INVOKABLE QString findSchemaKey(const QString &key) const;
 
     Q_INVOKABLE void setConfig(const QVariantMap &newConfig);
     Q_INVOKABLE QVariantList enumOptions(const QString &key) const;

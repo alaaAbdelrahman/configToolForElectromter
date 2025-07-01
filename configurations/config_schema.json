@@ -21,7 +21,7 @@
 },
     "NEW_ASHANTI_PROJECT": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "label": "New Ashanti Project"
     }
   },
@@ -194,190 +194,223 @@
       "label": "Big Endian"
     }
   },
-  "Communication":
-  {
+  "Communication": {
     "I2C_SPI_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable I2C/SPI Settings"
+      "label": "Enable I2C/SPI Settings",
+      "description": "Enables the configuration of I2C and SPI communication interfaces for the device."
     },
     "I2C_STATUS": {
       "type": "enum",
       "values": ["SHARED_I2C", "SEPARATE_I2C"],
+      "labels": ["Shared I2C", "Seperate I2C"],
       "default": "SEPARATE_I2C",
       "label": "I2C Status",
-      "dependsOn": "I2C_SPI_ENABLE"
+      "dependsOn": "I2C_SPI_ENABLE",
+      "description": "Determines whether I2C communication uses a shared or separate bus configuration, dependent on I2C/SPI enablement."
     },
     "HW_SPI": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Hardware SPI"
+      "label": "Enable Hardware SPI",
+      "description": "Enables the use of hardware-based SPI communication for improved performance."
     },
     "SW_SPI": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Software SPI"
+      "label": "Enable Software SPI",
+      "description": "Enables software-based SPI communication, offering flexibility but potentially lower performance."
     },
     "RF_LINK_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable RF Link"
+      "label": "Enable RF Link",
+      "description": "Activates the RF link feature for wireless communication with the device."
     },
     "RF_LINK_MBUS_DEVICE": {
       "type": "map",
       "values": ["RF_LINK_METER"],
       "default": "RF_LINK_METER",
-      "label": "RF Link Device"
+      "label": "RF Link Device",
+      "description": "Specifies the device type for the RF link, currently limited to RF_LINK_METER."
     },
     "RF_LINK_TI_CC1120_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable TI CC1120"
+      "label": "Enable TI CC1120",
+      "description": "Enables the TI CC1120 RF transceiver for advanced wireless communication."
     },
     "RF_LINK_TI_CC1120_PORT": {
       "type": "map",
-      "values": ["USART0", "USART1","USART2"],
+      "values": ["USART0", "USART1", "USART2"],
       "default": "USART2",
-      "label": "TI CC1120 Port"
+      "label": "TI CC1120 Port",
+      "description": "Selects the USART port (0, 1, or 2) for the TI CC1120 RF transceiver."
     },
     "RF_LINK_TI_CC1120_RESET_POWER": {
       "type": "boolean",
       "default": false,
-      "label": "Enable TI CC1120 Reset Power"
+      "label": "Enable TI CC1120 Reset Power",
+      "description": "Enables power reset functionality for the TI CC1120 to ensure stable operation."
     },
     "RFID_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable RFID Feature"
+      "label": "Enable RFID Feature",
+      "description": "Activates RFID functionality for identification and data exchange."
     },
     "MFRC522_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable RFID"
+      "label": "Enable RFID",
+      "description": "Enables the MFRC522 RFID module for reading and writing RFID tags."
     },
     "MFRC522_CARD_TYPE": {
       "type": "map",
-      "values": ["MFRC522_CARD_1K","MFRC522_CARD_4K","MFRC522_CARD_32K"],
+      "values": ["MFRC522_CARD_1K", "MFRC522_CARD_4K", "MFRC522_CARD_32K"],
       "default": "MFRC522_CARD_32K",
-      "label": "RFID Card Type"
+      "label": "RFID Card Type",
+      "description": "Specifies the memory capacity of the RFID card (1K, 4K, or 32K)."
     },
     "MFRC522_CARD_32k_TYPE": {
       "type": "map",
-      "values": ["CARD_32k_MASRIA_NXP_P60","CARD_32k_MASRIA_MTCOS_FLEX_ID"],
+      "values": ["CARD_32k_MASRIA_NXP_P60", "CARD_32k_MASRIA_MTCOS_FLEX_ID"],
       "default": "CARD_32k_MASRIA_MTCOS_FLEX_ID",
-      "label": "RFID 32K Card Type"
+      "label": "RFID 32K Card Type",
+      "description": "Defines the specific type of 32K RFID card used with the MFRC522 module."
     },
     "MFRC522_INCREASE_SPEED": {
       "type": "boolean",
       "default": false,
-      "label": "Enable MFRC522 Increase Speed"
+      "label": "Enable MFRC522 Increase Speed",
+      "description": "Enables higher speed settings for the MFRC522 RFID module."
     },
     "RFID_SEQ_READ_WRITE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable RFID Sequential Read/Write"
+      "label": "Enable RFID Sequential Read/Write",
+      "description": "Allows sequential read and write operations for RFID data processing."
     },
     "RFID_BUFFER_LEN": {
       "type": "integer",
       "default": 2000,
       "min": 0,
       "max": 5000,
-      "label": "RFID Buffer Length"
+      "label": "RFID Buffer Length",
+      "description": "Sets the buffer size (0-5000 bytes) for RFID data storage."
     },
     "RFID_PAR_LIMITED": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Limited Parameters"
+      "label": "Enable Limited Parameters",
+      "description": "Restricts RFID parameters to a limited set for specific use cases."
     },
     "RFID_PREPAID_PAR_NUM": {
       "type": "integer",
       "default": 100,
       "min": 0,
       "max": 1000,
-      "label": "Prepaid Parameter Number"
+      "label": "Prepaid Parameter Number",
+      "description": "Defines the number of prepaid parameters (0-1000) for RFID operations."
     },
     "RFID_PAR_PREDEFINED": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Predefined Parameters"
+      "label": "Enable Predefined Parameters",
+      "description": "Enables the use of predefined parameter sets for RFID configuration."
     },
     "RFID_PAR_POSTDEFINED": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Postdefined Parameters"
+      "label": "Enable Postdefined Parameters",
+      "description": "Enables the use of postdefined parameter sets for RFID configuration."
     },
     "RFID_POSTPAID_PAR_NUM": {
       "type": "integer",
       "default": 1000,
       "min": 0,
       "max": 2000,
-      "label": "Postpaid Parameter Number"
+      "label": "Postpaid Parameter Number",
+      "description": "Defines the number of postpaid parameters (0-2000) for RFID operations."
     },
     "RS485_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable RS485"
+      "label": "Enable RS485",
+      "description": "Enables RS485 communication protocol for serial data exchange."
     },
     "MODEM_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Modem"
+      "label": "Enable Modem",
+      "description": "Activates the modem for telecommunication capabilities."
     },
     "MODEM_BAUD_RATE": {
       "type": "string",
       "min": 0,
       "max": 115200,
-      "default": 5,
-      "label": "Modem Baud Rate"
+      "default": "5",
+      "label": "Modem Baud Rate",
+      "description": "Sets the baud rate (up to 115200) for modem communication."
     },
-     "GPRS_FEATURE": {
+    "GPRS_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable GPRS"
+      "label": "Enable GPRS",
+      "description": "Enables GPRS for cellular data communication."
     },
     "GPRS_SEND_NOTIFICATION_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Send Notification"
+      "label": "Enable Send Notification",
+      "description": "Enables sending notifications via GPRS."
     },
     "SCREEN_GPRS_FEATURE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable GPRS Screen Feature"
+      "label": "Enable GPRS Screen Feature",
+      "description": "Enables GPRS-related features on the device screen."
     },
     "GPRS_DATA_BUFFER_SIZE": {
       "type": "integer",
       "default": 1500,
       "min": 0,
       "max": 2000,
-      "label": "GPRS Data Buffer Size"
+      "label": "GPRS Data Buffer Size",
+      "description": "Sets the buffer size (0-2000 bytes) for GPRS data storage."
     },
     "GPRS_SRT_CARD": {
       "type": "boolean",
       "default": false,
-      "label": "Enable SRT Card"
+      "label": "Enable SRT Card",
+      "description": "Enables support for SRT cards in GPRS operations."
     },
     "IEC_62056_21_SLAVE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable IEC 62056-21 Slave"
+      "label": "Enable IEC 62056-21 Slave",
+      "description": "Enables the device to operate as a slave under the IEC 62056-21 standard."
     },
     "IEC_BUFFER_SIZE": {
       "type": "integer",
       "default": 1056,
       "min": 0,
       "max": 2000,
-      "label": "IEC Buffer Size"
+      "label": "IEC Buffer Size",
+      "description": "Sets the buffer size (0-2000 bytes) for IEC 62056-21 communication."
     },
     "IEC_62056_21_ISR_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable IEC ISR"
+      "label": "Enable IEC ISR",
+      "description": "Enables interrupt service routines for IEC 62056-21 communication."
     },
     "OPTICAL_DMA_ENABLE": {
       "type": "boolean",
       "default": false,
-      "label": "Enable Optical DMA"
+      "label": "Enable Optical DMA",
+      "description": "Enables Direct Memory Access (DMA) for optical communication."
     }
   },
   "Memory": {
@@ -692,24 +725,14 @@
             "label": "Down Switch",
             "section": "Control Pins",
             "description": "Enable down navigation switch"
-        },
-        "CTRL_MGNT_SW": {
-            "type": "boolean",
+        },"MagneticDetection":{
+            "type": "enum",
             "default": false,
-            "label": "Magnetic Switch Detection",
+            "values": ["CTRL_MGNT_SW", "CTRL_MGNT_SENSOR"],
+            "labels": ["Magnetic SWitch", "Magnetic Sensor"],
+            "label":"Magnetic Detection Method",
             "section": "Detection Method",
-            "group": "magnetic_detection",
-            "exclusive": "CTRL_MGNT_SENSOR",
-            "description": "Use magnetic switch for tamper detection"
-        },
-        "CTRL_MGNT_SENSOR": {
-            "type": "boolean",
-            "default": false,
-            "label": "Magnetic Sensor Detection",
-            "section": "Detection Method",
-            "group": "magnetic_detection",
-            "exclusive": "CTRL_MGNT_SW",
-            "description": "Use magnetic sensor for tamper detection"
+            "description": "Use magnetic switch/Sensor for tamper detection"
         },
         "CTRL_ACTIONS": {
             "type": "boolean",

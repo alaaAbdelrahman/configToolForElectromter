@@ -12,8 +12,7 @@ Page {
         "Control.CTRL_TRMNL_SW": false,
         "Control.CTRL_UP_SW": false,
         "Control.CTRL_DN_SW": false,
-        "Control.CTRL_MGNT_SW": false,
-        "Control.CTRL_MGNT_SENSOR": false,
+        "Control.MagneticDetection": "Disable",
         "Control.CTRL_ACTIONS": false,
         "Control.CTRL_RLY": false,
         "Control.CTRL_TMPR_LED": false,
@@ -179,52 +178,112 @@ Page {
                     }
                 }
             }
+            GroupBox{
 
+            Layout.fillWidth: true
+            padding: 20
+            spacing: 16
+
+            background: Rectangle {
+                color: "#FFFFFF"
+                radius: 8
+                border.color: "#E4E7EB"
+                border.width: 1
+            }
             // Detection Method Section
-            GroupBox {
-                title: "Detection Method"
-                Layout.fillWidth: true
-                padding: 20
-                spacing: 16
+            ColumnLayout {
+                spacing: 12
+                width: parent.width
 
-                background: Rectangle {
-                    color: "#FFFFFF"
-                    radius: 8
-                    border.color: "#E4E7EB"
-                    border.width: 1
+                CheckBox {
+                    id: magneticDetectionCheck
+                    text: configGenerator.schema?.Control?.MagneticDetection?.label || "Enable Magnetic Detection"
+                    checked: config["Control.MagneticDetection"] !== false && config["Control.MagneticDetection"] !== null
+                    visible: configGenerator.schema?.Control?.MagneticDetection !== undefined
+                    onClicked: {
+                        if (checked) {
+                            // Restore last value or default to first enum value
+                            const lastValue = config["Control.MagneticDetection"] || configGenerator.schema?.Control?.MagneticDetection?.values[0] || "CTRL_MGNT_SW"
+                            updateConfig("Control.MagneticDetection", lastValue)
+                        } else {
+                            updateConfig("Control.MagneticDetection", false)
+                        }
+                    }
+                    ToolTip.visible: hovered
+                    ToolTip.text: configGenerator.schema?.Control?.MagneticDetection?.description || ""
                 }
 
-                ColumnLayout {
-                    spacing: 12
-                    width: parent.width
+                RowLayout {
+                    spacing: 50
+                    Layout.fillWidth: true
+                    visible: magneticDetectionCheck.checked && configGenerator.schema?.Control?.MagneticDetection !== undefined
+                    enabled: magneticDetectionCheck.checked
+                    opacity: enabled ? 1.0 : 0.6
 
-                    CheckBox {
-                        id: magneticSwitchCheck
-                        text: configGenerator.schema.Control?.CTRL_MGNT_SW?.label || "Magnetic Switch Detection"
-                        checked: config["Control.CTRL_MGNT_SW"] !== undefined ? config["Control.CTRL_MGNT_SW"] : false
-                        visible: configGenerator.schema.Control?.CTRL_MGNT_SW !== undefined
-                        onCheckedChanged: {
-                            updateConfig("Control.CTRL_MGNT_SW", checked)
-                            if (checked) updateConfig("Control.CTRL_MGNT_SENSOR", false)
-                        }
-                        ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema.Control?.CTRL_MGNT_SW?.description || ""
+                    Label {
+                        text: configGenerator.schema?.Control?.MagneticDetection?.label || "Magnetic Detection Method"
+                        font.pixelSize: 16
+                        font.family: "Arial, sans-serif"
+                        color: "#1A2526"
+                        Layout.preferredWidth: 160
+                        verticalAlignment: Label.AlignVCenter
                     }
 
-                    CheckBox {
-                        id: magneticSensorCheck
-                        text: configGenerator.schema.Control?.CTRL_MGNT_SENSOR?.label || "Magnetic Sensor Detection"
-                        checked: config["Control.CTRL_MGNT_SENSOR"] !== undefined ? config["Control.CTRL_MGNT_SENSOR"] : false
-                        visible: configGenerator.schema.Control?.CTRL_MGNT_SENSOR !== undefined
-                        onCheckedChanged: {
-                            updateConfig("Control.CTRL_MGNT_SENSOR", checked)
-                            if (checked) updateConfig("Control.CTRL_MGNT_SW", false)
+                    ComboBox {
+                        id: magneticDetectionCombo
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 280
+                        Layout.maximumWidth: 480
+                        font.pixelSize: 14
+                        padding: 8
+                        model: configGenerator.schema?.Control?.MagneticDetection?.labels||configGenerator.schema?.Control?.MagneticDetection?.values || ["Magnetic SWitch", "Magnetic Sensor"]
+                        currentIndex: {
+                            const values = configGenerator.schema?.Control?.MagneticDetection?.values || ["CTRL_MGNT_SW", "CTRL_MGNT_SENSOR"]
+                            const currentValue = config["Control.MagneticDetection"]
+                            return values.indexOf(currentValue) !== -1 ? values.indexOf(currentValue) : 0
+                        }
+                        onActivated: {
+                            const values = configGenerator.schema?.Control?.MagneticDetection?.values || ["CTRL_MGNT_SW", "CTRL_MGNT_SENSOR"]
+                            updateConfig("Control.MagneticDetection", values[index])
+                        }
+                        contentItem: Text {
+                            text: magneticDetectionCombo.displayText
+                            font: magneticDetectionCombo.font
+                            color: "#1A2526"
+                            verticalAlignment: Text.AlignVCenter
+                            leftPadding: 8
+                        }
+                        background: Rectangle {
+                            color: magneticDetectionCombo.hovered ? "#F8FAFC" : "#FFFFFF"
+                            border.color: magneticDetectionCombo.focus ? "#007BFF" : "#CED4DA"
+                            border.width: magneticDetectionCombo.focus ? 2 : 1
+                            radius: 6
+                        }
+                        popup: Popup {
+                            y: magneticDetectionCombo.height
+                            width: magneticDetectionCombo.width
+                            implicitHeight: contentItem.implicitHeight
+                            padding: 1
+                            contentItem: ListView {
+                                clip: true
+                                implicitHeight: contentHeight
+                                model: magneticDetectionCombo.delegateModel
+                                currentIndex: magneticDetectionCombo.highlightedIndex
+                                ScrollIndicator.vertical: ScrollIndicator {}
+                            }
+                            background: Rectangle {
+                                border.color: "#CED4DA"
+                                radius: 6
+                            }
                         }
                         ToolTip.visible: hovered
-                        ToolTip.text: configGenerator.schema.Control?.CTRL_MGNT_SENSOR?.description || ""
+                        ToolTip.text: configGenerator.schema?.Control?.MagneticDetection?.description || ""
                     }
+                }
                 }
             }
+
+
 
             // Action Controls Section
             GroupBox {
@@ -475,7 +534,7 @@ Page {
                         onCheckedChanged: {
                             updateConfig("Control.KEYPAD_FEATURE", checked)
                             if (!checked) {
-                                updateConfig("Control.KEYPAD_TYPE", "TOUCH_KEYPAD")
+                                updateConfig("Control.KEYPAD_TYPE", false)
                             }
                         }
                         ToolTip.visible: hovered

@@ -119,7 +119,7 @@ Page {
                         Layout.fillWidth: true
 
                         Label {
-                            text: configGenerator.schema?.Metering.meterType.label || "Meter Type"
+                            text: configGenerator.schema?.Metering?.meterType?.label || "Meter Type"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"
@@ -134,7 +134,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema?.Metering.meterType?.labels ||configGenerator.schema?.Metering.meterType?.values|| ["Single Phase", "Two Phase", "Three Phase"]
+                            property var schema : configGenerator.schema?.Metering?.meterType
+                            model: schema?.labels ||schema?.values|| ["Single Phase", "Two Phase", "Three Phase"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -168,44 +169,20 @@ Page {
                                 radius: 6
                             }
 
+
                             Component.onCompleted: {
-                                const schema = configGenerator.schema?.Metering.meterType
-                                if (schema?.type === "enum" && schema.labels && schema.values) {
-                                    const valueMap = {}
-                                    for (let i = 0; i < schema.labels.length; i++) {
-                                        valueMap[schema.labels[i]] = schema.values[i]
-                                    }
-                                    const currentValue = config["Metering.meterType"] || schema.values[0]
-                                    const currentLabel = Object.keys(valueMap).find(label => valueMap[label] === currentValue) || schema.labels[0]
-                                    currentIndex = schema.labels.indexOf(currentLabel)
+
+                                if (schema.values) {
+                                    const current = config["Metering.meterType"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
                                     if (currentIndex === -1) {
                                         currentIndex = 0
-                                        console.warn(pageId, "Invalid initial meterType:", currentValue)
                                     }
-                                    console.log(pageId, "meterType initialized to label:", currentLabel, "value:", currentValue, "index:", currentIndex)
-                                } else {
-                                    currentIndex = 0
-                                    console.warn(pageId, "Invalid meterType schema:", JSON.stringify(schema))
                                 }
                             }
-
-                            onActivated: function(index) {
-                                const schema = configGenerator.schema?.Metering?.meterType
-                                if (schema?.type === "enum" && schema.labels && schema.values) {
-                                    const selectedLabel = model[index]
-                                    const valueMap = {}
-                                    for (let i = 0; i < schema.labels.length; i++) {
-                                        valueMap[schema.labels[i]] = schema.values[i]
-                                    }
-                                    const configKey = valueMap[selectedLabel]
-                                    if (configKey) {
-                                        updateConfig("Metering.meterType", configKey)
-                                        console.log(pageId, "Updated meterType to:", configKey, "from label:", selectedLabel)
-                                    } else {
-                                        console.warn(pageId, "No value mapped for label:", selectedLabel)
-                                    }
-                                } else {
-                                    console.warn(pageId, "Invalid meterType schema on activation:", JSON.stringify(schema))
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Metering.meterType", schema.values[index])
                                 }
                             }
                         }
@@ -260,7 +237,8 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema?.Metering.meterMeasurement?.labels || ["MTR_DIRECT", "MTR_INDIRECT"]
+                            property var schema : configGenerator.schema?.Metering?.meterMeasurement
+                            model: schema.labels || schema.values || ["MTR_DIRECT", "MTR_INDIRECT"]
 
                             contentItem: Text {
                                 leftPadding: 10
@@ -295,20 +273,18 @@ Page {
                             }
 
                             Component.onCompleted: {
-                                const schema = configGenerator.schema?.Metering.meterMeasurement
-                                const currentValue = config["Metering.meterMeasurement"] || schema?.default || "MTR_DIRECT"
-                                currentIndex = model.indexOf(currentValue)
-                                if (currentIndex === -1) {
-                                    currentIndex = 0
-                                    console.warn(pageId, "Invalid meterMeasurement:", currentValue)
+                                if (schema.values) {
+                                    const current = config["Metering.meterMeasurement"] || schema.default || schema.values[0]
+                                    currentIndex = schema.values.indexOf(current)
+                                    if (currentIndex === -1) {
+                                        currentIndex = 0
+                                    }
                                 }
-                                console.log(pageId, "meterMeasurement initialized to:", currentValue, "index:", currentIndex)
                             }
-
-                            onActivated: function(index) {
-                                const configKey = model[index]
-                                updateConfig("Metering.meterMeasurement", configKey)
-                                console.log(pageId, "Updated meterMeasurement to:", configKey)
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Metering.meterMeasurement", schema.values[index])
+                                }
                             }
                         }
                     }
@@ -421,8 +397,9 @@ Page {
                             Layout.maximumWidth: 480
                             font.pixelSize: 14
                             padding: 8
-                            model: configGenerator.schema?.Metering.meteringChips?.values || ["ADE7953_ENABLE", "V9203_ENABLE", "V9261F_ENABLE", "V9340_ENABLE", "V9360_ENABLE", "V9381_ENABLE"]
+                            property var schema : configGenerator.schema?.Metering?.meteringChips
 
+                            model: schema.labels || schema.values
                             contentItem: Text {
                                 leftPadding: 10
                                 rightPadding: 10
@@ -455,21 +432,22 @@ Page {
                                 radius: 6
                             }
 
-                            Component.onCompleted: {
-                                const schema = configGenerator.schema?.Metering.meteringChips
-                                const currentValue = config["Metering.meteringChips"] || schema?.default || "V9381_ENABLE"
-                                currentIndex = model.indexOf(currentValue)
-                                if (currentIndex === -1) {
-                                    currentIndex = 0
-                                    console.warn(pageId, "Invalid meteringChips:", currentValue)
-                                }
-                                console.log(pageId, "meteringChips initialized to:", currentValue, "index:", currentIndex)
-                            }
 
-                            onActivated: function(index) {
-                                const configKey = model[index]
-                                updateConfig("Metering.meteringChips", configKey)
-                                console.log(pageId, "Updated meteringChips to:", configKey)
+                            Component.onCompleted: {
+                                if (schema.values) {
+                                    const current = config["Metering.meteringChips"] || schema.default || schema.values[0]
+
+                                    currentIndex = schema.values.indexOf(current)
+                                    if (currentIndex === -1) {
+                                        currentIndex = 0
+                                    }
+                                    console.log(pageId, "meteringChipsCombo initialized with index:", currentIndex, "value:", current)
+                                }
+                            }
+                            onActivated: {
+                                if (schema.values && index >= 0 && index < schema.values.length) {
+                                    updateConfig("Metering.meteringChips", schema.values[index])
+                                }
                             }
                         }
                     }
@@ -563,7 +541,6 @@ Page {
                                 currentIndex = model.indexOf(currentValue)
                                 if (currentIndex === -1) {
                                     currentIndex = 0
-                                    console.warn(pageId, "Invalid pulseConstant:", currentValue)
                                 }
                                 console.log(pageId, "pulseConstant initialized to:", currentValue, "index:", currentIndex)
                             }

@@ -218,6 +218,12 @@ QString ConfigGenerator::generateConfigHeader() const {
     QString content;
     QTextStream out(&content);
 
+    out << "#ifndef CONFIGURABLE_METER_OPTIONS_H\n";
+    out << "#define CONFIGURABLE_METER_OPTIONS_H\n\n";
+
+
+
+    // Doxygen comments
     out << "// Auto-generated configuration file\n";
     out << "/**\n";
     out << " * @brief " << (m_config.contains("descriptionBrief") ? m_config["descriptionBrief"].toString() : "MISSING") << "\n";
@@ -226,8 +232,9 @@ QString ConfigGenerator::generateConfigHeader() const {
     out << " * @author " << (m_config.contains("descriptionAuthor") ? m_config["descriptionAuthor"].toString() : "MISSING") << "\n";
     out << " * @details " << (m_config.contains("descriptionDetails") ? m_config["descriptionDetails"].toString() : "MISSING") << "\n";
     out << " */\n";
-    out << "#ifndef CONFIGURABLE_METER_OPTIONS_H\n";
-    out << "#define CONFIGURABLE_METER_OPTIONS_H\n\n";
+
+    // Include static header as a single string
+    out << generateStaticHeader() << "\n";
 
     // Collect all configuration keys from schema
     QStringList configKeys;
@@ -260,31 +267,31 @@ QString ConfigGenerator::generateConfigHeader() const {
 
     // Generate configuration for each section
     for (auto it = sectionKeys.constBegin(); it != sectionKeys.constEnd(); ++it) {
-        const QString &section = it.key();
+        const QString section = it.key();
         const QStringList &keys = it.value();
         out << "// " << section << " Settings\n";
         for (const QString &key : keys) {
             if (m_config.contains(key)) {
                 const QVariant &val = m_config[key];
                 QString schemaType = getSchemaType(key);
+
                 if (schemaType == "boolean") {
                     if (val.toBool()) {
                         out << "#define " << key.split(".").last() << "\n";
                     } else {
                         out << "#undef " << key.split(".").last() << "\n";
                     }
-                } else if (schemaType == "enum" ) {
-                    if (val.canConvert<QString>()) {
-                        out << "#define " << " " << val.toString() << "\n";
+                } else if (schemaType == "enum") {
+                    if (val.canConvert<QString>() && val != "false") {
+                        out << "#define " << val.toString() << "\n";
                     }
-                    else if(schemaType == "string"){
-                        out << "#define " << " " <<"'"<< val.toString() <<"'"<< "\n";
-                    }
-                }else if (schemaType == "map") {
+                } else if (schemaType == "string") {
+                    out << "#define " << key.split(".").last() << " \"" << val.toString() << "\"\n";
+                } else if (schemaType == "map") {
                     if (val.canConvert<QString>()) {
                         out << "#define " << key.split(".").last() << " " << val.toString() << "\n";
                     }
-                }else if (schemaType == "integer") {
+                } else if (schemaType == "integer") {
                     if (val.canConvert<int>()) {
                         out << "#define " << key.split(".").last() << " " << val.toInt() << "\n";
                     }
@@ -294,8 +301,140 @@ QString ConfigGenerator::generateConfigHeader() const {
         out << "\n";
     }
 
+
     out << "#endif // CONFIGURABLE_METER_OPTIONS_H\n";
     return content;
+}
+
+QString ConfigGenerator::generateStaticHeader() const {
+    // Raw string literal for static header content
+    return R"(
+#define Micro_V85XX         1
+#define Micro_V94XX         2
+#if (MicroController == Micro_V94XX)
+#include "V94XX.h"
+#else
+#include "v85xx.h"
+#endif
+#include "I2C_Interface.h"
+#include "UART_Interface.h"
+
+typedef enum {RESET = 0, SET = !RESET} FlagStatus, ITStatus, BitStatus, BitAction;
+
+#define U8_MAX     (255)
+#define S8_MAX     (127)
+#define S8_MIN     (-128)
+#define U16_MAX    (65535u)
+#define S16_MAX    (32767)
+#define S16_MIN    (-32768)
+#define U32_MAX    (4294967295uL)
+#define S32_MAX    (2147483647)
+#define S32_MIN    (-2147483648uL)
+
+/*******************************************************************************
+                                    Types definitions
+******************************************************************************/
+#define WRONG_ARGUMENT          0xff
+
+#define ASHANTI_CRC  /*This feature adds CRC and backup.*/
+#define __MSP430_HAS_EUSCI_Bx__
+#define Dlms_NoParity    1
+#define Dlms_EvenParity  0
+
+/* Unsigned types */
+typedef unsigned char      uint8;
+typedef unsigned int       uint16;
+typedef unsigned long int  uint32;
+
+/* Signed types */
+typedef signed char        int8;
+typedef signed int         int16;
+typedef signed long int    int32;
+
+/* Declares an enumeration data type called BOOLEAN */
+typedef unsigned char bool;
+typedef unsigned char bool_t;
+enum { FALSE, TRUE };
+enum { false, true };
+enum { WRITE, READ };
+
+#undef NULL
+#define NULL        (0)
+/* Return functions codes */
+#define iSUCCESS            (0)
+#define iERROR              (-1)
+
+typedef uint8_t   TU08;
+typedef int8_t    TS08;
+typedef uint16_t  TU16;
+typedef int16_t   TS16;
+typedef uint32_t  TU32;
+typedef int32_t   TS32;
+typedef uint64_t  TU64;
+typedef int64_t   TS64;
+
+typedef signed char         TBOOL;
+
+/* Date Structure */
+__packed typedef struct
+{
+  uint16_t uiYear;      // 0xFFFF mean that it is not specified
+  uint8_t uiMonth;     // from 1 to 12; 1 is January, & 0xFD mean daylight saving end, 0xFE mean daylight saving begin, 0xFF mean that it is not specified
+  uint8_t uiDay;       // from 1 to 31; & 0xFD mean 2nd last day of month, 0xFE mean last day of month, 0xFF mean that it is not specified
+  uint8_t uiDayOfWeek; // from 1 to 7; 1 is Monday & 0xFF mean that it is not specified
+  uint8_t uiReserved;
+} TstDate;
+
+/* Time Structure */
+__packed typedef struct
+{
+  uint8_t uiHour;      // from 0 to 23; & 0xFF mean that it is not specified
+  uint8_t uiMin;       // from 0 to 59; & 0xFF mean that it is not specified
+  uint8_t uiSec;       // from 0 to 59; & 0xFF mean that it is not specified
+  uint8_t uiHundredths;// from 0 to 99; & 0xFF mean that it is not specified
+} TstTime;
+
+/* Structure DateTime */
+__packed typedef struct
+{
+  TstDate stDate;
+  TstTime stTime;
+  int16_t iDeviation;  // from -720 to 720 in minutes of local time to GMT; & 0x8000 mean that it is not specified
+  uint8_t uiClockStatus;
+  // Bit1: indicate time is invalid "may be due to power down"
+  // Bit2: indicate doubful value "time is recovered but we can't guarante its value"
+  // Bit3: indicate that at least on bit in the clock is invalid
+  // Bit4, 5 & 6 are reserved
+  // Bit6: indicate that daylight saving is active
+  uint8_t uiReserved;
+} TstDateTime;//14byte=size
+typedef enum
+{
+  NO       = 0,
+  XTAL     = 1,
+  FREQ_50  = 2,
+  FREQ_60  = 3,
+  GPS      = 4,
+  RADIO    = 5
+} TClockBase;
+//=============================================================================
+//                 MACROS DEFINITION
+//=============================================================================
+/*Relay number*/
+enum
+{
+  Relay0 = 0,
+  Relay1,
+  Relay2
+};
+
+/*Control Actions*/
+enum
+{
+  Connect = 0,
+  Disconnect
+};
+)";
 }
 
 QString ConfigGenerator::getSchemaType(const QString &key) const {

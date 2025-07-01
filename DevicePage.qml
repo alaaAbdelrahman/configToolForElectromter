@@ -75,7 +75,6 @@ Page {
                 title: ""
                 Layout.fillWidth: true
                 padding: 12
-                spacing: 16
                 background: Rectangle {
                     color: "#FFFFFF"
                     radius: 4
@@ -106,11 +105,11 @@ Page {
                             font.pixelSize: 14
                             font.family: "Roboto"
                             text: config["descriptionBrief"] || ""
-                            placeholderText: text ? "" : "Brief description"
+                            placeholderText: !text && !activeFocus ? "Brief description" : ""
                             background: Rectangle {
                                 color: "#F8FAFC"
-                                border.color: briefTextField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: briefTextField.focus ? 2 : 1
+                                border.color: briefTextField.activeFocus ? "#007BFF" : "#CED4DA"
+                                border.width: briefTextField.activeFocus ? 2 : 1
                                 radius: 6
                             }
                             onTextChanged: updateConfig("descriptionBrief", text)
@@ -136,11 +135,11 @@ Page {
                             font.pixelSize: 14
                             font.family: "Roboto"
                             text: config["descriptionVersion"] || ""
-                            placeholderText: text ? "" : "Version number"
+                            placeholderText: !text && !activeFocus ? "Version number" : ""
                             background: Rectangle {
                                 color: "#F8FAFC"
-                                border.color: versionTextField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: versionTextField.focus ? 2 : 1
+                                border.color: versionTextField.activeFocus ? "#007BFF" : "#CED4DA"
+                                border.width: versionTextField.activeFocus ? 2 : 1
                                 radius: 6
                             }
                             onTextChanged: updateConfig("descriptionVersion", text)
@@ -166,11 +165,11 @@ Page {
                             font.pixelSize: 14
                             font.family: "Roboto"
                             text: config["descriptionDate"] || ""
-                            placeholderText: text ? "" : "YYYY-MM-DD"
+                            placeholderText: !text && !activeFocus ? "YYYY-MM-DD" : ""
                             background: Rectangle {
                                 color: "#F8FAFC"
-                                border.color: dateTextField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: dateTextField.focus ? 2 : 1
+                                border.color: dateTextField.activeFocus ? "#007BFF" : "#CED4DA"
+                                border.width: dateTextField.activeFocus ? 2 : 1
                                 radius: 6
                             }
                             onTextChanged: updateConfig("descriptionDate", text)
@@ -196,11 +195,11 @@ Page {
                             font.pixelSize: 14
                             font.family: "Roboto"
                             text: config["descriptionAuthor"] || ""
-                            placeholderText: text ? "" : "Author name"
+                            placeholderText: !text && !activeFocus ? "Author name" : ""
                             background: Rectangle {
                                 color: "#F8FAFC"
-                                border.color: authorTextField.focus ? "#007BFF" : "#CED4DA"
-                                border.width: authorTextField.focus ? 2 : 1
+                                border.color: authorTextField.activeFocus ? "#007BFF" : "#CED4DA"
+                                border.width: authorTextField.activeFocus ? 2 : 1
                                 radius: 6
                             }
                             onTextChanged: updateConfig("descriptionAuthor", text)
@@ -250,7 +249,7 @@ Page {
                                         id: placeholderText
                                         anchors.fill: parent
                                         font: detailsTextArea.font
-                                        text: detailsTextArea.text ? "" : "Detailed description"
+                                        text: detailsTextArea.text && !detailsTextArea.activeFocus ? "" : "Detailed description"
                                         color: "#CED4DA"
                                         verticalAlignment: Text.AlignVCenter
                                         wrapMode: Text.WordWrap
