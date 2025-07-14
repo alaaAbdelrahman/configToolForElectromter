@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("Process", new ProcessHelper(&engine));
     engine.rootContext()->setContextProperty("configGenerator", &configGenerator);
 
+
+
     // Load QML UI from resources
     const QUrl url(QStringLiteral("qrc:/Main.qml"));
     QObject::connect(

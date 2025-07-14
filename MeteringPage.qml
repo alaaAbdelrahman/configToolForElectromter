@@ -793,7 +793,7 @@ Page {
                         Layout.alignment: Qt.AlignHCenter
 
                         Label {
-                            text: configGenerator.schema?.Metering?.PULSE_COUNT_ENABLE?.label || "Enable Pulse Count"
+                            text: configGenerator.schema["Metering.PULSE_COUNT_ENABLE"].label || "Enable Pulse Count"
                             font.pixelSize: 16
                             font.family: "Roboto"
                             color: "#1A2526"

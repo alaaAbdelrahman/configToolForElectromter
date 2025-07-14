@@ -4,31 +4,40 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QDir>
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QStringConverter>
 #include <QJsonArray>
 
 ConfigGenerator::ConfigGenerator(QObject *parent) : QObject(parent) {}
 
+/**
+ * @brief Retrieves the current configuration map.
+ * @return A QVariantMap containing the current configuration settings.
+ */
 QVariantMap ConfigGenerator::config() const {
     return m_config;
 }
 
+/**
+ * @brief Sets a new configuration map, merging it with the existing one.
+ * @param newConfig The new configuration map to merge.
+ */
 void ConfigGenerator::setConfig(const QVariantMap &newConfig) {
-    qDebug() << "setConfig called with:" << newConfig;
     QVariantMap mergedConfig = m_config;
     for (auto it = newConfig.constBegin(); it != newConfig.constEnd(); ++it) {
         mergedConfig[it.key()] = it.value();
     }
     if (m_config != mergedConfig) {
         m_config = mergedConfig;
-        qDebug() << "Merged config:" << m_config;
         emit configChanged();
     }
 }
 
+/**
+ * @brief Sets a specific value in the configuration using a dot-notated key.
+ * @param key The dot-notated path to the configuration key (e.g., "section.key").
+ * @param value The value to set for the specified key.
+ */
 void ConfigGenerator::setValue(const QString &key, const QVariant &value) {
     QVariantMap newConfig = m_config;
     setNestedValue(newConfig, key, value);
@@ -38,15 +47,27 @@ void ConfigGenerator::setValue(const QString &key, const QVariant &value) {
     }
 }
 
+/**
+ * @brief Updates the configuration based on a new configuration map.
+ * @param newConfig The new configuration map to apply.
+ */
 void ConfigGenerator::onConfigUpdated(const QVariantMap &newConfig) {
-    qDebug() << "onConfigUpdated called with:" << newConfig;
     setConfig(newConfig);
 }
 
+/**
+ * @brief Retrieves the schema defining the configuration structure.
+ * @return A QVariantMap representing the schema.
+ */
 QVariantMap ConfigGenerator::schema() const {
     return m_schema;
 }
 
+/**
+ * @brief Retrieves the list of enum options for a given configuration key.
+ * @param key The dot-notated path to the configuration key.
+ * @return A QVariantList containing the enum options, or an empty list if not found.
+ */
 QVariantList ConfigGenerator::enumOptions(const QString &key) const {
     QStringList parts = key.split('.');
     QVariantMap current = m_schema;
@@ -57,19 +78,20 @@ QVariantList ConfigGenerator::enumOptions(const QString &key) const {
     return current.value("values").toList();
 }
 
+/**
+ * @brief Loads a schema from a JSON file.
+ * @param filePath The path to the schema JSON file.
+ * @return true if the schema was loaded successfully, false otherwise.
+ */
 bool ConfigGenerator::loadSchema(const QString &filePath) {
-    qDebug() << "Loading schema from:" << filePath;
-    qDebug() << "Absolute path:" << QFileInfo(filePath).absoluteFilePath();
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Failed to open schema file:" << filePath;
         emit errorOccurred("Cannot open schema: " + filePath);
         return false;
     }
 
     const QByteArray data = file.readAll();
     if (data.isEmpty()) {
-        qWarning() << "Schema file is empty.";
         emit errorOccurred("Schema file is empty.");
         return false;
     }
@@ -77,7 +99,6 @@ bool ConfigGenerator::loadSchema(const QString &filePath) {
     QJsonParseError parseError;
     const QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
-        qWarning() << "Failed to parse schema JSON:" << parseError.errorString();
         emit errorOccurred("Schema parse error: " + parseError.errorString());
         return false;
     }
@@ -115,7 +136,6 @@ bool ConfigGenerator::loadSchema(const QString &filePath) {
 
     processGroup(rootObj, config, defaults, schema, "");
 
-    qDebug() << "Loaded schema:" << QJsonDocument::fromVariant(schema).toJson(QJsonDocument::Indented);
     m_config = std::move(config);
     m_defaults = std::move(defaults);
     m_schema = std::move(schema);
@@ -125,11 +145,14 @@ bool ConfigGenerator::loadSchema(const QString &filePath) {
     return true;
 }
 
+/**
+ * @brief Loads a configuration from a header file.
+ * @param filePath The path to the configuration header file.
+ * @return true if the configuration was loaded successfully, false otherwise.
+ */
 bool ConfigGenerator::loadConfig(const QString &filePath) {
-    qDebug() << "Loading config from:" << filePath;
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open config file:" << filePath;
         emit errorOccurred("Cannot open config file: " + filePath);
         return false;
     }
@@ -143,7 +166,6 @@ bool ConfigGenerator::loadConfig(const QString &filePath) {
             if (parts.size() >= 2) {
                 QString key = parts[1];
                 QString value = parts.size() >= 3 ? parts[2] : "";
-                // Determine type from schema
                 QString schemaType = getSchemaType(key);
                 if (schemaType == "enum" || schemaType == "string" || schemaType == "map") {
                     newConfig[key] = value;
@@ -154,16 +176,14 @@ bool ConfigGenerator::loadConfig(const QString &filePath) {
                         newConfig[key] = intValue;
                     }
                 } else {
-                    newConfig[key] = true; // #define KEY means true for booleans
+                    newConfig[key] = true;
                 }
-                qDebug() << "Loaded config key:" << key << "value:" << newConfig[key];
             }
         } else if (line.startsWith("#undef")) {
             QStringList parts = line.split(" ", Qt::SkipEmptyParts);
             if (parts.size() >= 2) {
                 QString key = parts[1];
-                newConfig[key] = false; // #undef KEY means false
-                qDebug() << "Loaded config key:" << key << "value:" << newConfig[key];
+                newConfig[key] = false;
             }
         }
     }
@@ -176,6 +196,11 @@ bool ConfigGenerator::loadConfig(const QString &filePath) {
     return true;
 }
 
+/**
+ * @brief Generates and saves a configuration header file.
+ * @param fileUrl The URL or path where the header file should be saved.
+ * @return true if the file was generated and saved successfully, false otherwise.
+ */
 bool ConfigGenerator::generateConfigFile(const QString &fileUrl) {
     QString filePath = QUrl(fileUrl).toLocalFile();
     if (fileUrl.isEmpty() || filePath.isEmpty()) {
@@ -213,8 +238,11 @@ bool ConfigGenerator::generateConfigFile(const QString &fileUrl) {
     return true;
 }
 
+/**
+ * @brief Generates the content of the configuration header as a string.
+ * @return A QString containing the header file content.
+ */
 QString ConfigGenerator::generateConfigHeader() const {
-    qDebug() << "generateConfigHeader called, m_config:" << m_config;
     QString content;
     QTextStream out(&content);
 
@@ -236,7 +264,6 @@ QString ConfigGenerator::generateConfigHeader() const {
     // Include static header as a single string
     out << generateStaticHeader() << "\n";
 
-    // Collect all configuration keys from schema
     QStringList configKeys;
     std::function<void(const QVariantMap &, const QString &)> collectKeys;
     collectKeys = [&](const QVariantMap &schema, const QString &prefix) {
@@ -245,11 +272,9 @@ QString ConfigGenerator::generateConfigHeader() const {
             if (it.value().canConvert<QVariantMap>()) {
                 QVariantMap nested = it.value().toMap();
                 if (nested.contains("type")) {
-                    // Leaf node with type (e.g., bool, enum, integer)
                     QString fullKey = prefix.isEmpty() ? key : prefix + "." + key;
                     configKeys.append(fullKey);
                 } else {
-                    // Nested group (e.g., Control, Device)
                     collectKeys(nested, prefix.isEmpty() ? key : prefix + "." + key);
                 }
             }
@@ -258,14 +283,12 @@ QString ConfigGenerator::generateConfigHeader() const {
 
     collectKeys(m_schema, "");
 
-    // Group keys by section for output
     QMap<QString, QStringList> sectionKeys;
     for (const QString &key : configKeys) {
         QString section = key.contains(".") ? key.split(".").first() : "General";
         sectionKeys[section].append(key);
     }
 
-    // Generate configuration for each section
     for (auto it = sectionKeys.constBegin(); it != sectionKeys.constEnd(); ++it) {
         const QString section = it.key();
         const QStringList &keys = it.value();
@@ -447,6 +470,12 @@ QString ConfigGenerator::getSchemaType(const QString &key) const {
     return current.value("type").toString();
 }
 
+/**
+ * @brief Sets a nested value in a QVariantMap using a dot-notated path.
+ * @param map The QVariantMap to modify.
+ * @param path The dot-notated path to the value.
+ * @param value The value to set.
+ */
 void ConfigGenerator::setNestedValue(QVariantMap &map, const QString &path, const QVariant &value) {
     QStringList parts = path.split('.');
     if (parts.isEmpty()) return;
