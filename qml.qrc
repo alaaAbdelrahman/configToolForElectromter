@@ -13,7 +13,6 @@
         <file alias="icons/meter.png">icons/meter.png</file>
         <file>icons/wifi.png</file>
         <file>icons/gauge.png</file>
-        <file>ConfigGenerator.qml</file>
         <file>icons/control.png</file>
         <file>icons/display.png</file>
         <file>icons/dlms.png</file>
